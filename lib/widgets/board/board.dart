@@ -87,6 +87,7 @@ class BoardState extends State<Board> {
           currentPlayer: _currentPlayer,
           player1: widget.player1,
           player2: widget.player2,
+          playingAgainstAI: widget.playingAgainstAI,
         ),
         const SizedBox(height: 16),
         AspectRatio(
