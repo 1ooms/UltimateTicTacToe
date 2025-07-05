@@ -30,8 +30,10 @@ StaticBoardState buildStaticBoardState(List<Move> moves) {
     lastMove = move;
 
     // Check if that subBoard has a winner now
-    if (winPatterns.any((pattern) =>
-        pattern.every((i) => subBoards[move.boardIndex][i] == move.player))) {
+    if (winPatterns.any(
+      (pattern) =>
+          pattern.every((i) => subBoards[move.boardIndex][i] == move.player),
+    )) {
       subBoardWinners[move.boardIndex] = move.player;
     }
 

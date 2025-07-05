@@ -7,9 +7,9 @@ import 'package:ultimate_tic_tac_toe/widgets/board/current_player_indicator.dart
 import 'package:ultimate_tic_tac_toe/widgets/board/sub_board.dart';
 
 import '../../models/ai_player/ai_isolate.dart';
+import '../../models/enum/player.dart';
 import '../../models/move.dart';
 import '../../models/move_parameters.dart';
-import '../../models/enum/player.dart';
 import '../../models/player_config.dart';
 import '../../models/win_patterns.dart';
 import '../dialogs/draw_dialog.dart';

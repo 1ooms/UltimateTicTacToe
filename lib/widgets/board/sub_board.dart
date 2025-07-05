@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import '../../models/move.dart';
+
 import '../../models/enum/player.dart';
+import '../../models/move.dart';
 import '../../models/player_config.dart';
 import '../dialogs/player_customizer.dart';
 
@@ -32,32 +33,35 @@ class SubBoard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Stack(
       children: [
-        Table(
-          border: TableBorder.all(),
-          children: List.generate(3, (row) {
-            return TableRow(
-              children: List.generate(3, (col) {
-                int cellIndex = row * 3 + col;
-                return _buildSubBoardCell(context, boardIndex, cellIndex);
-              }),
-            );
-          }),
+        GridView.builder(
+          physics: const NeverScrollableScrollPhysics(),
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 3,
+          ),
+          itemCount: 9,
+          itemBuilder:
+              (ctx, cellIndex) =>
+                  _buildSubBoardCell(context, boardIndex, cellIndex),
         ),
         if (winner != null)
-          Container(
-            color:
-                Theme.of(context).brightness == Brightness.dark
-                    ? (winner == Player.one ? player1.color : player2.color)
-                        .withAlpha(130)
-                    : (winner == Player.one ? player1.color : player2.color)
-                        .withAlpha(102),
-            child: Center(
-              child: buildIcon(
-                winner == Player.one ? player1.shape : player2.shape,
-                winner == Player.one ? player1.color : player2.color,
-                110,
-              ),
-            ),
+          LayoutBuilder(
+              builder: (context, constraints) {
+                return Container(
+                  color:
+                  Theme.of(context).brightness == Brightness.dark
+                      ? (winner == Player.one ? player1.color : player2.color)
+                      .withAlpha(130)
+                      : (winner == Player.one ? player1.color : player2.color)
+                      .withAlpha(102),
+                  child: Center(
+                    child: buildIcon(
+                      winner == Player.one ? player1.shape : player2.shape,
+                      winner == Player.one ? player1.color : player2.color,
+                      constraints.maxWidth
+                    ),
+                  ),
+                );
+              }
           ),
       ],
     );
@@ -69,13 +73,6 @@ class SubBoard extends StatelessWidget {
     int cellIndex,
   ) {
     final player = board[boardIndex][cellIndex];
-
-    Icon? symbol;
-    if (player == Player.one) {
-      symbol = buildIcon(player1.shape, player1.color, 32);
-    } else if (player == Player.two) {
-      symbol = buildIcon(player2.shape, player2.color, 32);
-    }
 
     final highlightColor =
         currentPlayer == Player.one ? player1.color : player2.color;
@@ -108,7 +105,18 @@ class SubBoard extends StatelessWidget {
                       : highlightColor.withAlpha(38)
                   : null,
         ),
-        child: Center(child: symbol),
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            final double iconSize = constraints.maxWidth;
+            Icon? symbol;
+            if (player == Player.one) {
+              symbol = buildIcon(player1.shape, player1.color, iconSize);
+            } else if (player == Player.two) {
+              symbol = buildIcon(player2.shape, player2.color, iconSize);
+            }
+            return Center(child: symbol);
+          },
+        ),
       ),
     );
   }

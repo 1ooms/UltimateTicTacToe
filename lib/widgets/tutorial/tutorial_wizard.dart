@@ -1,8 +1,6 @@
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
 import 'package:ultimate_tic_tac_toe/widgets/tutorial/static_board.dart';
-import 'package:ultimate_tic_tac_toe/widgets/tutorial/tutorial_pages.dart';
+import 'package:ultimate_tic_tac_toe/models/tutorial_pages.dart';
 
 import '../../main.dart';
 import '../../models/player_config.dart';
@@ -42,11 +40,12 @@ class _TutorialWizardState extends State<TutorialWizard> {
     }
   }
 
-  void onNextPage(){
-    if(_currentPage  < pages.length - 1) {
+  void onNextPage() {
+    if (_currentPage < pages.length - 1) {
       _controller.nextPage(
         duration: const Duration(milliseconds: 500),
-        curve: Curves.fastEaseInToSlowEaseOut,);
+        curve: Curves.fastEaseInToSlowEaseOut,
+      );
     }
   }
 
@@ -117,9 +116,12 @@ class _TutorialWizardState extends State<TutorialWizard> {
                   width: isActive ? 12 : 8,
                   height: isActive ? 12 : 8,
                   decoration: BoxDecoration(
-                    color: isActive
-                        ? Theme.of(context).colorScheme.primary
-                        : Theme.of(context).colorScheme.onSurface.withAlpha(100),
+                    color:
+                        isActive
+                            ? Theme.of(context).colorScheme.primary
+                            : Theme.of(
+                              context,
+                            ).colorScheme.onSurface.withAlpha(100),
                     shape: BoxShape.circle,
                   ),
                 ),

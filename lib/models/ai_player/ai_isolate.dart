@@ -1,9 +1,9 @@
 import 'dart:async';
 import 'dart:isolate';
 
+import '../enum/ai_difficulty.dart';
 import '../move.dart';
 import '../move_parameters.dart';
-import '../enum/ai_difficulty.dart';
 import 'ai_isolate_message.dart';
 import 'ai_player.dart';
 
@@ -16,7 +16,9 @@ void _aiIsolateEntryPoint(SendPort sendPort) {
   isolateReceivePort.listen((message) async {
     if (message is AIIsolateMessage) {
       final move = chooseAIMove(message.moveParametersJson);
-      message.responsePort.send(move); // Already serialized (Map<String, dynamic>?)
+      message.responsePort.send(
+        move,
+      ); // Already serialized (Map<String, dynamic>?)
     }
   });
 }
@@ -47,7 +49,9 @@ class AIIsolate {
 
     final responsePort = ReceivePort();
 
-    _sendPort.send(AIIsolateMessage(parameters.toJson(), responsePort.sendPort));
+    _sendPort.send(
+      AIIsolateMessage(parameters.toJson(), responsePort.sendPort),
+    );
 
     final resultJson = await responsePort.first as Map<String, dynamic>?;
     return resultJson != null ? Move.fromJson(resultJson) : null;

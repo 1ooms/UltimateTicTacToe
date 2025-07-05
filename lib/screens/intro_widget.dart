@@ -9,7 +9,8 @@ class IntroWidget extends StatelessWidget {
     required this.skip,
     required this.image,
     required this.onTab,
-    required this.index,});
+    required this.index,
+  });
 
   final String color;
   final String title;
@@ -21,14 +22,15 @@ class IntroWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ColoredBox(
-      color: hexToColor(color),
-    );
+    return ColoredBox(color: hexToColor(color));
   }
 }
 
 Color hexToColor(String hex) {
   assert(RegExp(r'^#([0-9a-fA-F]{6})|([0-9a-fA-F]{8})$').hasMatch(hex));
 
-  return Color(int.parse(hex.substring(1), radix: 16) + (hex.length == 7 ? 0xFF000000 : 0x00000000));
+  return Color(
+    int.parse(hex.substring(1), radix: 16) +
+        (hex.length == 7 ? 0xFF000000 : 0x00000000),
+  );
 }

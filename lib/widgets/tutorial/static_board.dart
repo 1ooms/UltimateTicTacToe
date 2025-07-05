@@ -50,13 +50,15 @@ class StaticBoard extends StatelessWidget {
                 player2: player2,
                 currentPlayer: boardState.currentPlayer,
                 isValidMove: (boardIdx, cellIdx) {
-                  final valid = boardState.subBoardWinners[boardIdx] == null &&
+                  final valid =
+                      boardState.subBoardWinners[boardIdx] == null &&
                       (boardState.activeSubBoardIndex == null ||
                           boardIdx == boardState.activeSubBoardIndex) &&
                       boardState.subBoards[boardIdx][cellIdx] == null;
                   return valid;
                 },
-                onCellTap: (_, __) {}, // No-op
+                onCellTap: (_, __) {},
+                // No-op
                 previousMove: boardState.lastMove,
               );
             },

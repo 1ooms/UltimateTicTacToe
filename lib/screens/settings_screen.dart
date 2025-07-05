@@ -6,6 +6,7 @@ class SettingsScreen extends StatefulWidget {
     required this.onChangeThemeMode,
     required this.themeMode,
   });
+
   final Function(ThemeMode) onChangeThemeMode;
   final ThemeMode themeMode;
 
@@ -32,10 +33,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const SizedBox(height: 24),
-            Text(
-              'Appearance',
-              style: Theme.of(context).textTheme.titleLarge,
-            ),
+            Text('Appearance', style: Theme.of(context).textTheme.titleLarge),
             const SizedBox(height: 16),
             ListTile(
               title: const Text('Light theme'),

@@ -1,14 +1,13 @@
 import 'dart:async';
 import 'dart:ui';
 
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:ultimate_tic_tac_toe/screens/home_screen.dart';
-import 'package:google_mobile_ads/google_mobile_ads.dart';
-
-import 'package:firebase_core/firebase_core.dart';
 
 import 'firebase_options.dart';
 // import 'package:provider/provider.dart';
@@ -34,7 +33,6 @@ class AppScrollBehavior extends MaterialScrollBehavior {
     PointerDeviceKind.mouse,
   };
 }
-
 
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 

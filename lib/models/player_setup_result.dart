@@ -8,5 +8,10 @@ class PlayerSetupResult {
   bool player1Starts;
   AIDifficulty? aiDifficulty;
 
-  PlayerSetupResult({required this.player1, required this.player2, required this.player1Starts, this.aiDifficulty});
+  PlayerSetupResult({
+    required this.player1,
+    required this.player2,
+    required this.player1Starts,
+    this.aiDifficulty,
+  });
 }

@@ -10,9 +10,8 @@ class MoveParameters {
   final AIDifficulty difficulty;
 
   Map<String, dynamic> toJson() => {
-    'subBoards': subBoards
-        .map((board) => board.map((p) => p?.name).toList())
-        .toList(),
+    'subBoards':
+        subBoards.map((board) => board.map((p) => p?.name).toList()).toList(),
     'subBoardWinners': subBoardWinners.map((p) => p?.name).toList(),
     'aiPlayer': aiPlayer.name,
     'activeSubBoardIndex': activeSubBoardIndex,
@@ -21,9 +20,14 @@ class MoveParameters {
 
   factory MoveParameters.fromJson(Map<String, dynamic> json) => MoveParameters(
     (json['subBoards'] as List)
-        .map<List<Player?>>((board) => (board as List)
-        .map<Player?>((p) => p != null ? Player.values.byName(p) : null)
-        .toList())
+        .map<List<Player?>>(
+          (board) =>
+              (board as List)
+                  .map<Player?>(
+                    (p) => p != null ? Player.values.byName(p) : null,
+                  )
+                  .toList(),
+        )
         .toList(),
     (json['subBoardWinners'] as List)
         .map<Player?>((p) => p != null ? Player.values.byName(p) : null)

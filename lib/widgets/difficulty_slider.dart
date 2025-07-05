@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import '../extensions/string_extension.dart';
 
+import '../extensions/string_extension.dart';
 import '../models/enum/ai_difficulty.dart';
 
 class DifficultySlider extends StatelessWidget {
@@ -18,10 +18,7 @@ class DifficultySlider extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          'AI Difficulty',
-          style: Theme.of(context).textTheme.titleSmall,
-        ),
+        Text('AI Difficulty', style: Theme.of(context).textTheme.titleSmall),
         Slider(
           value: selectedDifficulty.index.toDouble(),
           min: 0,
@@ -33,10 +30,16 @@ class DifficultySlider extends StatelessWidget {
         ),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: AIDifficulty.values
-              .map((d) => Text(d.name.capitalize(), style: const TextStyle(fontSize: 12)))
-              .toList(),
-        )
+          children:
+              AIDifficulty.values
+                  .map(
+                    (d) => Text(
+                      d.name.capitalize(),
+                      style: const TextStyle(fontSize: 12),
+                    ),
+                  )
+                  .toList(),
+        ),
       ],
     );
   }

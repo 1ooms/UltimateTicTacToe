@@ -1,1 +1,1 @@
-enum AIDifficulty {easy, medium, hard, expert}
+enum AIDifficulty { easy, medium, hard, expert }

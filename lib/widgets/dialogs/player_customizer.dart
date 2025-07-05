@@ -4,7 +4,7 @@ import '../../main.dart';
 import '../../models/player_config.dart';
 
 Icon buildIcon(IconData shape, Color color, double size) {
-  return(Icon(shape, color: color, size: size));
+  return (Icon(shape, color: color, size: size));
 }
 
 class PlayerCustomizer extends StatelessWidget {
@@ -55,11 +55,7 @@ class PlayerCustomizer extends StatelessWidget {
                 borderRadius: BorderRadius.circular(12),
                 color: colorScheme.surface,
               ),
-              child: buildIcon(
-                config1.shape,
-                config1.color,
-                32,
-              ),
+              child: buildIcon(config1.shape, config1.color, 32),
             ),
             IconButton(
               icon: const Icon(Icons.edit),
@@ -102,7 +98,8 @@ class PlayerCustomizer extends StatelessWidget {
                                           decoration: BoxDecoration(
                                             color:
                                                 isTaken
-                                                    ? colorScheme.onInverseSurface
+                                                    ? colorScheme
+                                                        .onInverseSurface
                                                     : colorScheme.surface,
                                             borderRadius: BorderRadius.circular(
                                               8,
@@ -121,7 +118,8 @@ class PlayerCustomizer extends StatelessWidget {
                                               shape,
                                               isSelected
                                                   ? colorScheme.onSurface
-                                                  : colorScheme.onSurface.withAlpha(125),
+                                                  : colorScheme.onSurface
+                                                      .withAlpha(125),
                                               32,
                                             ),
                                           ),
@@ -136,7 +134,9 @@ class PlayerCustomizer extends StatelessWidget {
                                 runSpacing: 8,
                                 children:
                                     availableColors.map((color) {
-                                      final isTaken = color.toARGB32() == config2.color.toARGB32();
+                                      final isTaken =
+                                          color.toARGB32() ==
+                                          config2.color.toARGB32();
                                       final isSelected = color == tempColor;
                                       return GestureDetector(
                                         onTap:
@@ -159,7 +159,8 @@ class PlayerCustomizer extends StatelessWidget {
                                                 border: Border.all(
                                                   color:
                                                       isSelected
-                                                          ? colorScheme.onSurface
+                                                          ? colorScheme
+                                                              .onSurface
                                                           : Colors.transparent,
                                                   width: 2,
                                                 ),
@@ -168,7 +169,9 @@ class PlayerCustomizer extends StatelessWidget {
                                             if (isTaken)
                                               CustomPaint(
                                                 size: Size(48, 48),
-                                                painter: DiagonalLinePainter(colorScheme),
+                                                painter: DiagonalLinePainter(
+                                                  colorScheme,
+                                                ),
                                               ),
                                           ],
                                         ),
@@ -184,11 +187,7 @@ class PlayerCustomizer extends StatelessWidget {
                                   borderRadius: BorderRadius.circular(12),
                                   color: colorScheme.surface,
                                 ),
-                                child: buildIcon(
-                                  tempShape,
-                                  tempColor,
-                                  32,
-                                ),
+                                child: buildIcon(tempShape, tempColor, 32),
                               ),
                             ],
                           ),

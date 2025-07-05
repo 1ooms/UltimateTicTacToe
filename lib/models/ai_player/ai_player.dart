@@ -3,9 +3,9 @@ import 'dart:math';
 import 'package:ultimate_tic_tac_toe/models/win_patterns.dart';
 
 import '../enum/ai_difficulty.dart';
+import '../enum/player.dart';
 import '../move.dart';
 import '../move_parameters.dart';
-import '../enum/player.dart';
 
 Map<String, dynamic>? chooseAIMove(Map<String, dynamic> moveParametersJson) {
   final moveParameters = MoveParameters.fromJson(moveParametersJson);
@@ -18,15 +18,24 @@ Map<String, dynamic>? chooseAIMove(Map<String, dynamic> moveParametersJson) {
 
   final AIPlayer aiPlayer = AIPlayer(difficulty: difficulty);
 
-  if (subBoardWinners.every((value) => value == null) && activeSubBoardIndex == null) {
+  if (subBoardWinners.every((value) => value == null) &&
+      activeSubBoardIndex == null) {
     // First AI move --> every move is optimal, so just perform a random one
-    Move? move = aiPlayer.randomMove(board, subBoardWinners, activeSubBoardIndex);
+    Move? move = aiPlayer.randomMove(
+      board,
+      subBoardWinners,
+      activeSubBoardIndex,
+    );
     return (move != null) ? move.toJson() : null;
   }
 
   switch (difficulty) {
     case AIDifficulty.easy:
-      Move? move = aiPlayer.randomMove(board, subBoardWinners, activeSubBoardIndex);
+      Move? move = aiPlayer.randomMove(
+        board,
+        subBoardWinners,
+        activeSubBoardIndex,
+      );
       return (move != null) ? move.toJson() : null;
 
     case AIDifficulty.medium:
@@ -126,9 +135,7 @@ class AIPlayer {
         bestScore = score;
         bestMoves.clear();
         bestMoves.add(move);
-      }
-
-      else if (score == bestScore) {
+      } else if (score == bestScore) {
         bestMoves.add(move);
       }
     }

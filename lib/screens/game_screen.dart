@@ -10,10 +10,7 @@ import '../models/player_setup_result.dart';
 import '../widgets/ads/banner_ad_widget.dart';
 
 class GameScreen extends StatefulWidget {
-  const GameScreen({
-    super.key,
-    required this.gameMode,
-  });
+  const GameScreen({super.key, required this.gameMode});
 
   final GameMode gameMode;
 
@@ -43,7 +40,9 @@ class _GameScreenState extends State<GameScreen> {
     final result = await showDialog<PlayerSetupResult>(
       barrierDismissible: false,
       context: context,
-      builder: (context) => PlayerSetup(gameMode: widget.gameMode, gameStarted: gameStarted),
+      builder:
+          (context) =>
+              PlayerSetup(gameMode: widget.gameMode, gameStarted: gameStarted),
     );
 
     if (result != null) {
@@ -92,14 +91,14 @@ class _GameScreenState extends State<GameScreen> {
                 const SizedBox(height: 24),
                 gameStarted
                     ? Board(
-                  key: _boardKey,
-                  player1: player1,
-                  player2: player2,
-                  player1Starts: player1Starts,
-                  playingAgainstAI:
-                  widget.gameMode == GameMode.computer ? true : false,
-                  aiDifficulty: aiDifficulty,
-                )
+                      key: _boardKey,
+                      player1: player1,
+                      player2: player2,
+                      player1Starts: player1Starts,
+                      playingAgainstAI:
+                          widget.gameMode == GameMode.computer ? true : false,
+                      aiDifficulty: aiDifficulty,
+                    )
                     : const Text("Waiting for game to start..."),
               ],
             ),
