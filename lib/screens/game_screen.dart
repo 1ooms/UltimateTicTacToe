@@ -42,7 +42,7 @@ class _GameScreenState extends State<GameScreen> {
       context: context,
       builder:
           (context) =>
-          PlayerSetup(gameMode: widget.gameMode, gameStarted: gameStarted),
+              PlayerSetup(gameMode: widget.gameMode, gameStarted: gameStarted),
     );
 
     if (result != null) {
@@ -79,76 +79,32 @@ class _GameScreenState extends State<GameScreen> {
           ),
         ],
       ),
-      body: OrientationBuilder(
-        builder: (context, orientation) {
-          if (orientation == Orientation.portrait) {
-            return Padding(
-              padding: const EdgeInsets.all(24.0),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      const SizedBox(height: 24),
-                      gameStarted
-                          ? Board(
-                        key: _boardKey,
-                        player1: player1,
-                        player2: player2,
-                        player1Starts: player1Starts,
-                        playingAgainstAI:
-                        widget.gameMode == GameMode.computer ? true : false,
-                        aiDifficulty: aiDifficulty,
-                      )
-                          : const Text("Waiting for game to start..."),
-                    ],
-                  ),
-                  BannerAdWidget(),
-                ],
-              ),
-            );
-          } else {
-            return SingleChildScrollView(
-              scrollDirection: Axis.horizontal, // Allow horizontal scrolling if content is too wide
-              child: Padding(
-                padding: const EdgeInsets.all(24.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    if (gameStarted)
-                      Expanded(
-                        flex: 3, // Give more space to the board
-                        child: Center(
-                          child: Board(
-                            key: _boardKey,
-                            player1: player1,
-                            player2: player2,
-                            player1Starts: player1Starts,
-                            playingAgainstAI:
-                            widget.gameMode == GameMode.computer ? true : false,
-                            aiDifficulty: aiDifficulty,
-                          ),
-                        ),
-                      )
-                    else
-                      const Expanded(
-                        flex: 3,
-                        child: Center(child: Text("Waiting for game to start...")),
-                      ),
-                    const SizedBox(width: 24), // Space between board and ad
-                    Expanded(
-                      flex: 1, // Less space for the ad
-                      child: Center(child: BannerAdWidget()),
-                    ),
-                  ],
-                ),
-              ),
-            );
-          }
-        },
+      body: Padding(
+        padding: const EdgeInsets.all(24.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const SizedBox(height: 24),
+                gameStarted
+                    ? Board(
+                      key: _boardKey,
+                      player1: player1,
+                      player2: player2,
+                      player1Starts: player1Starts,
+                      playingAgainstAI:
+                          widget.gameMode == GameMode.computer ? true : false,
+                      aiDifficulty: aiDifficulty,
+                    )
+                    : const Text("Waiting for game to start..."),
+              ],
+            ),
+            BannerAdWidget(),
+          ],
+        ),
       ),
     );
   }
