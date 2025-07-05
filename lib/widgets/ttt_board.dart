@@ -97,6 +97,7 @@ class TicTacToeBoardState extends State<TicTacToeBoard> {
       int lastIndex = _moveHistory.removeLast();
       _board[lastIndex] = null;
       _currentPlayer = _currentPlayer == Player.one ? Player.two : Player.one;
+      showPlayAgain = false;
     });
   }
 

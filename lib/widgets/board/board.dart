@@ -294,6 +294,8 @@ class BoardState extends State<Board> {
         _currentPlayer = move.player;
         _activeSubBoardIndex = move.activeBoardIndex;
       }
+
+      _playAgainVisible = false;
     });
 
     if (widget.playingAgainstAI && _currentPlayer == Player.two) {
