@@ -2,12 +2,13 @@ import 'dart:math';
 
 import 'package:confetti/confetti.dart';
 import 'package:flutter/material.dart';
-import 'package:ultimate_tic_tac_toe/models/ai_difficulty.dart';
+import 'package:ultimate_tic_tac_toe/models/ai/ai_difficulty.dart';
 import 'package:ultimate_tic_tac_toe/widgets/board/current_player_indicator.dart';
 import 'package:ultimate_tic_tac_toe/widgets/board/sub_board.dart';
 
-import '../../models/ai_player.dart';
+import '../../models/ai/ai_isolate.dart';
 import '../../models/move.dart';
+import '../../models/move_parameters.dart';
 import '../../models/player.dart';
 import '../../models/player_config.dart';
 import '../../models/win_patterns.dart';
@@ -47,14 +48,19 @@ class BoardState extends State<Board> {
   bool _playAgainVisible = false;
   Color _winnerColor = Colors.transparent;
   final _confettiController = ConfettiController();
+  late final AIIsolate _aiIsolate;
 
   @override
   void initState() {
     super.initState();
     _initializeGame();
 
-    if (widget.playingAgainstAI && _currentPlayer == Player.two) {
-      _makeAIMove();
+    if (widget.playingAgainstAI) {
+      _aiIsolate = AIIsolate(widget.aiDifficulty!);
+
+      if (_currentPlayer == Player.two) {
+        _makeAIMove();
+      }
     }
   }
 
@@ -120,14 +126,20 @@ class BoardState extends State<Board> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text("AI is thinking", style: Theme.of(context).textTheme.titleMedium),
+              Text(
+                "AI is thinking",
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
               const SizedBox(width: 8),
               SizedBox(
                 height: 25.0,
                 width: 25.0,
-                child: CircularProgressIndicator(color: Colors.black, strokeWidth: 2,),
+                child: CircularProgressIndicator(
+                  color: Colors.black,
+                  strokeWidth: 2,
+                ),
               ),
-            ]
+            ],
           ),
         ),
       ],
@@ -135,6 +147,8 @@ class BoardState extends State<Board> {
   }
 
   void _handleTap(int boardIndex, int cellIndex) {
+    if (_aiThinking) return;
+
     if (!_isValidMove(boardIndex, cellIndex)) return;
 
     setState(() {
@@ -179,24 +193,21 @@ class BoardState extends State<Board> {
 
     await Future.delayed(Duration(milliseconds: 500));
 
-    AIPlayer aiPlayer = AIPlayer(
-      difficulty: widget.aiDifficulty!,
-      checkWin: checkWin,
+    final moveParameters = MoveParameters(
+      _subBoards,
+      _subBoardWinners,
+      Player.two,
+      _activeSubBoardIndex,
+      widget.aiDifficulty!,
     );
 
-    final move = await aiPlayer.chooseAIMove(
-      board: _subBoards,
-      subBoardWinners: _subBoardWinners,
-      aiPlayer: Player.two,
-      activeSubBoardIndex: _activeSubBoardIndex,
-      difficulty: widget.aiDifficulty!,
-    );
+    final move = await _aiIsolate.computeMove(moveParameters);
+
+    _aiThinking = false;
 
     if (move != null) {
       _handleTap(move.boardIndex, move.cellIndex);
     }
-
-    _aiThinking = false;
   }
 
   bool _isValidMove(int boardIndex, int cellIndex) {

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../extensions/string_extension.dart';
 
-import '../models/ai_difficulty.dart';
+import '../models/ai/ai_difficulty.dart';
 
 class DifficultySlider extends StatelessWidget {
   final AIDifficulty selectedDifficulty;

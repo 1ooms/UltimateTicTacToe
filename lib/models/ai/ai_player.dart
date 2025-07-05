@@ -1,56 +1,89 @@
 import 'dart:math';
 
+import 'package:ultimate_tic_tac_toe/models/win_patterns.dart';
+
 import 'ai_difficulty.dart';
-import 'move.dart';
-import 'player.dart';
+import '../move.dart';
+import '../move_parameters.dart';
+import '../player.dart';
+
+Map<String, dynamic>? chooseAIMove(Map<String, dynamic> moveParametersJson) {
+  final moveParameters = MoveParameters.fromJson(moveParametersJson);
+
+  final board = moveParameters.subBoards;
+  final subBoardWinners = moveParameters.subBoardWinners;
+  final aiPlayerNumber = moveParameters.aiPlayer;
+  final activeSubBoardIndex = moveParameters.activeSubBoardIndex;
+  final difficulty = moveParameters.difficulty;
+
+  final AIPlayer aiPlayer = AIPlayer(difficulty: difficulty);
+
+  switch (difficulty) {
+    case AIDifficulty.easy:
+      Move? move = aiPlayer.randomMove(board, subBoardWinners, activeSubBoardIndex);
+      return (move != null) ? move.toJson() : null;
+
+    case AIDifficulty.medium:
+      Move? move = aiPlayer.minimaxMove(
+        board,
+        subBoardWinners,
+        aiPlayerNumber,
+        activeSubBoardIndex,
+        maxDepth: 2,
+      );
+      return (move != null) ? move.toJson() : null;
+
+    case AIDifficulty.hard:
+      Move? move = aiPlayer.minimaxMove(
+        board,
+        subBoardWinners,
+        aiPlayerNumber,
+        activeSubBoardIndex,
+        maxDepth: 4,
+      );
+      return (move != null) ? move.toJson() : null;
+
+    case AIDifficulty.expert:
+      Move? move = aiPlayer.minimaxMove(
+        board,
+        subBoardWinners,
+        aiPlayerNumber,
+        activeSubBoardIndex,
+        maxDepth: 9,
+      );
+      return (move != null) ? move.toJson() : null;
+  }
+}
 
 class AIPlayer {
   final AIDifficulty difficulty;
-  final bool Function(List<Player?>, Player) checkWin;
 
-  AIPlayer({
-    required this.difficulty,
-    required this.checkWin,
-  });
+  AIPlayer({required this.difficulty});
 
   final Random _random = Random();
 
-  Future<Move?> chooseAIMove({
-    required List<List<Player?>> board,
-    required List<Player?> subBoardWinners,
-    required Player aiPlayer,
-    required int? activeSubBoardIndex,
-    required AIDifficulty difficulty,
-  }) async {
+  Move? randomMove(
+    List<List<Player?>> board,
+    List<Player?> subBoardWinners,
+    int? activeSubBoardIndex,
+  ) {
+    final validMoves = _getValidMoves(
+      board,
+      subBoardWinners,
+      activeSubBoardIndex,
+    );
 
-    switch (difficulty) {
-      case AIDifficulty.easy:
-        return _randomMove(board, subBoardWinners, activeSubBoardIndex);
-
-      case AIDifficulty.medium:
-        return _minimaxMove(board, subBoardWinners, aiPlayer, activeSubBoardIndex, maxDepth: 2);
-
-      case AIDifficulty.hard:
-        return _minimaxMove(board, subBoardWinners, aiPlayer, activeSubBoardIndex, maxDepth: 4);
-
-      case AIDifficulty.expert:
-        return _minimaxMove(board, subBoardWinners, aiPlayer, activeSubBoardIndex, maxDepth: 9);
-    }
-  }
-
-  Move? _randomMove(List<List<Player?>> board, List<Player?> subBoardWinners, int? activeSubBoardIndex) {
-    final validMoves = _getValidMoves(board, subBoardWinners, activeSubBoardIndex);
     if (validMoves.isEmpty) return null;
     return validMoves[_random.nextInt(validMoves.length)];
   }
 
-  Move? _minimaxMove(
-      List<List<Player?>> board,
-      List<Player?> subBoardWinners,
-      Player aiPlayer,
-      int? activeSubBoardIndex, {
-        required int maxDepth,
-      }) {
+  Move? minimaxMove(
+    List<List<Player?>> board,
+    List<Player?> subBoardWinners,
+    Player aiPlayer,
+    int? activeSubBoardIndex, {
+    required int maxDepth,
+  }) {
     int bestScore = -1000000;
     List<Move> bestMoves = List<Move>.empty(growable: true);
 
@@ -61,7 +94,11 @@ class AIPlayer {
       activeSubBoardIndex = null;
     }
 
-    for (final move in _getValidMoves(board, subBoardWinners, activeSubBoardIndex)) {
+    for (final move in _getValidMoves(
+      board,
+      subBoardWinners,
+      activeSubBoardIndex,
+    )) {
       final prevWinner = subBoardWinners[move.boardIndex];
       _applyMove(board, subBoardWinners, move, aiPlayer);
 
@@ -93,20 +130,21 @@ class AIPlayer {
     Random random = Random();
     int randomBestMoveIndex = random.nextInt(bestMoves.length);
 
+    print("Considered ${bestMoves.length} moves");
     return bestMoves[randomBestMoveIndex];
   }
 
   int _minimax(
-      List<List<Player?>> board,
-      List<Player?> subBoardWinners,
-      Player currentPlayer,
-      int? activeSubBoardIndex,
-      int depth,
-      int maxDepth,
-      int alpha,
-      int beta,
-      Player aiPlayer,
-      ) {
+    List<List<Player?>> board,
+    List<Player?> subBoardWinners,
+    Player currentPlayer,
+    int? activeSubBoardIndex,
+    int depth,
+    int maxDepth,
+    int alpha,
+    int beta,
+    Player aiPlayer,
+  ) {
     // Fallback if sub-board is unplayable
     if (activeSubBoardIndex != null &&
         (subBoardWinners[activeSubBoardIndex] != null ||
@@ -124,14 +162,30 @@ class AIPlayer {
     }
 
     if (checkDraw(board, subBoardWinners)) return 0;
-    if (depth >= maxDepth) return _evaluateBoard(board, subBoardWinners, aiPlayer);
+    if (depth >= maxDepth) {
+      return _evaluateBoard(board, subBoardWinners, aiPlayer);
+    }
 
     if (currentPlayer == aiPlayer) {
       int maxEval = -1000000;
-      for (final move in _getValidMoves(board, subBoardWinners, activeSubBoardIndex)) {
+      for (final move in _getValidMoves(
+        board,
+        subBoardWinners,
+        activeSubBoardIndex,
+      )) {
         final prevWinner = subBoardWinners[move.boardIndex];
         _applyMove(board, subBoardWinners, move, currentPlayer);
-        int eval = _minimax(board, subBoardWinners, _switchPlayer(currentPlayer), move.cellIndex, depth + 1, maxDepth, alpha, beta, aiPlayer);
+        int eval = _minimax(
+          board,
+          subBoardWinners,
+          _switchPlayer(currentPlayer),
+          move.cellIndex,
+          depth + 1,
+          maxDepth,
+          alpha,
+          beta,
+          aiPlayer,
+        );
         _undoMove(board, subBoardWinners, move, prevWinner);
         maxEval = max(maxEval, eval);
         alpha = max(alpha, eval);
@@ -140,10 +194,24 @@ class AIPlayer {
       return maxEval;
     } else {
       int minEval = 1000000;
-      for (final move in _getValidMoves(board, subBoardWinners, activeSubBoardIndex)) {
+      for (final move in _getValidMoves(
+        board,
+        subBoardWinners,
+        activeSubBoardIndex,
+      )) {
         final prevWinner = subBoardWinners[move.boardIndex];
         _applyMove(board, subBoardWinners, move, currentPlayer);
-        int eval = _minimax(board, subBoardWinners, _switchPlayer(currentPlayer), move.cellIndex, depth + 1, maxDepth, alpha, beta, aiPlayer);
+        int eval = _minimax(
+          board,
+          subBoardWinners,
+          _switchPlayer(currentPlayer),
+          move.cellIndex,
+          depth + 1,
+          maxDepth,
+          alpha,
+          beta,
+          aiPlayer,
+        );
         _undoMove(board, subBoardWinners, move, prevWinner);
         minEval = min(minEval, eval);
         beta = min(beta, eval);
@@ -154,10 +222,10 @@ class AIPlayer {
   }
 
   List<Move> _getValidMoves(
-      List<List<Player?>> board,
-      List<Player?> subBoardWinners,
-      int? activeSubBoardIndex,
-      ) {
+    List<List<Player?>> board,
+    List<Player?> subBoardWinners,
+    int? activeSubBoardIndex,
+  ) {
     final moves = <Move>[];
 
     // Fallback if target board is not playable
@@ -169,11 +237,15 @@ class AIPlayer {
 
     for (int boardIndex = 0; boardIndex < 9; boardIndex++) {
       if (subBoardWinners[boardIndex] != null) continue;
-      if (activeSubBoardIndex != null && boardIndex != activeSubBoardIndex) continue;
+      if (activeSubBoardIndex != null && boardIndex != activeSubBoardIndex) {
+        continue;
+      }
 
       for (int cellIndex = 0; cellIndex < 9; cellIndex++) {
         if (board[boardIndex][cellIndex] == null) {
-          moves.add(Move(boardIndex, cellIndex, Player.two, activeSubBoardIndex));
+          moves.add(
+            Move(boardIndex, cellIndex, Player.two, activeSubBoardIndex),
+          );
         }
       }
     }
@@ -181,13 +253,16 @@ class AIPlayer {
     return moves;
   }
 
+  bool checkWin(List<Player?> board, Player player) =>
+      winPatterns.any((pattern) => pattern.every((i) => board[i] == player));
+
   bool checkDraw(subBoards, subBoardWinners) =>
       subBoardWinners.every(
-            (winner) =>
-        winner != null ||
+        (winner) =>
+            winner != null ||
             !subBoards[subBoardWinners.indexOf(winner)].contains(null),
       ) &&
-          checkOverallWinner(subBoardWinners) == null;
+      checkOverallWinner(subBoardWinners) == null;
 
   Player? checkOverallWinner(subBoardWinners) {
     for (final player in [Player.one, Player.two]) {
@@ -199,11 +274,11 @@ class AIPlayer {
   }
 
   void _applyMove(
-      List<List<Player?>> board,
-      List<Player?> subBoardWinners,
-      Move move,
-      Player player,
-      ) {
+    List<List<Player?>> board,
+    List<Player?> subBoardWinners,
+    Move move,
+    Player player,
+  ) {
     board[move.boardIndex][move.cellIndex] = player;
     if (checkWin(board[move.boardIndex], player)) {
       subBoardWinners[move.boardIndex] = player;
@@ -211,11 +286,11 @@ class AIPlayer {
   }
 
   void _undoMove(
-      List<List<Player?>> board,
-      List<Player?> subBoardWinners,
-      Move move,
-      Player? previousWinner,
-      ) {
+    List<List<Player?>> board,
+    List<Player?> subBoardWinners,
+    Move move,
+    Player? previousWinner,
+  ) {
     board[move.boardIndex][move.cellIndex] = null;
     subBoardWinners[move.boardIndex] = previousWinner;
   }
@@ -225,10 +300,10 @@ class AIPlayer {
   }
 
   int _evaluateBoard(
-      List<List<Player?>> board,
-      List<Player?> subBoardWinners,
-      Player aiPlayer,
-      ) {
+    List<List<Player?>> board,
+    List<Player?> subBoardWinners,
+    Player aiPlayer,
+  ) {
     int score = 0;
 
     for (int i = 0; i < 9; i++) {
