@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:ultimate_tic_tac_toe/widgets/tutorial/tutorial_wizard.dart';
 
 class HowToPlayScreen extends StatelessWidget {
   const HowToPlayScreen({super.key});
@@ -7,14 +8,8 @@ class HowToPlayScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: Text('How to play')),
-      body: Padding(padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-
-          ],
-        ),
-
+      body: Padding(padding: const EdgeInsets.all(24.0),
+        child: TutorialWizard()
       )
     );
   }

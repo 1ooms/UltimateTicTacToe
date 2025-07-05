@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -25,6 +26,15 @@ final darkTheme = ThemeData(
   textTheme: GoogleFonts.latoTextTheme(ThemeData.dark().textTheme),
   colorScheme: ColorScheme.dark(),
 );
+
+class AppScrollBehavior extends MaterialScrollBehavior {
+  @override
+  Set<PointerDeviceKind> get dragDevices => {
+    PointerDeviceKind.touch,
+    PointerDeviceKind.mouse,
+  };
+}
+
 
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
@@ -118,6 +128,7 @@ class _AppState extends State<App> {
         themeMode: themeMode,
       ),
       navigatorKey: navigatorKey,
+      scrollBehavior: AppScrollBehavior(),
     );
   }
 }

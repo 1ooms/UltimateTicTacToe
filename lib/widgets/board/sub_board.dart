@@ -32,15 +32,16 @@ class SubBoard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Stack(
       children: [
-        GridView.builder(
-          physics: const NeverScrollableScrollPhysics(),
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 3,
-          ),
-          itemCount: 9,
-          itemBuilder:
-              (ctx, cellIndex) =>
-                  _buildSubBoardCell(context, boardIndex, cellIndex),
+        Table(
+          border: TableBorder.all(),
+          children: List.generate(3, (row) {
+            return TableRow(
+              children: List.generate(3, (col) {
+                int cellIndex = row * 3 + col;
+                return _buildSubBoardCell(context, boardIndex, cellIndex);
+              }),
+            );
+          }),
         ),
         if (winner != null)
           Container(
@@ -71,9 +72,9 @@ class SubBoard extends StatelessWidget {
 
     Icon? symbol;
     if (player == Player.one) {
-      symbol = buildIcon(player1.shape, player1.color, 32.toDouble());
+      symbol = buildIcon(player1.shape, player1.color, 32);
     } else if (player == Player.two) {
-      symbol = buildIcon(player2.shape, player2.color, 32.toDouble());
+      symbol = buildIcon(player2.shape, player2.color, 32);
     }
 
     final highlightColor =

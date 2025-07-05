@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../screens/how_to_play_screen.dart';
+import '../screens/intro_screen.dart';
 import '../screens/settings_screen.dart';
 
 class AppDrawer extends StatelessWidget {
@@ -65,6 +66,16 @@ class AppDrawer extends StatelessWidget {
               );
             },
           ),
+          // ListTile(
+          //   leading: Icon(Icons.help),
+          //   title: Text('Test screen'),
+          //   onTap: () {
+          //     Navigator.push(
+          //       context,
+          //       MaterialPageRoute(builder: (ctx) => IntroScreen()),
+          //     );
+          //   },
+          // ),
         ],
       ),
     );
