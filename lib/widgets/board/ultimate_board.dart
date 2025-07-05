@@ -4,7 +4,7 @@ import 'package:confetti/confetti.dart';
 import 'package:flutter/material.dart';
 import 'package:ultimate_tic_tac_toe/models/enum/ai_difficulty.dart';
 import 'package:ultimate_tic_tac_toe/widgets/board/current_player_indicator.dart';
-import 'package:ultimate_tic_tac_toe/widgets/board/sub_board.dart';
+import 'package:ultimate_tic_tac_toe/widgets/board/ultimate_sub_board.dart';
 
 import '../../models/ai_player/ai_isolate.dart';
 import '../../models/enum/player.dart';

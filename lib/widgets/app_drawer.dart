@@ -33,8 +33,8 @@ class AppDrawer extends StatelessWidget {
             ),
           ),
           ListTile(
-            leading: Icon(Icons.home),
-            title: Text('Home'),
+            leading: Icon(Icons.play_circle),
+            title: Text('Play'),
             onTap: () {
               Navigator.pop(context);
             },

@@ -4,7 +4,7 @@ import 'package:ultimate_tic_tac_toe/widgets/tutorial/static_board_state.dart';
 import '../../models/move.dart';
 import '../../models/player_config.dart';
 import '../board/current_player_indicator.dart';
-import '../board/sub_board.dart';
+import '../board/ultimate_sub_board.dart';
 
 class StaticBoard extends StatelessWidget {
   final List<Move> moveHistory;

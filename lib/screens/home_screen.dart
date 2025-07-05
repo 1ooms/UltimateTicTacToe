@@ -24,7 +24,7 @@ class HomeScreen extends StatelessWidget {
     return Scaffold(
       key: _scaffoldKey,
       appBar: AppBar(
-        title: Text('Home'),
+        title: Text('Play'),
         leading: IconButton(
           icon: Icon(Icons.menu),
           onPressed: () {

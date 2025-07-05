@@ -3,7 +3,7 @@
 // import 'package:cloud_firestore/cloud_firestore.dart';
 // import 'package:flutter/foundation.dart';
 //
-// import '../widgets/board/board.dart';
+// import '../widgets/board/ultimate_board.dart';
 //
 //
 // class FirestoreController {
