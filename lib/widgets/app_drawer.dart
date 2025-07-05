@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../screens/how_to_play_screen.dart';
 import '../screens/settings_screen.dart';
 
 class AppDrawer extends StatelessWidget {
@@ -24,7 +25,12 @@ class AppDrawer extends StatelessWidget {
         children: [
           DrawerHeader(
             decoration: BoxDecoration(color: colorScheme.primary),
-            child: Text('Ultimate Tic Tac Toe', style: textTheme.titleLarge?.copyWith(color: Colors.white)),
+            child: Text(
+              'Ultimate Tic Tac Toe',
+              style: textTheme.titleLarge?.copyWith(
+                color: colorScheme.onPrimary,
+              ),
+            ),
           ),
           ListTile(
             leading: Icon(Icons.home),
@@ -50,10 +56,13 @@ class AppDrawer extends StatelessWidget {
             },
           ),
           ListTile(
-            leading: Icon(Icons.info),
-            title: Text('About'),
+            leading: Icon(Icons.help),
+            title: Text('How to play'),
             onTap: () {
-              // Navigate to about page
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (ctx) => HowToPlayScreen()),
+              );
             },
           ),
         ],
