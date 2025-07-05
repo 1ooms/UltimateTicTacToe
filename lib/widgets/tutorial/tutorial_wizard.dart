@@ -108,22 +108,19 @@ class _TutorialWizardState extends State<TutorialWizard> {
             mainAxisSize: MainAxisSize.min,
             children: List.generate(pages.length, (index) {
               final isActive = index == _currentPage;
-              return GestureDetector(
-                onTap: () => _goTo(index),
-                child: AnimatedContainer(
-                  duration: const Duration(milliseconds: 300),
-                  margin: const EdgeInsets.symmetric(horizontal: 4),
-                  width: isActive ? 12 : 8,
-                  height: isActive ? 12 : 8,
-                  decoration: BoxDecoration(
-                    color:
-                        isActive
-                            ? Theme.of(context).colorScheme.primary
-                            : Theme.of(
-                              context,
-                            ).colorScheme.onSurface.withAlpha(100),
-                    shape: BoxShape.circle,
-                  ),
+              return AnimatedContainer(
+                duration: const Duration(milliseconds: 300),
+                margin: const EdgeInsets.symmetric(horizontal: 4),
+                width: isActive ? 12 : 8,
+                height: isActive ? 12 : 8,
+                decoration: BoxDecoration(
+                  color:
+                  isActive
+                      ? Theme.of(context).colorScheme.primary
+                      : Theme.of(
+                    context,
+                  ).colorScheme.onSurface.withAlpha(100),
+                  shape: BoxShape.circle,
                 ),
               );
             }),

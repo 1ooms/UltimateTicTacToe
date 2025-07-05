@@ -68,6 +68,24 @@ class HomeScreen extends StatelessWidget {
                             title: 'Online',
                             icon: Icons.public,
                             onTap: () {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Center(
+                                    child: Text(
+                                      'Coming soon!',
+                                      style: Theme.of(
+                                        context,
+                                      ).textTheme.titleLarge?.copyWith(
+                                        color:
+                                            Theme.of(
+                                              context,
+                                            ).colorScheme.onInverseSurface,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              );
+                              return;
                               // Navigator.push(...)
                             },
                           ),
