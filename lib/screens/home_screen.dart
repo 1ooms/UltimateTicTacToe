@@ -1,14 +1,20 @@
 import 'package:flutter/material.dart';
-import 'package:ultimate_tic_tac_toe/models/game_mode.dart';
+import 'package:ultimate_tic_tac_toe/models/enum/game_mode.dart';
 import 'package:ultimate_tic_tac_toe/widgets/app_drawer.dart';
 import 'package:ultimate_tic_tac_toe/widgets/game_mode_card.dart';
 
 import 'game_screen.dart';
 
 class HomeScreen extends StatelessWidget {
-  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+  HomeScreen({
+    super.key,
+    required this.onChangeThemeMode,
+    required this.themeMode,
+  });
 
-  HomeScreen({super.key});
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+  final Function(ThemeMode) onChangeThemeMode;
+  final ThemeMode themeMode;
 
   @override
   Widget build(BuildContext context) {
@@ -25,7 +31,10 @@ class HomeScreen extends StatelessWidget {
           },
         ),
       ),
-      drawer: const AppDrawer(),
+      drawer: AppDrawer(
+        onChangeThemeMode: onChangeThemeMode,
+        themeMode: themeMode,
+      ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -44,9 +53,7 @@ class HomeScreen extends StatelessWidget {
                         context,
                         MaterialPageRoute(
                           builder:
-                              (ctx) => GameScreen(
-                                gameMode: GameMode.local,
-                              ),
+                              (ctx) => GameScreen(gameMode: GameMode.local),
                         ),
                       );
                     },
@@ -71,9 +78,7 @@ class HomeScreen extends StatelessWidget {
                         context,
                         MaterialPageRoute(
                           builder:
-                              (ctx) => GameScreen(
-                                gameMode: GameMode.computer,
-                              ),
+                              (ctx) => GameScreen(gameMode: GameMode.computer),
                         ),
                       );
                     },

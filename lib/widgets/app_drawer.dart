@@ -1,7 +1,16 @@
 import 'package:flutter/material.dart';
 
+import '../screens/settings_screen.dart';
+
 class AppDrawer extends StatelessWidget {
-  const AppDrawer({super.key});
+  const AppDrawer({
+    super.key,
+    required this.onChangeThemeMode,
+    required this.themeMode,
+  });
+
+  final Function(ThemeMode) onChangeThemeMode;
+  final ThemeMode themeMode;
 
   @override
   Widget build(BuildContext context) {
@@ -14,13 +23,8 @@ class AppDrawer extends StatelessWidget {
         padding: EdgeInsets.zero,
         children: [
           DrawerHeader(
-            decoration: BoxDecoration(
-              color: colorScheme.primaryContainer,
-            ),
-            child: Text(
-              'Navigation',
-              style: textTheme.titleLarge,
-            ),
+            decoration: BoxDecoration(color: colorScheme.primary),
+            child: Text('Ultimate Tic Tac Toe', style: textTheme.titleLarge?.copyWith(color: Colors.white)),
           ),
           ListTile(
             leading: Icon(Icons.home),
@@ -33,7 +37,16 @@ class AppDrawer extends StatelessWidget {
             leading: Icon(Icons.settings),
             title: Text('Settings'),
             onTap: () {
-              // Navigate to settings page
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder:
+                      (ctx) => SettingsScreen(
+                        onChangeThemeMode: onChangeThemeMode,
+                        themeMode: themeMode,
+                      ),
+                ),
+              );
             },
           ),
           ListTile(

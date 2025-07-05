@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../models/move.dart';
-import '../../models/player.dart';
+import '../../models/enum/player.dart';
 import '../../models/player_config.dart';
 import '../dialogs/player_customizer.dart';
 
@@ -39,12 +39,17 @@ class SubBoard extends StatelessWidget {
           ),
           itemCount: 9,
           itemBuilder:
-              (ctx, cellIndex) => _buildSubBoardCell(boardIndex, cellIndex),
+              (ctx, cellIndex) =>
+                  _buildSubBoardCell(context, boardIndex, cellIndex),
         ),
         if (winner != null)
           Container(
-            color: (winner == Player.one ? player1.color : player2.color)
-                .withAlpha(102),
+            color:
+                Theme.of(context).brightness == Brightness.dark
+                    ? (winner == Player.one ? player1.color : player2.color)
+                        .withAlpha(130)
+                    : (winner == Player.one ? player1.color : player2.color)
+                        .withAlpha(102),
             child: Center(
               child: buildIcon(
                 winner == Player.one ? player1.shape : player2.shape,
@@ -57,7 +62,11 @@ class SubBoard extends StatelessWidget {
     );
   }
 
-  Widget _buildSubBoardCell(int boardIndex, int cellIndex) {
+  Widget _buildSubBoardCell(
+    BuildContext context,
+    int boardIndex,
+    int cellIndex,
+  ) {
     final player = board[boardIndex][cellIndex];
 
     Icon? symbol;
@@ -76,7 +85,7 @@ class SubBoard extends StatelessWidget {
     if (previousMove != null &&
         previousMove!.boardIndex == boardIndex &&
         previousMove!.cellIndex == cellIndex) {
-      borderColor = Colors.black;
+      borderColor = Theme.of(context).colorScheme.onSurface;
       borderThickness = 2;
     } else {
       borderColor = Colors.grey;
@@ -93,7 +102,9 @@ class SubBoard extends StatelessWidget {
           border: Border.all(color: borderColor, width: borderThickness),
           color:
               isValidMove(boardIndex, cellIndex)
-                  ? highlightColor.withAlpha(38)
+                  ? Theme.of(context).brightness == Brightness.dark
+                      ? highlightColor.withAlpha(75)
+                      : highlightColor.withAlpha(38)
                   : null,
         ),
         child: Center(child: symbol),

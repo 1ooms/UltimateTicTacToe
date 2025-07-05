@@ -1,4 +1,4 @@
-import 'package:ultimate_tic_tac_toe/models/player.dart';
+import 'package:ultimate_tic_tac_toe/models/enum/player.dart';
 
 class Move {
   final int boardIndex;

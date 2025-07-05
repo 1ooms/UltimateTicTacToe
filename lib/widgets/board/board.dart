@@ -2,14 +2,14 @@ import 'dart:math';
 
 import 'package:confetti/confetti.dart';
 import 'package:flutter/material.dart';
-import 'package:ultimate_tic_tac_toe/models/ai/ai_difficulty.dart';
+import 'package:ultimate_tic_tac_toe/models/enum/ai_difficulty.dart';
 import 'package:ultimate_tic_tac_toe/widgets/board/current_player_indicator.dart';
 import 'package:ultimate_tic_tac_toe/widgets/board/sub_board.dart';
 
-import '../../models/ai/ai_isolate.dart';
+import '../../models/ai_player/ai_isolate.dart';
 import '../../models/move.dart';
 import '../../models/move_parameters.dart';
-import '../../models/player.dart';
+import '../../models/enum/player.dart';
 import '../../models/player_config.dart';
 import '../../models/win_patterns.dart';
 import '../dialogs/draw_dialog.dart';
@@ -137,7 +137,7 @@ class BoardState extends State<Board> {
                 height: 25.0,
                 width: 25.0,
                 child: CircularProgressIndicator(
-                  color: Colors.black,
+                  color: Theme.of(context).colorScheme.onSurface,
                   strokeWidth: 2,
                 ),
               ),

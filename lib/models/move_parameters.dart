@@ -1,6 +1,6 @@
-import 'package:ultimate_tic_tac_toe/models/player.dart';
+import 'package:ultimate_tic_tac_toe/models/enum/player.dart';
 
-import 'ai/ai_difficulty.dart';
+import 'enum/ai_difficulty.dart';
 
 class MoveParameters {
   final List<List<Player?>> subBoards;

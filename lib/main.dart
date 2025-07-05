@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:ultimate_tic_tac_toe/screens/home_screen.dart';
 
 import 'package:firebase_core/firebase_core.dart';
@@ -8,10 +9,18 @@ import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 // import 'package:provider/provider.dart';
 
-final theme = ThemeData(
+final lightTheme = ThemeData(
+  brightness: Brightness.light,
   useMaterial3: true,
+  textTheme: GoogleFonts.latoTextTheme(ThemeData.light().textTheme),
   colorSchemeSeed: Colors.teal,
-  textTheme: GoogleFonts.latoTextTheme(),
+);
+
+final darkTheme = ThemeData(
+  brightness: Brightness.dark,
+  useMaterial3: true,
+  textTheme: GoogleFonts.latoTextTheme(ThemeData.dark().textTheme),
+  colorScheme: ColorScheme.dark(),
 );
 
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
@@ -25,12 +34,89 @@ void main() async {
   runApp(const ProviderScope(child: App()));
 }
 
-
-class App extends StatelessWidget {
+class App extends StatefulWidget {
   const App({super.key});
 
   @override
+  State<App> createState() => _AppState();
+}
+
+class _AppState extends State<App> {
+  late ThemeMode themeMode;
+  late SharedPreferences prefs;
+  bool isLoading = true;
+
+  Future<void> _loadPrefs() async {
+    prefs = await SharedPreferences.getInstance();
+    final themeModeIndex = prefs.getInt("themeMode");
+    print(themeModeIndex);
+    switch (themeModeIndex) {
+      case 0:
+        themeMode = ThemeMode.light;
+        break;
+      case 1:
+        themeMode = ThemeMode.dark;
+        break;
+      case 2:
+        themeMode = ThemeMode.system;
+        break;
+      default:
+        themeMode = ThemeMode.system;
+        break;
+    }
+
+    setState(() {
+      isLoading = false;
+    });
+  }
+
+  void _savePrefs() async {
+    prefs = await SharedPreferences.getInstance();
+
+    print("saving changes: $themeMode");
+    switch (themeMode) {
+      case ThemeMode.light:
+        prefs.setInt("themeMode", 0);
+        break;
+      case ThemeMode.dark:
+        prefs.setInt("themeMode", 1);
+        break;
+      case ThemeMode.system:
+        prefs.setInt("themeMode", 2);
+        break;
+    }
+    print("saved");
+  }
+
+  void changeThemeMode(ThemeMode newThemeMode) {
+    setState(() {
+      themeMode = newThemeMode;
+    });
+    _savePrefs();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _loadPrefs();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return MaterialApp(title: "Tic Tac Toe", theme: theme, home: HomeScreen(), navigatorKey: navigatorKey,);
+    if (isLoading) {
+      return Center(child: CircularProgressIndicator());
+    }
+
+    return MaterialApp(
+      title: "Tic Tac Toe",
+      theme: lightTheme,
+      darkTheme: darkTheme,
+      themeMode: themeMode,
+      home: HomeScreen(
+        onChangeThemeMode: changeThemeMode,
+        themeMode: themeMode,
+      ),
+      navigatorKey: navigatorKey,
+    );
   }
 }

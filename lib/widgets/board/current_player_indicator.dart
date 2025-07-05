@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../models/player.dart';
+import '../../models/enum/player.dart';
 import '../../models/player_config.dart';
 import '../dialogs/player_customizer.dart';
 

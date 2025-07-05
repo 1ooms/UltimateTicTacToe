@@ -2,10 +2,10 @@ import 'dart:math';
 
 import 'package:ultimate_tic_tac_toe/models/win_patterns.dart';
 
-import 'ai_difficulty.dart';
+import '../enum/ai_difficulty.dart';
 import '../move.dart';
 import '../move_parameters.dart';
-import '../player.dart';
+import '../enum/player.dart';
 
 Map<String, dynamic>? chooseAIMove(Map<String, dynamic> moveParametersJson) {
   final moveParameters = MoveParameters.fromJson(moveParametersJson);
@@ -136,7 +136,7 @@ class AIPlayer {
     Random random = Random();
     int randomBestMoveIndex = random.nextInt(bestMoves.length);
 
-    print("Considered ${bestMoves.length} moves");
+    // print("Considered ${bestMoves.length} moves");
 
     // for (final move in bestMoves) {
     //   print("Move: ${move.boardIndex}, ${move.cellIndex}");

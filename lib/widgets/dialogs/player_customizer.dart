@@ -42,6 +42,8 @@ class PlayerCustomizer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    ColorScheme colorScheme = Theme.of(context).colorScheme;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -51,7 +53,7 @@ class PlayerCustomizer extends StatelessWidget {
               padding: const EdgeInsets.all(4),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(12),
-                color: Colors.grey.shade100,
+                color: colorScheme.surface,
               ),
               child: buildIcon(
                 config1.shape,
@@ -100,15 +102,15 @@ class PlayerCustomizer extends StatelessWidget {
                                           decoration: BoxDecoration(
                                             color:
                                                 isTaken
-                                                    ? Colors.grey.shade300
-                                                    : Colors.white,
+                                                    ? colorScheme.onInverseSurface
+                                                    : colorScheme.surface,
                                             borderRadius: BorderRadius.circular(
                                               8,
                                             ),
                                             border: Border.all(
                                               color:
                                                   isSelected
-                                                      ? Colors.black
+                                                      ? colorScheme.onSurface
                                                       : Colors.transparent,
                                               width: 2,
                                             ),
@@ -118,8 +120,8 @@ class PlayerCustomizer extends StatelessWidget {
                                             child: buildIcon(
                                               shape,
                                               isSelected
-                                                  ? Colors.black
-                                                  : Colors.grey,
+                                                  ? colorScheme.onSurface
+                                                  : colorScheme.onSurface.withAlpha(125),
                                               32,
                                             ),
                                           ),
@@ -136,7 +138,6 @@ class PlayerCustomizer extends StatelessWidget {
                                     availableColors.map((color) {
                                       final isTaken = color.toARGB32() == config2.color.toARGB32();
                                       final isSelected = color == tempColor;
-
                                       return GestureDetector(
                                         onTap:
                                             isTaken
@@ -158,7 +159,7 @@ class PlayerCustomizer extends StatelessWidget {
                                                 border: Border.all(
                                                   color:
                                                       isSelected
-                                                          ? Colors.black
+                                                          ? colorScheme.onSurface
                                                           : Colors.transparent,
                                                   width: 2,
                                                 ),
@@ -167,7 +168,7 @@ class PlayerCustomizer extends StatelessWidget {
                                             if (isTaken)
                                               CustomPaint(
                                                 size: Size(48, 48),
-                                                painter: DiagonalLinePainter(),
+                                                painter: DiagonalLinePainter(colorScheme),
                                               ),
                                           ],
                                         ),
@@ -181,7 +182,7 @@ class PlayerCustomizer extends StatelessWidget {
                                 padding: const EdgeInsets.all(8),
                                 decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(12),
-                                  color: Colors.grey.shade100,
+                                  color: colorScheme.surface,
                                 ),
                                 child: buildIcon(
                                   tempShape,
@@ -224,6 +225,10 @@ class PlayerCustomizer extends StatelessWidget {
 }
 
 class DiagonalLinePainter extends CustomPainter {
+  late ColorScheme colorScheme;
+
+  DiagonalLinePainter(this.colorScheme);
+
   @override
   void paint(Canvas canvas, Size size) {
     final path =
@@ -238,7 +243,7 @@ class DiagonalLinePainter extends CustomPainter {
 
     final paint =
         Paint()
-          ..color = Colors.grey.shade500
+          ..color = colorScheme.outline
           ..strokeWidth = 3
           ..strokeCap = StrokeCap.round;
 

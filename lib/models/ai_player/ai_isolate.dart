@@ -3,7 +3,7 @@ import 'dart:isolate';
 
 import '../move.dart';
 import '../move_parameters.dart';
-import 'ai_difficulty.dart';
+import '../enum/ai_difficulty.dart';
 import 'ai_isolate_message.dart';
 import 'ai_player.dart';
 

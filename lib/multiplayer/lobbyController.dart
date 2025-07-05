@@ -3,7 +3,9 @@ import 'dart:math';
 
 Future<String> createLobby(String userId) async {
   final lobbyCode = generateLobbyCode();
-  final lobbyRef = FirebaseFirestore.instance.collection('lobbies').doc(lobbyCode);
+  final lobbyRef = FirebaseFirestore.instance
+      .collection('lobbies')
+      .doc(lobbyCode);
 
   await lobbyRef.set({
     'hostId': userId,
@@ -25,7 +27,9 @@ String generateLobbyCode() {
 }
 
 Future<bool> joinLobby(String lobbyCode, String userId) async {
-  final lobbyRef = FirebaseFirestore.instance.collection('lobbies').doc(lobbyCode);
+  final lobbyRef = FirebaseFirestore.instance
+      .collection('lobbies')
+      .doc(lobbyCode);
   final lobbySnap = await lobbyRef.get();
 
   if (!lobbySnap.exists) return false;
@@ -39,6 +43,8 @@ Future<bool> joinLobby(String lobbyCode, String userId) async {
 }
 
 Stream<DocumentSnapshot> getLobbyStream(String lobbyCode) {
-  return FirebaseFirestore.instance.collection('lobbies').doc(lobbyCode).snapshots();
+  return FirebaseFirestore.instance
+      .collection('lobbies')
+      .doc(lobbyCode)
+      .snapshots();
 }
-

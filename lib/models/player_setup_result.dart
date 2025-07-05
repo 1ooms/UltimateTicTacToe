@@ -1,6 +1,6 @@
 import 'package:ultimate_tic_tac_toe/models/player_config.dart';
 
-import 'ai/ai_difficulty.dart';
+import 'enum/ai_difficulty.dart';
 
 class PlayerSetupResult {
   PlayerConfig player1;

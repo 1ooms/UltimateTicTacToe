@@ -27,11 +27,7 @@ class GameModeCard extends StatelessWidget {
           padding: const EdgeInsets.all(24),
           child: Row(
             children: [
-              Icon(
-                icon,
-                size: 32,
-                color: theme.colorScheme.primary,
-              ),
+              Icon(icon, size: 32, color: theme.colorScheme.primary),
               const SizedBox(width: 16),
               Text(title, style: theme.textTheme.titleLarge),
             ],

@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:ultimate_tic_tac_toe/models/ai/ai_difficulty.dart';
+import 'package:ultimate_tic_tac_toe/models/enum/ai_difficulty.dart';
 import 'package:ultimate_tic_tac_toe/widgets/dialogs/player_customizer.dart';
 import 'package:ultimate_tic_tac_toe/widgets/difficulty_slider.dart';
 
-import '../../models/game_mode.dart';
+import '../../models/enum/game_mode.dart';
 import '../../models/player_config.dart';
 import '../../models/player_setup_result.dart';
 
