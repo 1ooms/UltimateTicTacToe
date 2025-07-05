@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../models/move.dart';
 import '../../models/player.dart';
 import '../../models/player_config.dart';
 import '../dialogs/player_customizer.dart';
@@ -12,6 +13,7 @@ class SubBoard extends StatelessWidget {
   final Player currentPlayer;
   final void Function(int, int) onCellTap;
   final bool Function(int boardIndex, int cellIndex) isValidMove;
+  final Move? previousMove;
 
   const SubBoard({
     super.key,
@@ -23,6 +25,7 @@ class SubBoard extends StatelessWidget {
     required this.currentPlayer,
     required this.onCellTap,
     required this.isValidMove,
+    required this.previousMove,
   });
 
   @override
@@ -35,22 +38,17 @@ class SubBoard extends StatelessWidget {
             crossAxisCount: 3,
           ),
           itemCount: 9,
-          itemBuilder: (ctx, cellIndex) => _buildSubBoardCell(boardIndex, cellIndex),
+          itemBuilder:
+              (ctx, cellIndex) => _buildSubBoardCell(boardIndex, cellIndex),
         ),
         if (winner != null)
           Container(
-            color: (winner == Player.one
-                ? player1.color
-                : player2.color)
+            color: (winner == Player.one ? player1.color : player2.color)
                 .withAlpha(102),
             child: Center(
               child: buildIcon(
-                winner == Player.one
-                    ? player1.shape
-                    : player2.shape,
-                winner == Player.one
-                    ? player1.color
-                    : player2.color,
+                winner == Player.one ? player1.shape : player2.shape,
+                winner == Player.one ? player1.color : player2.color,
                 110,
               ),
             ),
@@ -70,16 +68,33 @@ class SubBoard extends StatelessWidget {
     }
 
     final highlightColor =
-    currentPlayer == Player.one
-        ? player1.color
-        : player2.color;
+        currentPlayer == Player.one ? player1.color : player2.color;
+
+    late final Color borderColor;
+    late final double borderThickness;
+
+    if (previousMove != null &&
+        previousMove!.boardIndex == boardIndex &&
+        previousMove!.cellIndex == cellIndex) {
+      borderColor = Colors.black;
+      borderThickness = 2;
+    } else {
+      borderColor = Colors.grey;
+      borderThickness = 1;
+    }
 
     return GestureDetector(
-      onTap: isValidMove(boardIndex, cellIndex) ? () => onCellTap(boardIndex, cellIndex) : null,
+      onTap:
+          isValidMove(boardIndex, cellIndex)
+              ? () => onCellTap(boardIndex, cellIndex)
+              : null,
       child: Container(
         decoration: BoxDecoration(
-          border: Border.all(color: Colors.grey),
-          color: isValidMove(boardIndex, cellIndex) ? highlightColor.withAlpha(38) : null,
+          border: Border.all(color: borderColor, width: borderThickness),
+          color:
+              isValidMove(boardIndex, cellIndex)
+                  ? highlightColor.withAlpha(38)
+                  : null,
         ),
         child: Center(child: symbol),
       ),

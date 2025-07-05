@@ -110,6 +110,7 @@ class BoardState extends State<Board> {
                 currentPlayer: _currentPlayer,
                 isValidMove: _isValidMove,
                 onCellTap: _handleTap,
+                previousMove: _moveHistory.lastOrNull,
               );
             },
           ),
