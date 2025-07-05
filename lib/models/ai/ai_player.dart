@@ -18,6 +18,12 @@ Map<String, dynamic>? chooseAIMove(Map<String, dynamic> moveParametersJson) {
 
   final AIPlayer aiPlayer = AIPlayer(difficulty: difficulty);
 
+  if (subBoardWinners.every((value) => value == null) && activeSubBoardIndex == null) {
+    // First AI move --> every move is optimal, so just perform a random one
+    Move? move = aiPlayer.randomMove(board, subBoardWinners, activeSubBoardIndex);
+    return (move != null) ? move.toJson() : null;
+  }
+
   switch (difficulty) {
     case AIDifficulty.easy:
       Move? move = aiPlayer.randomMove(board, subBoardWinners, activeSubBoardIndex);
@@ -122,7 +128,7 @@ class AIPlayer {
         bestMoves.add(move);
       }
 
-      if (score == bestScore) {
+      else if (score == bestScore) {
         bestMoves.add(move);
       }
     }
@@ -131,6 +137,11 @@ class AIPlayer {
     int randomBestMoveIndex = random.nextInt(bestMoves.length);
 
     print("Considered ${bestMoves.length} moves");
+
+    // for (final move in bestMoves) {
+    //   print("Move: ${move.boardIndex}, ${move.cellIndex}");
+    // }
+
     return bestMoves[randomBestMoveIndex];
   }
 
