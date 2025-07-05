@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:ultimate_tic_tac_toe/models/game_mode.dart';
 import 'package:ultimate_tic_tac_toe/widgets/app_drawer.dart';
 import 'package:ultimate_tic_tac_toe/widgets/game_mode_card.dart';
 
-import '../models/player_config.dart';
-import 'game_modes/computer_game_screen.dart';
-import 'game_modes/local_game_screen.dart';
-import 'game_modes/online_game_screen.dart';
+import 'game_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
@@ -46,16 +44,8 @@ class HomeScreen extends StatelessWidget {
                         context,
                         MaterialPageRoute(
                           builder:
-                              (ctx) => LocalGameScreen(
-                                player1: PlayerConfig(
-                                  shape: PlayerShape.circle,
-                                  color: Colors.blue,
-                                ),
-                                player2: PlayerConfig(
-                                  shape: PlayerShape.cross,
-                                  color: Colors.red,
-                                ),
-                                player1Starts: true,
+                              (ctx) => GameScreen(
+                                gameMode: GameMode.local,
                               ),
                         ),
                       );
@@ -65,12 +55,12 @@ class HomeScreen extends StatelessWidget {
                     title: 'Online',
                     icon: Icons.public,
                     onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (ctx) => const OnlineGameScreen(),
-                        ),
-                      );
+                      // Navigator.push(
+                      //   context,
+                      //   MaterialPageRoute(
+                      //     builder: (ctx) => LocalGameScreen(player1: player1, player2: player2, player1Starts: player1Starts, gameMode: gameMode),
+                      //   ),
+                      // );
                     },
                   ),
                   GameModeCard(
@@ -80,7 +70,10 @@ class HomeScreen extends StatelessWidget {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (ctx) => const ComputerGameScreen(),
+                          builder:
+                              (ctx) => GameScreen(
+                                gameMode: GameMode.computer,
+                              ),
                         ),
                       );
                     },

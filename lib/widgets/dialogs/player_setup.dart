@@ -1,98 +1,225 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:ultimate_tic_tac_toe/models/ai_difficulty.dart';
 import 'package:ultimate_tic_tac_toe/widgets/dialogs/player_customizer.dart';
+import 'package:ultimate_tic_tac_toe/widgets/difficulty_slider.dart';
 
+import '../../models/game_mode.dart';
 import '../../models/player_config.dart';
 import '../../models/player_setup_result.dart';
 
-class PlayerSetup extends StatelessWidget {
-  PlayerSetup({super.key});
+class PlayerSetup extends StatefulWidget {
+  const PlayerSetup({
+    super.key,
+    required this.gameMode,
+    required this.gameStarted,
+  });
 
-  bool gameStarted = false;
-  bool isPlayer1First = true;
-  PlayerConfig player1Config = PlayerConfig(
-    shape: PlayerShape.cross,
-    color: Colors.red,
-  );
-  PlayerConfig player2Config = PlayerConfig(
-    shape: PlayerShape.circle,
-    color: Colors.blue,
-  );
+  final GameMode gameMode;
+  final bool gameStarted;
+
+  @override
+  State<PlayerSetup> createState() => _PlayerSetupState();
+}
+
+class _PlayerSetupState extends State<PlayerSetup> {
+  late SharedPreferences prefs;
+
+  late bool isPlayer1First;
+  late PlayerConfig player1Config;
+  late PlayerConfig player2Config;
+  bool isLoading = true;
+  AIDifficulty aiDifficulty = AIDifficulty.medium;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadPrefs();
+  }
+
+  Future<void> _loadPrefs() async {
+    prefs = await SharedPreferences.getInstance();
+
+    final int player1Shape =
+        prefs.getInt('player1Shape') ?? Icons.close.codePoint;
+    final int player2Shape =
+        prefs.getInt('player2Shape') ?? Icons.circle_outlined.codePoint;
+    final int player1Color =
+        prefs.getInt('player1Color') ?? Colors.red.toARGB32();
+    final int player2Color =
+        prefs.getInt('player2Color') ?? Colors.blue.toARGB32();
+    isPlayer1First = prefs.getBool('isPlayer1First') ?? true;
+    if (prefs.getString('aiDifficulty') != null) {
+      aiDifficulty = AIDifficulty.values.firstWhere(
+        (element) => element.name == prefs.getString('aiDifficulty'),
+      );
+    }
+
+    setState(() {
+      player1Config = PlayerConfig(
+        color: Color(player1Color),
+        shape: IconData(player1Shape, fontFamily: 'MaterialIcons'),
+      );
+      player2Config = PlayerConfig(
+        color: Color(player2Color),
+        shape: IconData(player2Shape, fontFamily: 'MaterialIcons'),
+      );
+      isLoading = false;
+    });
+  }
+
+  void _savePrefs() async {
+    prefs = await SharedPreferences.getInstance();
+
+    prefs.setInt('player1Shape', player1Config.shape.codePoint);
+    prefs.setInt('player2Shape', player2Config.shape.codePoint);
+    prefs.setInt('player1Color', player1Config.color.toARGB32());
+    prefs.setInt('player2Color', player2Config.color.toARGB32());
+    prefs.setBool('isPlayer1First', isPlayer1First);
+    prefs.setString('aiDifficulty', aiDifficulty.name);
+  }
 
   @override
   Widget build(BuildContext context) {
+    if (isLoading) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
+    ThemeData theme = Theme.of(context);
+
     return StatefulBuilder(
       builder: (context, setState) {
         return Stack(
-          children: [AlertDialog(
-            title: const Text('Player Setup'),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            PopScope(
+              canPop: false,
+              onPopInvokedWithResult: (didPop, result) {
+                if (!didPop) {
+                  Navigator.of(context).pop(); // Pop the dialog
+                  Navigator.of(context).pop(); // Pop the screen
+                }
+              },
+              child: AlertDialog(
+                title: Text('Player Setup', style: theme.textTheme.titleLarge),
+                content: Column(
+                  mainAxisSize: MainAxisSize.min,
                   children: [
-                    PlayerCustomizer(
-                      label: 'Player 1',
-                      config1: player1Config,
-                      config2: player2Config,
-                      onChanged: (config) {
-                        setState(() {
-                          player1Config = config;
-                        });
-                      },
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text('Players', style: theme.textTheme.titleSmall),
+                        Text('Who starts?', style: theme.textTheme.titleSmall),
+                      ],
                     ),
-                    Radio<bool>(
-                      value: true,
-                      groupValue: isPlayer1First,
-                      onChanged: (value) {
-                        setState(() {
-                          isPlayer1First = true;
-                        });
-                      },
-                    ),
-                  ],
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    PlayerCustomizer(
-                      label: 'Player 2',
-                      config1: player2Config,
-                      config2: player1Config,
-                      onChanged: (config) {
-                        setState(() {
-                          player2Config = config;
-                        });
-                      },
-                    ),
-                    Radio<bool>(
-                      value: false,
-                      groupValue: isPlayer1First,
-                      onChanged: (value) {
-                        setState(() {
-                          isPlayer1First = false;
-                        });
-                      },
-                    ),
-                  ],
-                ),
-              ],
-            ),
-            actions: [
-              TextButton(
-                onPressed: () {
-                  Navigator.of(context).pop(PlayerSetupResult(
-                    player1: player1Config,
-                    player2: player2Config,
-                    player1Starts: isPlayer1First,
-                  ));
-                },
-                child: const Text('Start Game'),
-              ),
-            ],
-          ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Row(
+                          children: [
+                            const Icon(Icons.person_outline),
+                            const SizedBox(width: 10),
+                            PlayerCustomizer(
+                              config1: player1Config,
+                              config2: player2Config,
+                              onChanged: (config) {
+                                setState(() {
+                                  player1Config = config;
+                                });
+                              },
+                            ),
+                          ],
+                        ),
 
-          ]
+                        Radio<bool>(
+                          value: true,
+                          groupValue: isPlayer1First,
+                          onChanged: (value) {
+                            setState(() {
+                              isPlayer1First = true;
+                            });
+                          },
+                        ),
+                      ],
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Row(
+                          children: [
+                            widget.gameMode == GameMode.computer
+                                ? Icon(Icons.smart_toy_outlined)
+                                : widget.gameMode == GameMode.online
+                                ? Icon(Icons.language)
+                                : Icon(Icons.person_outline),
+                            const SizedBox(width: 10),
+                            PlayerCustomizer(
+                              config1: player2Config,
+                              config2: player1Config,
+                              onChanged: (config) {
+                                setState(() {
+                                  player2Config = config;
+                                });
+                              },
+                            ),
+                          ],
+                        ),
+                        Radio<bool>(
+                          value: false,
+                          groupValue: isPlayer1First,
+                          onChanged: (value) {
+                            setState(() {
+                              isPlayer1First = false;
+                            });
+                          },
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+                    widget.gameMode == GameMode.computer
+                        ? DifficultySlider(
+                          selectedDifficulty: aiDifficulty,
+                          onChanged: (difficulty) {
+                            setState(() {
+                              aiDifficulty = difficulty;
+                            });
+                          },
+                        )
+                        : Container(),
+                  ],
+                ),
+                actions: [
+                  TextButton(
+                    onPressed: () {
+                      if (widget.gameStarted) {
+                        Navigator.of(context).pop();
+                      } else {
+                        Navigator.of(context).pop();
+                        Navigator.of(context).pop();
+                      }
+                    },
+                    child: const Text('Cancel'),
+                  ),
+                  ElevatedButton(
+                    onPressed: () {
+                      _savePrefs();
+                      Navigator.of(context).pop(
+                        PlayerSetupResult(
+                          player1: player1Config,
+                          player2: player2Config,
+                          player1Starts: isPlayer1First,
+                          aiDifficulty: aiDifficulty,
+                        ),
+                      );
+                    },
+                    child:
+                        widget.gameStarted
+                            ? const Text('Continue game')
+                            : const Text('Start Game'),
+                  ),
+                ],
+              ),
+            ),
+          ],
         );
       },
     );

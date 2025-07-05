@@ -14,6 +14,8 @@ class GameModeCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    ThemeData theme = Theme.of(context);
+
     return Card(
       margin: const EdgeInsets.symmetric(vertical: 8),
       elevation: 1,
@@ -28,10 +30,10 @@ class GameModeCard extends StatelessWidget {
               Icon(
                 icon,
                 size: 32,
-                color: Theme.of(context).colorScheme.primary,
+                color: theme.colorScheme.primary,
               ),
               const SizedBox(width: 16),
-              Text(title, style: Theme.of(context).textTheme.titleLarge),
+              Text(title, style: theme.textTheme.titleLarge),
             ],
           ),
         ),

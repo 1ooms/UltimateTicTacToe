@@ -3,57 +3,66 @@ import 'package:flutter/material.dart';
 import '../../main.dart';
 import '../../models/player_config.dart';
 
-Icon buildIcon(PlayerShape shape, Color color, double size) {
-  switch (shape) {
-    case PlayerShape.cross:
-      return Icon(Icons.close, color: color, size: size);
-    case PlayerShape.circle:
-      return Icon(Icons.circle_outlined, color: color, size: size);
-    case PlayerShape.square:
-      return Icon(Icons.square_outlined, color: color, size: size);
-    case PlayerShape.triangle:
-      return Icon(Icons.change_history, color: color, size: size); // triangle
-  }
+Icon buildIcon(IconData shape, Color color, double size) {
+  return(Icon(shape, color: color, size: size));
 }
 
 class PlayerCustomizer extends StatelessWidget {
   PlayerCustomizer({
     super.key,
-    required this.label,
     required this.config1,
     required this.config2,
     required this.onChanged,
   });
 
-  String label;
-  PlayerConfig config1;
-  PlayerConfig config2;
+  final PlayerConfig config1;
+  final PlayerConfig config2;
 
-  List<PlayerShape> availableShapes = PlayerShape.values;
-  List<Color> availableColors = [
-    Colors.red,
-    Colors.blue,
-    Colors.green,
-    Colors.orange,
+  final List<IconData> availableShapes = [
+    Icons.circle_outlined,
+    Icons.close,
+    Icons.square_outlined,
+    Icons.change_history,
+    Icons.star_border,
+    Icons.favorite_outline,
   ];
 
-  Function(PlayerConfig) onChanged;
+  final List<Color> availableColors = [
+    Colors.red,
+    Colors.orangeAccent,
+    Colors.yellow,
+    Colors.green,
+    Colors.lightBlueAccent,
+    Colors.blue,
+    Colors.purple,
+    Colors.pinkAccent,
+  ];
+
+  final Function(PlayerConfig) onChanged;
 
   @override
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: const TextStyle(fontWeight: FontWeight.bold)),
-        const SizedBox(height: 4),
         Row(
           children: [
-            buildIcon(config1.shape, config1.color, 32),
-            const SizedBox(width: 12),
+            Container(
+              padding: const EdgeInsets.all(4),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(12),
+                color: Colors.grey.shade100,
+              ),
+              child: buildIcon(
+                config1.shape,
+                config1.color,
+                32,
+              ),
+            ),
             IconButton(
               icon: const Icon(Icons.edit),
               onPressed: () {
-                PlayerShape tempShape = config1.shape;
+                IconData tempShape = config1.shape;
                 Color tempColor = config1.color;
 
                 showDialog(
@@ -62,7 +71,7 @@ class PlayerCustomizer extends StatelessWidget {
                     return StatefulBuilder(
                       builder: (context, setDialogState) {
                         return AlertDialog(
-                          title: Text('Customize $label'),
+                          title: Text('Customize player'),
                           content: Column(
                             mainAxisSize: MainAxisSize.min,
                             children: [
@@ -100,7 +109,7 @@ class PlayerCustomizer extends StatelessWidget {
                                               color:
                                                   isSelected
                                                       ? Colors.black
-                                                      : Colors.grey,
+                                                      : Colors.transparent,
                                               width: 2,
                                             ),
                                           ),
@@ -125,7 +134,7 @@ class PlayerCustomizer extends StatelessWidget {
                                 runSpacing: 8,
                                 children:
                                     availableColors.map((color) {
-                                      final isTaken = color == config2.color;
+                                      final isTaken = color.toARGB32() == config2.color.toARGB32();
                                       final isSelected = color == tempColor;
 
                                       return GestureDetector(
@@ -150,7 +159,7 @@ class PlayerCustomizer extends StatelessWidget {
                                                   color:
                                                       isSelected
                                                           ? Colors.black
-                                                          : Colors.grey,
+                                                          : Colors.transparent,
                                                   width: 2,
                                                 ),
                                               ),
@@ -234,6 +243,7 @@ class DiagonalLinePainter extends CustomPainter {
           ..strokeCap = StrokeCap.round;
 
     canvas.drawLine(Offset(0, size.height), Offset(size.width, 0), paint);
+    canvas.drawLine(Offset(0, 0), Offset(size.width, size.height), paint);
   }
 
   @override

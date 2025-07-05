@@ -2,9 +2,11 @@ import 'dart:math';
 
 import 'package:confetti/confetti.dart';
 import 'package:flutter/material.dart';
+import 'package:ultimate_tic_tac_toe/models/ai_difficulty.dart';
 import 'package:ultimate_tic_tac_toe/widgets/board/current_player_indicator.dart';
 import 'package:ultimate_tic_tac_toe/widgets/board/sub_board.dart';
 
+import '../../models/ai_player.dart';
 import '../../models/move.dart';
 import '../../models/player.dart';
 import '../../models/player_config.dart';
@@ -13,29 +15,34 @@ import '../dialogs/draw_dialog.dart';
 import '../dialogs/player_customizer.dart';
 import '../dialogs/win_dialog.dart';
 
-class BigBoard extends StatefulWidget {
-  const BigBoard({
+class Board extends StatefulWidget {
+  const Board({
     super.key,
     required this.player1,
     required this.player2,
     required this.player1Starts,
+    required this.playingAgainstAI,
+    this.aiDifficulty,
   });
 
   final PlayerConfig player1;
   final PlayerConfig player2;
   final bool player1Starts;
+  final bool playingAgainstAI;
+  final AIDifficulty? aiDifficulty;
 
   @override
-  State<BigBoard> createState() => BigBoardState();
+  State<Board> createState() => BoardState();
 }
 
-class BigBoardState extends State<BigBoard> {
+class BoardState extends State<Board> {
   late List<List<Player?>> _subBoards;
   late List<Player?> _subBoardWinners;
   late Player _currentPlayer;
   int? _activeSubBoardIndex;
 
   final List<Move> _moveHistory = [];
+  bool _aiThinking = false;
 
   bool _playAgainVisible = false;
   Color _winnerColor = Colors.transparent;
@@ -45,6 +52,10 @@ class BigBoardState extends State<BigBoard> {
   void initState() {
     super.initState();
     _initializeGame();
+
+    if (widget.playingAgainstAI && _currentPlayer == Player.two) {
+      _makeAIMove();
+    }
   }
 
   void _initializeGame() {
@@ -104,6 +115,21 @@ class BigBoardState extends State<BigBoard> {
             child: const Text("Play again"),
           ),
         ),
+        Visibility(
+          visible: _aiThinking,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text("AI is thinking", style: Theme.of(context).textTheme.titleMedium),
+              const SizedBox(width: 8),
+              SizedBox(
+                height: 25.0,
+                width: 25.0,
+                child: CircularProgressIndicator(color: Colors.black, strokeWidth: 2,),
+              ),
+            ]
+          ),
+        ),
       ],
     );
   }
@@ -113,16 +139,18 @@ class BigBoardState extends State<BigBoard> {
 
     setState(() {
       _subBoards[boardIndex][cellIndex] = _currentPlayer;
-      _moveHistory.add(Move(boardIndex, cellIndex, _currentPlayer, _activeSubBoardIndex));
+      _moveHistory.add(
+        Move(boardIndex, cellIndex, _currentPlayer, _activeSubBoardIndex),
+      );
 
       // check win/draw
-      if (_checkWin(_subBoards[boardIndex], _currentPlayer)) {
+      if (checkWin(_subBoards[boardIndex], _currentPlayer)) {
         _subBoardWinners[boardIndex] = _currentPlayer;
 
-        if (_checkOverallWinner() != null) {
+        if (checkOverallWinner() != null) {
           _showWinDialog(_currentPlayer);
           return;
-        } else if (_checkDraw()) {
+        } else if (checkDraw()) {
           _showDrawDialog();
           return;
         }
@@ -138,7 +166,37 @@ class BigBoardState extends State<BigBoard> {
 
       // switch player turn
       _currentPlayer = _currentPlayer == Player.one ? Player.two : Player.one;
+
+      if (widget.playingAgainstAI && _currentPlayer == Player.two) {
+        _makeAIMove();
+      }
     });
+  }
+
+  Future<void> _makeAIMove() async {
+    if (_aiThinking) return;
+    _aiThinking = true;
+
+    await Future.delayed(Duration(milliseconds: 500));
+
+    AIPlayer aiPlayer = AIPlayer(
+      difficulty: widget.aiDifficulty!,
+      checkWin: checkWin,
+    );
+
+    final move = await aiPlayer.chooseAIMove(
+      board: _subBoards,
+      subBoardWinners: _subBoardWinners,
+      aiPlayer: Player.two,
+      activeSubBoardIndex: _activeSubBoardIndex,
+      difficulty: widget.aiDifficulty!,
+    );
+
+    if (move != null) {
+      _handleTap(move.boardIndex, move.cellIndex);
+    }
+
+    _aiThinking = false;
   }
 
   bool _isValidMove(int boardIndex, int cellIndex) {
@@ -149,20 +207,20 @@ class BigBoardState extends State<BigBoard> {
     return boardPlayable && cellEmpty;
   }
 
-  bool _checkWin(List<Player?> board, Player player) =>
+  bool checkWin(List<Player?> board, Player player) =>
       winPatterns.any((pattern) => pattern.every((i) => board[i] == player));
 
-  bool _checkDraw() =>
+  bool checkDraw() =>
       _subBoardWinners.every(
         (winner) =>
             winner != null ||
             !_subBoards[_subBoardWinners.indexOf(winner)].contains(null),
       ) &&
-      _checkOverallWinner() == null;
+      checkOverallWinner() == null;
 
-  Player? _checkOverallWinner() {
+  Player? checkOverallWinner() {
     for (final player in [Player.one, Player.two]) {
-      if (_checkWin(_subBoardWinners, player)) {
+      if (checkWin(_subBoardWinners, player)) {
         return player;
       }
     }
@@ -224,16 +282,23 @@ class BigBoardState extends State<BigBoard> {
   }
 
   void undoMove() {
-    if (_moveHistory.isEmpty) return;
+    if (_moveHistory.isEmpty || _aiThinking) return;
 
     setState(() {
-      final lastMove = _moveHistory.removeLast();
-      _subBoards[lastMove.boardIndex][lastMove.cellIndex] = null;
-      _currentPlayer = _currentPlayer == Player.one ? Player.two : Player.one;
+      int movesToUndo = widget.playingAgainstAI ? 2 : 1;
 
-      _subBoardWinners[lastMove.boardIndex] = null;
-      _activeSubBoardIndex = lastMove.activeBoardIndex;
+      for (int i = 0; i < movesToUndo && _moveHistory.isNotEmpty; i++) {
+        final move = _moveHistory.removeLast();
+        _subBoards[move.boardIndex][move.cellIndex] = null;
+        _subBoardWinners[move.boardIndex] = null;
+        _currentPlayer = move.player;
+        _activeSubBoardIndex = move.activeBoardIndex;
+      }
     });
+
+    if (widget.playingAgainstAI && _currentPlayer == Player.two) {
+      _makeAIMove;
+    }
   }
 
   void performUndo() => undoMove();
