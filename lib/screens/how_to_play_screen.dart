@@ -7,7 +7,7 @@ class HowToPlayScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: Text('How to play')),
-      body: Padding(padding: const EdgeInsets.all(24.0),
+      body: Padding(padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [

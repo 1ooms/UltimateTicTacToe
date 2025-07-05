@@ -7,6 +7,7 @@ import 'package:ultimate_tic_tac_toe/widgets/dialogs/player_setup.dart';
 import '../models/enum/ai_difficulty.dart';
 import '../models/player_config.dart';
 import '../models/player_setup_result.dart';
+import '../widgets/ads/banner_ad_widget.dart';
 
 class GameScreen extends StatefulWidget {
   const GameScreen({
@@ -82,20 +83,27 @@ class _GameScreenState extends State<GameScreen> {
       body: Padding(
         padding: const EdgeInsets.all(24.0),
         child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            const SizedBox(height: 24),
-            gameStarted
-                ? Board(
+            Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const SizedBox(height: 24),
+                gameStarted
+                    ? Board(
                   key: _boardKey,
                   player1: player1,
                   player2: player2,
                   player1Starts: player1Starts,
                   playingAgainstAI:
-                      widget.gameMode == GameMode.computer ? true : false,
+                  widget.gameMode == GameMode.computer ? true : false,
                   aiDifficulty: aiDifficulty,
                 )
-                : const Text("Waiting for game to start..."),
+                    : const Text("Waiting for game to start..."),
+              ],
+            ),
+            BannerAdWidget(),
           ],
         ),
       ),

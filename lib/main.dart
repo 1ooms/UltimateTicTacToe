@@ -1,8 +1,11 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:ultimate_tic_tac_toe/screens/home_screen.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 import 'package:firebase_core/firebase_core.dart';
 
@@ -27,6 +30,7 @@ final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  unawaited(MobileAds.instance.initialize());
 
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
@@ -49,7 +53,6 @@ class _AppState extends State<App> {
   Future<void> _loadPrefs() async {
     prefs = await SharedPreferences.getInstance();
     final themeModeIndex = prefs.getInt("themeMode");
-    print(themeModeIndex);
     switch (themeModeIndex) {
       case 0:
         themeMode = ThemeMode.light;
@@ -73,7 +76,6 @@ class _AppState extends State<App> {
   void _savePrefs() async {
     prefs = await SharedPreferences.getInstance();
 
-    print("saving changes: $themeMode");
     switch (themeMode) {
       case ThemeMode.light:
         prefs.setInt("themeMode", 0);
@@ -85,7 +87,6 @@ class _AppState extends State<App> {
         prefs.setInt("themeMode", 2);
         break;
     }
-    print("saved");
   }
 
   void changeThemeMode(ThemeMode newThemeMode) {
