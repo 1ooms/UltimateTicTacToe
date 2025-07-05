@@ -38,46 +38,57 @@ class ShapeSelectorGrid extends StatelessWidget {
         Wrap(
           spacing: 8,
           runSpacing: 8,
-          children: shapes.map((shape) {
-            final isTaken = shape == otherShape;
-            final isSelected = shape == selectedShape;
+          children:
+              shapes.map((shape) {
+                final isTaken = shape == otherShape;
+                final isSelected = shape == selectedShape;
 
-            return GestureDetector(
-              onTap: isTaken
-                  ? () => showSnackbar(
-                context,
-                Text(
-                  'The other player is using this shape.',
-                  style: Theme.of(context)
-                      .textTheme
-                      .titleLarge
-                      ?.copyWith(color: colorScheme.onInverseSurface),
-                ),
-              )
-                  : () => onShapeSelected(shape),
-              child: Container(
-                width: 48,
-                height: 48,
-                padding: const EdgeInsets.all(2),
-                decoration: BoxDecoration(
-                  color: isTaken ? colorScheme.onInverseSurface : colorScheme.surface,
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(
-                    color: isSelected ? colorScheme.onSurface : Colors.transparent,
-                    width: 2,
+                return GestureDetector(
+                  onTap:
+                      isTaken
+                          ? () => showCustomSnackBar(
+                            context,
+                            Text(
+                              'The other player is using this shape.',
+                              style: Theme.of(
+                                context,
+                              ).textTheme.titleMedium?.copyWith(
+                                color: colorScheme.onInverseSurface,
+                              ),
+                            ),
+                          )
+                          : () => onShapeSelected(shape),
+                  child: Container(
+                    width: 48,
+                    height: 48,
+                    padding: const EdgeInsets.all(2),
+                    decoration: BoxDecoration(
+                      color:
+                          isTaken
+                              ? colorScheme.onInverseSurface
+                              : colorScheme.surface,
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(
+                        color:
+                            isSelected
+                                ? colorScheme.onSurface
+                                : Colors.transparent,
+                        width: 2,
+                      ),
+                    ),
+                    child: Opacity(
+                      opacity: isTaken ? 0.4 : 1.0,
+                      child: buildIcon(
+                        shape,
+                        isSelected
+                            ? colorScheme.onSurface
+                            : Colors.grey.shade500,
+                        32,
+                      ),
+                    ),
                   ),
-                ),
-                child: Opacity(
-                  opacity: isTaken ? 0.4 : 1.0,
-                  child: buildIcon(
-                    shape,
-                    isSelected ? colorScheme.onSurface : colorScheme.onSurface.withAlpha(125),
-                    32,
-                  ),
-                ),
-              ),
-            );
-          }).toList(),
+                );
+              }).toList(),
         ),
       ],
     );
@@ -85,4 +96,3 @@ class ShapeSelectorGrid extends StatelessWidget {
     return expand ? Expanded(child: content) : content;
   }
 }
-

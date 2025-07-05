@@ -40,47 +40,52 @@ class ColorSelectorGrid extends StatelessWidget {
         Wrap(
           spacing: 8,
           runSpacing: 8,
-          children: colors.map((color) {
-            final isTaken = color.toARGB32() == otherColor.toARGB32();
-            final isSelected = color.toARGB32() == selectedColor.toARGB32();
+          children:
+              colors.map((color) {
+                final isTaken = color.toARGB32() == otherColor.toARGB32();
+                final isSelected = color.toARGB32() == selectedColor.toARGB32();
 
-            return GestureDetector(
-              onTap: isTaken
-                  ? () => showSnackbar(
-                context,
-                Text(
-                  'The other player is using this color.',
-                  style: Theme.of(context)
-                      .textTheme
-                      .titleLarge
-                      ?.copyWith(color: colorScheme.onInverseSurface),
-                ),
-              )
-                  : () => onColorSelected(color),
-              child: Stack(
-                children: [
-                  Container(
-                    width: 48,
-                    height: 48,
-                    decoration: BoxDecoration(
-                      color: color,
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(
-                        color:
-                        isSelected ? colorScheme.onSurface : Colors.transparent,
-                        width: 2,
+                return GestureDetector(
+                  onTap:
+                      isTaken
+                          ? () => showCustomSnackBar(
+                            context,
+                            Text(
+                              'The other player is using this color.',
+                              style: Theme.of(
+                                context,
+                              ).textTheme.titleMedium?.copyWith(
+                                color: colorScheme.onInverseSurface,
+                              ),
+                            ),
+                          )
+                          : () => onColorSelected(color),
+                  child: Stack(
+                    children: [
+                      Container(
+                        width: 48,
+                        height: 48,
+                        decoration: BoxDecoration(
+                          color: color,
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(
+                            color:
+                                isSelected
+                                    ? colorScheme.onSurface
+                                    : Colors.transparent,
+                            width: 2,
+                          ),
+                        ),
                       ),
-                    ),
+                      if (isTaken)
+                        CustomPaint(
+                          size: const Size(48, 48),
+                          painter: DiagonalLinePainter(colorScheme),
+                        ),
+                    ],
                   ),
-                  if (isTaken)
-                    CustomPaint(
-                      size: const Size(48, 48),
-                      painter: DiagonalLinePainter(colorScheme),
-                    ),
-                ],
-              ),
-            );
-          }).toList(),
+                );
+              }).toList(),
         ),
       ],
     );
@@ -108,7 +113,7 @@ class DiagonalLinePainter extends CustomPainter {
 
     final paint =
         Paint()
-          ..color = colorScheme.outline
+          ..color = Colors.grey.shade500
           ..strokeWidth = 3
           ..strokeCap = StrokeCap.round;
 

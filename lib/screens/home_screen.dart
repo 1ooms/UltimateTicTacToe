@@ -54,7 +54,7 @@ class HomeScreen extends StatelessWidget {
               title: 'Online',
               icon: Icons.public,
               onTap: () {
-                showSnackbar(
+                showCustomSnackBar(
                   context,
                   Text(
                     'Coming soon!',

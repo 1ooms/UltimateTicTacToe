@@ -34,12 +34,22 @@ class PlayerCustomizer extends StatelessWidget {
           icon: const Icon(Icons.edit),
           onPressed: () {
             showDialog(
+              barrierColor: Colors.transparent,
               context: context,
-              builder: (context) => PlayerCustomizationDialog(
-                currentConfig: config1,
-                otherConfig: config2,
-                onConfirm: onChanged,
-              ),
+              builder:
+                  (context) => ScaffoldMessenger(
+                    child: Builder(
+                      builder:
+                          (context) => Scaffold(
+                            backgroundColor: Colors.transparent,
+                            body: PlayerCustomizationDialog(
+                              currentConfig: config1,
+                              otherConfig: config2,
+                              onConfirm: onChanged,
+                            ),
+                          ),
+                    ),
+                  ),
             );
           },
         ),
