@@ -3,12 +3,12 @@ import 'dart:math';
 import 'package:confetti/confetti.dart';
 import 'package:flutter/material.dart';
 import 'package:ultimate_tic_tac_toe/widgets/dialogs/draw_dialog.dart';
-import 'package:ultimate_tic_tac_toe/widgets/dialogs/player_customizer.dart';
 import 'package:ultimate_tic_tac_toe/widgets/dialogs/win_dialog.dart';
 
 import '../models/enum/player.dart';
 import '../models/player_config.dart';
 import '../models/win_patterns.dart';
+import '../utils/ui_helpers.dart';
 
 // enum Player { one, two }
 

@@ -20,14 +20,12 @@ class _BannerAdWidgetState extends State<BannerAdWidget> {
     _loadAd();
   }
 
-  /// Loads a banner ad.
   void _loadAd() {
     final bannerAd = BannerAd(
       size: widget.adSize,
       adUnitId: widget.adUnitId,
       request: const AdRequest(),
       listener: BannerAdListener(
-        // Called when an ad is successfully received.
         onAdLoaded: (ad) {
           if (!mounted) {
             ad.dispose();
@@ -37,7 +35,6 @@ class _BannerAdWidgetState extends State<BannerAdWidget> {
             _bannerAd = ad as BannerAd;
           });
         },
-        // Called when an ad request failed.
         onAdFailedToLoad: (ad, error) {
           debugPrint('BannerAd failed to load: $error');
           ad.dispose();

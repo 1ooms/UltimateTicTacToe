@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import '../../models/enum/player.dart';
 import '../../models/move.dart';
 import '../../models/player_config.dart';
-import '../dialogs/player_customizer.dart';
+import '../../utils/ui_helpers.dart';
 
 class SubBoard extends StatelessWidget {
   final int boardIndex;

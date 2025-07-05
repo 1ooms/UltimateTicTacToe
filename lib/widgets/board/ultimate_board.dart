@@ -12,8 +12,8 @@ import '../../models/move.dart';
 import '../../models/move_parameters.dart';
 import '../../models/player_config.dart';
 import '../../models/win_patterns.dart';
+import '../../utils/ui_helpers.dart';
 import '../dialogs/draw_dialog.dart';
-import '../dialogs/player_customizer.dart';
 import '../dialogs/win_dialog.dart';
 
 class Board extends StatefulWidget {

@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:ultimate_tic_tac_toe/models/enum/ai_difficulty.dart';
-import 'package:ultimate_tic_tac_toe/widgets/dialogs/player_customizer.dart';
+import 'package:ultimate_tic_tac_toe/widgets/dialogs/player_setup/player_preview.dart';
 import 'package:ultimate_tic_tac_toe/widgets/difficulty_slider.dart';
 
-import '../../models/enum/game_mode.dart';
-import '../../models/player_config.dart';
-import '../../models/player_setup_result.dart';
+import '../../../models/enum/game_mode.dart';
+import '../../../models/player_config.dart';
+import '../../../models/player_setup_result.dart';
 
 class PlayerSetup extends StatefulWidget {
   const PlayerSetup({
