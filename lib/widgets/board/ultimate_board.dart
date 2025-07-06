@@ -13,6 +13,7 @@ import '../../models/move_parameters.dart';
 import '../../models/player_config.dart';
 import '../../models/win_patterns.dart';
 import '../../utils/ui_helpers.dart';
+import '../ads/banner_ad_widget.dart';
 import '../dialogs/draw_dialog.dart';
 import '../dialogs/win_dialog.dart';
 
@@ -81,71 +82,180 @@ class BoardState extends State<Board> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        CurrentPlayerIndicator(
-          currentPlayer: _currentPlayer,
-          player1: widget.player1,
-          player2: widget.player2,
-          playingAgainstAI: widget.playingAgainstAI,
-        ),
-        const SizedBox(height: 16),
-        AspectRatio(
-          aspectRatio: 1,
-          child: GridView.builder(
-            physics: const NeverScrollableScrollPhysics(),
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 3,
-              mainAxisSpacing: 4,
-              crossAxisSpacing: 4,
-            ),
-            itemCount: 9,
-            itemBuilder: (context, subBoardIndex) {
-              return SubBoard(
-                boardIndex: subBoardIndex,
-                board: _subBoards,
-                winner: _subBoardWinners[subBoardIndex],
+    final isLandscape =
+        MediaQuery.of(context).orientation == Orientation.landscape;
+
+    if (isLandscape) {
+      return LayoutBuilder(
+        builder: (context, constraints) {
+          final totalWidth = constraints.maxWidth;
+          final totalHeight = constraints.maxHeight;
+
+          final desiredBoardWidth = min(totalWidth * 0.5, 500.0);
+          final boardSize = min(desiredBoardWidth, totalHeight);
+
+          final sidePanelWidth = (totalWidth - boardSize) / 2;
+
+          return Row(
+            children: [
+              SizedBox(
+                width: sidePanelWidth,
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    children: [
+                      CurrentPlayerIndicator(
+                        currentPlayer: _currentPlayer,
+                        player1: widget.player1,
+                        player2: widget.player2,
+                        playingAgainstAI: widget.playingAgainstAI,
+                      ),
+                      const SizedBox(height: 16),
+                      Visibility(
+                        visible: _playAgainVisible,
+                        child: TextButton(
+                          onPressed: _resetGame,
+                          child: const Text("Play again"),
+                        ),
+                      ),
+                      Visibility(
+                        visible: _aiThinking,
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              "AI is thinking",
+                              style: Theme.of(context).textTheme.titleMedium,
+                            ),
+                            const SizedBox(width: 8),
+                            const SizedBox(
+                              height: 25.0,
+                              width: 25.0,
+                              child: CircularProgressIndicator(strokeWidth: 2),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+
+              SizedBox(
+                width: boardSize,
+                height: boardSize,
+                child: GridView.builder(
+                  physics: const NeverScrollableScrollPhysics(),
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 3,
+                    mainAxisSpacing: 4,
+                    crossAxisSpacing: 4,
+                  ),
+                  itemCount: 9,
+                  itemBuilder: (context, subBoardIndex) {
+                    return SubBoard(
+                      boardIndex: subBoardIndex,
+                      board: _subBoards,
+                      winner: _subBoardWinners[subBoardIndex],
+                      player1: widget.player1,
+                      player2: widget.player2,
+                      currentPlayer: _currentPlayer,
+                      isValidMove: _isValidMove,
+                      onCellTap: _handleTap,
+                      previousMove: _moveHistory.lastOrNull,
+                    );
+                  },
+                ),
+              ),
+
+              SizedBox(
+                width: sidePanelWidth,
+                child: const Padding(
+                  padding: EdgeInsets.all(16.0),
+                  child: BannerAdWidget(),
+                ),
+              ),
+            ],
+          );
+        },
+      );
+    }
+
+
+
+    else {
+      return Column(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Column(
+            children: [
+              CurrentPlayerIndicator(
+                currentPlayer: _currentPlayer,
                 player1: widget.player1,
                 player2: widget.player2,
-                currentPlayer: _currentPlayer,
-                isValidMove: _isValidMove,
-                onCellTap: _handleTap,
-                previousMove: _moveHistory.lastOrNull,
-              );
-            },
-          ),
-        ),
-        const SizedBox(height: 16),
-        Visibility(
-          visible: _playAgainVisible,
-          child: TextButton(
-            onPressed: _resetGame,
-            child: const Text("Play again"),
-          ),
-        ),
-        Visibility(
-          visible: _aiThinking,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                "AI is thinking",
-                style: Theme.of(context).textTheme.titleMedium,
+                playingAgainstAI: widget.playingAgainstAI,
               ),
-              const SizedBox(width: 8),
-              SizedBox(
-                height: 25.0,
-                width: 25.0,
-                child: CircularProgressIndicator(
-                  color: Theme.of(context).colorScheme.onSurface,
-                  strokeWidth: 2,
+              const SizedBox(height: 16),
+              AspectRatio(
+                aspectRatio: 1,
+                child: GridView.builder(
+                  physics: const NeverScrollableScrollPhysics(),
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 3,
+                    mainAxisSpacing: 4,
+                    crossAxisSpacing: 4,
+                  ),
+                  itemCount: 9,
+                  itemBuilder: (context, subBoardIndex) {
+                    return SubBoard(
+                      boardIndex: subBoardIndex,
+                      board: _subBoards,
+                      winner: _subBoardWinners[subBoardIndex],
+                      player1: widget.player1,
+                      player2: widget.player2,
+                      currentPlayer: _currentPlayer,
+                      isValidMove: _isValidMove,
+                      onCellTap: _handleTap,
+                      previousMove: _moveHistory.lastOrNull,
+                    );
+                  },
+                ),
+              ),
+              const SizedBox(height: 16),
+              Visibility(
+                visible: _playAgainVisible,
+                child: TextButton(
+                  onPressed: _resetGame,
+                  child: const Text("Play again"),
+                ),
+              ),
+              Visibility(
+                visible: _aiThinking,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      "AI is thinking",
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
+                    const SizedBox(width: 8),
+                    SizedBox(
+                      height: 25.0,
+                      width: 25.0,
+                      child: CircularProgressIndicator(
+                        color: Theme.of(context).colorScheme.onSurface,
+                        strokeWidth: 2,
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ],
           ),
-        ),
-      ],
-    );
+          BannerAdWidget(),
+        ],
+      );
+    }
   }
 
   void _handleTap(int boardIndex, int cellIndex) {
