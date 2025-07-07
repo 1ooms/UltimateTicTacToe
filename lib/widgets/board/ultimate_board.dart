@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:ultimate_tic_tac_toe/models/enum/ai_difficulty.dart';
 import 'package:ultimate_tic_tac_toe/widgets/board/current_player_indicator.dart';
 import 'package:ultimate_tic_tac_toe/widgets/board/ultimate_sub_board.dart';
+import 'package:ultimate_tic_tac_toe/widgets/board/winner_indicator.dart';
 
 import '../../models/ai_player/ai_isolate.dart';
 import '../../models/enum/player.dart';
@@ -42,11 +43,12 @@ class BoardState extends State<Board> {
   late List<Player?> _subBoardWinners;
   late Player _currentPlayer;
   int? _activeSubBoardIndex;
+  late Player overallWinner;
 
   final List<Move> _moveHistory = [];
   bool _aiThinking = false;
 
-  bool _playAgainVisible = false;
+  bool gameFinished = false;
   Color _winnerColor = Colors.transparent;
   final _confettiController = ConfettiController();
   late final AIIsolate _aiIsolate;
@@ -76,7 +78,7 @@ class BoardState extends State<Board> {
     setState(() {
       _initializeGame();
       _moveHistory.clear();
-      _playAgainVisible = false;
+      gameFinished = false;
     });
   }
 
@@ -104,15 +106,22 @@ class BoardState extends State<Board> {
                   padding: const EdgeInsets.all(16.0),
                   child: Column(
                     children: [
-                      CurrentPlayerIndicator(
-                        currentPlayer: _currentPlayer,
-                        player1: widget.player1,
-                        player2: widget.player2,
-                        playingAgainstAI: widget.playingAgainstAI,
-                      ),
+                      gameFinished
+                          ? WinnerIndicator(
+                            overallWinner: overallWinner,
+                            player1: widget.player1,
+                            player2: widget.player2,
+                            playingAgainstAI: widget.playingAgainstAI,
+                          )
+                          : CurrentPlayerIndicator(
+                            currentPlayer: _currentPlayer,
+                            player1: widget.player1,
+                            player2: widget.player2,
+                            playingAgainstAI: widget.playingAgainstAI,
+                          ),
                       const SizedBox(height: 16),
                       Visibility(
-                        visible: _playAgainVisible,
+                        visible: gameFinished,
                         child: TextButton(
                           onPressed: _resetGame,
                           child: const Text("Play again"),
@@ -179,22 +188,25 @@ class BoardState extends State<Board> {
           );
         },
       );
-    }
-
-
-
-    else {
+    } else {
       return Column(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Column(
             children: [
-              CurrentPlayerIndicator(
-                currentPlayer: _currentPlayer,
-                player1: widget.player1,
-                player2: widget.player2,
-                playingAgainstAI: widget.playingAgainstAI,
-              ),
+              gameFinished
+                  ? WinnerIndicator(
+                    overallWinner: overallWinner,
+                    player1: widget.player1,
+                    player2: widget.player2,
+                    playingAgainstAI: widget.playingAgainstAI,
+                  )
+                  : CurrentPlayerIndicator(
+                    currentPlayer: _currentPlayer,
+                    player1: widget.player1,
+                    player2: widget.player2,
+                    playingAgainstAI: widget.playingAgainstAI,
+                  ),
               const SizedBox(height: 16),
               AspectRatio(
                 aspectRatio: 1,
@@ -223,7 +235,7 @@ class BoardState extends State<Board> {
               ),
               const SizedBox(height: 16),
               Visibility(
-                visible: _playAgainVisible,
+                visible: gameFinished,
                 child: TextButton(
                   onPressed: _resetGame,
                   child: const Text("Play again"),
@@ -275,9 +287,12 @@ class BoardState extends State<Board> {
 
         if (checkOverallWinner() != null) {
           _showWinDialog(_currentPlayer);
+          overallWinner = _currentPlayer;
+          gameFinished = true;
           return;
         } else if (checkDraw()) {
           _showDrawDialog();
+          gameFinished = true;
           return;
         }
       }
@@ -365,7 +380,7 @@ class BoardState extends State<Board> {
                 winningPlayer: winner,
                 winnerConfig:
                     winner == Player.one ? widget.player1 : widget.player2,
-                viewingBoard: _playAgainVisible,
+                viewingBoard: gameFinished,
                 confettiController: _confettiController,
                 onPlayAgain: _resetGame,
                 onViewBoard: _showPlayAgainButton,
@@ -400,7 +415,7 @@ class BoardState extends State<Board> {
 
   void _showPlayAgainButton() {
     setState(() {
-      _playAgainVisible = true;
+      gameFinished = true;
     });
   }
 
@@ -418,7 +433,7 @@ class BoardState extends State<Board> {
         _activeSubBoardIndex = move.activeBoardIndex;
       }
 
-      _playAgainVisible = false;
+      gameFinished = false;
     });
 
     if (widget.playingAgainstAI && _currentPlayer == Player.two) {
