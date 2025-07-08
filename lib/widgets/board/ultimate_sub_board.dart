@@ -15,6 +15,7 @@ class SubBoard extends StatelessWidget {
   final void Function(int, int) onCellTap;
   final bool Function(int boardIndex, int cellIndex) isValidMove;
   final Move? previousMove;
+  final bool gameFinished;
 
   const SubBoard({
     super.key,
@@ -27,6 +28,7 @@ class SubBoard extends StatelessWidget {
     required this.onCellTap,
     required this.isValidMove,
     required this.previousMove,
+    required this.gameFinished,
   });
 
   @override
@@ -99,7 +101,7 @@ class SubBoard extends StatelessWidget {
         decoration: BoxDecoration(
           border: Border.all(color: borderColor, width: borderThickness),
           color:
-              isValidMove(boardIndex, cellIndex)
+              isValidMove(boardIndex, cellIndex) && !gameFinished
                   ? Theme.of(context).brightness == Brightness.dark
                       ? highlightColor.withAlpha(75)
                       : highlightColor.withAlpha(38)

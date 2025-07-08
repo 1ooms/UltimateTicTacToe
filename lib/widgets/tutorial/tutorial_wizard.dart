@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:ultimate_tic_tac_toe/widgets/tutorial/static_board.dart';
-import 'package:ultimate_tic_tac_toe/models/tutorial_pages.dart';
+import 'package:ultimate_tic_tac_toe/data/tutorial_pages.dart';
 
 import '../../main.dart';
 import '../../models/player_config.dart';

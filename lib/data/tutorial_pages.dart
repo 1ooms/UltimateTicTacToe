@@ -1,7 +1,7 @@
 import 'package:ultimate_tic_tac_toe/models/tutorial_page_data.dart';
 
-import 'enum/player.dart';
-import 'move.dart';
+import '../models/enum/player.dart';
+import '../models/move.dart';
 
 final List<TutorialPageData> pages = [
   TutorialPageData(

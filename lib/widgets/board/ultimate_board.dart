@@ -12,7 +12,7 @@ import '../../models/enum/player.dart';
 import '../../models/move.dart';
 import '../../models/move_parameters.dart';
 import '../../models/player_config.dart';
-import '../../models/win_patterns.dart';
+import '../../data/win_patterns.dart';
 import '../../utils/ui_helpers.dart';
 import '../ads/banner_ad_widget.dart';
 import '../dialogs/draw_dialog.dart';

@@ -1,6 +1,6 @@
 import 'dart:math';
 
-import 'package:ultimate_tic_tac_toe/models/win_patterns.dart';
+import 'package:ultimate_tic_tac_toe/data/win_patterns.dart';
 
 import '../enum/ai_difficulty.dart';
 import '../enum/player.dart';
