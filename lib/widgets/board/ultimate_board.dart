@@ -172,6 +172,7 @@ class BoardState extends State<Board> {
                       isValidMove: _isValidMove,
                       onCellTap: _handleTap,
                       previousMove: _moveHistory.lastOrNull,
+                      gameFinished: gameFinished,
                     );
                   },
                 ),
@@ -229,6 +230,7 @@ class BoardState extends State<Board> {
                       isValidMove: _isValidMove,
                       onCellTap: _handleTap,
                       previousMove: _moveHistory.lastOrNull,
+                      gameFinished: gameFinished,
                     );
                   },
                 ),

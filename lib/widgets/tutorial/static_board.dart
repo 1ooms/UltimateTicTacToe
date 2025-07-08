@@ -60,6 +60,7 @@ class StaticBoard extends StatelessWidget {
                 onCellTap: (_, __) {},
                 // No-op
                 previousMove: boardState.lastMove,
+                gameFinished: true, //TODO: Implement this
               );
             },
           ),
