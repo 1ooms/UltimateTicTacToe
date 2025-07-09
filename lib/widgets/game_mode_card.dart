@@ -17,7 +17,7 @@ class GameModeCard extends StatelessWidget {
     ThemeData theme = Theme.of(context);
 
     return Card(
-      margin: const EdgeInsets.symmetric(vertical: 8),
+      margin: const EdgeInsets.all(8.0),
       elevation: 1,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: InkWell(

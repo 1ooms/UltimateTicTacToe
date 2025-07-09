@@ -27,7 +27,6 @@ class HomeScreen extends StatelessWidget {
 
     Widget buildGameModeCards() {
       final double cardWidth = 200.0;
-      const double spacing = 16.0;
 
       return ListView(
         scrollDirection: isLandscape ? Axis.horizontal : Axis.vertical,
@@ -47,7 +46,6 @@ class HomeScreen extends StatelessWidget {
               },
             ),
           ),
-          if (isLandscape) const SizedBox(width: spacing),
           SizedBox(
             width: isLandscape ? cardWidth : null,
             child: GameModeCard(
@@ -66,7 +64,6 @@ class HomeScreen extends StatelessWidget {
               },
             ),
           ),
-          if (isLandscape) const SizedBox(width: spacing),
           SizedBox(
             width: isLandscape ? cardWidth : null,
             child: GameModeCard(
