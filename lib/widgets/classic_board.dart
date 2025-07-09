@@ -161,7 +161,7 @@ class TicTacToeBoardState extends State<TicTacToeBoard> {
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (ctx) => DrawDialog(onPlayAgain: _resetGame),
+      builder: (ctx) => DrawDialog(onPlayAgain: _resetGame, onViewBoard: _showPlayAgainButton,),
     );
   }
 
