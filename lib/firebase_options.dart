@@ -63,6 +63,6 @@ class DefaultFirebaseOptions {
     messagingSenderId: '161833593264',
     projectId: 'ultimate-tic-tac-toe-7439e',
     storageBucket: 'ultimate-tic-tac-toe-7439e.firebasestorage.app',
-    iosBundleId: 'com.lukeo.tictactoe',
+    iosBundleId: 'com.ohms.tictactoe',
   );
 }
