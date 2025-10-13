@@ -3,6 +3,7 @@ import 'package:ultimate_tic_tac_toe/widgets/tutorial/static_board.dart';
 import 'package:ultimate_tic_tac_toe/data/tutorial_pages.dart';
 
 import '../../main.dart';
+import '../../models/enum/player_shape.dart';
 import '../../models/player_config.dart';
 
 class TutorialWizard extends StatefulWidget {
@@ -18,11 +19,11 @@ class _TutorialWizardState extends State<TutorialWizard> {
 
   final PlayerConfig player1 = PlayerConfig(
     color: Colors.red,
-    shape: Icons.close,
+    shape: PlayerShape.cross,
   );
   final PlayerConfig player2 = PlayerConfig(
     color: Colors.blue,
-    shape: Icons.circle_outlined,
+    shape: PlayerShape.circle,
   );
 
   @override

@@ -33,8 +33,8 @@ class _CurrentPlayerIndicatorState extends State<CurrentPlayerIndicator> {
           style: Theme.of(context).textTheme.titleMedium,
         ),
         widget.currentPlayer == Player.one
-            ? buildIcon(widget.player1.shape, widget.player1.color, 28)
-            : buildIcon(widget.player2.shape, widget.player2.color, 28),
+            ? buildIcon(widget.player1.shape.icon, widget.player1.color, 28)
+            : buildIcon(widget.player2.shape.icon, widget.player2.color, 28),
         widget.playingAgainstAI
             ? widget.currentPlayer == Player.two
                 ? const Text(' (AI)')

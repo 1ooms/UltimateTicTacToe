@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../../models/enum/player_shape.dart';
 import '../../../../utils/ui_helpers.dart';
 
 class ShapeSelectorGrid extends StatelessWidget {
@@ -21,14 +22,7 @@ class ShapeSelectorGrid extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    final shapes = [
-      Icons.circle_outlined,
-      Icons.close,
-      Icons.square_outlined,
-      Icons.change_history,
-      Icons.star_border,
-      Icons.favorite_outline,
-    ];
+    final shapes = PlayerShape.values.map((e) => e.icon).toList();
 
     final content = Column(
       mainAxisSize: MainAxisSize.min,

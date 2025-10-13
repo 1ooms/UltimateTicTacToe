@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:ultimate_tic_tac_toe/widgets/dialogs/player_setup/player_customizer/shape_selector_grid.dart';
 
+import '../../../../models/enum/player_shape.dart';
 import '../../../../models/player_config.dart';
 import '../../../../utils/ui_helpers.dart';
 import 'color_selector_grid.dart';
@@ -28,7 +29,7 @@ class _PlayerCustomizationDialogState extends State<PlayerCustomizationDialog> {
   @override
   void initState() {
     super.initState();
-    selectedShape = widget.currentConfig.shape;
+    selectedShape = widget.currentConfig.shape.icon;
     selectedColor = widget.currentConfig.color;
   }
 
@@ -51,7 +52,11 @@ class _PlayerCustomizationDialogState extends State<PlayerCustomizationDialog> {
   }
 
   void confirmSelection() {
-    widget.onConfirm(PlayerConfig(shape: selectedShape, color: selectedColor));
+    final playerShape = PlayerShape.values.firstWhere(
+          (e) => e.name == selectedShape.toString()
+    );
+
+    widget.onConfirm(PlayerConfig(shape: playerShape, color: selectedColor));
     Navigator.pop(context);
   }
 
@@ -62,7 +67,7 @@ class _PlayerCustomizationDialogState extends State<PlayerCustomizationDialog> {
 
     final shapeSelector = ShapeSelectorGrid(
       selectedShape: selectedShape,
-      otherShape: widget.otherConfig.shape,
+      otherShape: widget.otherConfig.shape.icon,
       onShapeSelected: (shape) => setState(() => selectedShape = shape),
       expand: isLandscape,
     );

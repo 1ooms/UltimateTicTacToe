@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:ultimate_tic_tac_toe/models/enum/ai_difficulty.dart';
+import 'package:ultimate_tic_tac_toe/models/enum/player_shape.dart';
 import 'package:ultimate_tic_tac_toe/widgets/dialogs/player_setup/player_preview.dart';
 import 'package:ultimate_tic_tac_toe/widgets/difficulty_slider.dart';
 
@@ -40,10 +41,10 @@ class _PlayerSetupState extends State<PlayerSetup> {
   Future<void> _loadPrefs() async {
     prefs = await SharedPreferences.getInstance();
 
-    final int player1Shape =
-        prefs.getInt('player1Shape') ?? Icons.close.codePoint;
-    final int player2Shape =
-        prefs.getInt('player2Shape') ?? Icons.circle_outlined.codePoint;
+    final String player1ShapeName =
+        prefs.getString('player1Shape') ?? PlayerShape.cross.name;
+    final String player2ShapeName =
+        prefs.getString('player2Shape') ?? PlayerShape.circle.name;
     final int player1Color =
         prefs.getInt('player1Color') ?? Colors.red.toARGB32();
     final int player2Color =
@@ -55,14 +56,24 @@ class _PlayerSetupState extends State<PlayerSetup> {
       );
     }
 
+    final player1Shape = PlayerShape.values.firstWhere(
+          (e) => e.name == player1ShapeName,
+      orElse: () => PlayerShape.cross,
+    );
+
+    final player2Shape = PlayerShape.values.firstWhere(
+          (e) => e.name == player2ShapeName,
+      orElse: () => PlayerShape.circle,
+    );
+
     setState(() {
       player1Config = PlayerConfig(
         color: Color(player1Color),
-        shape: IconData(player1Shape, fontFamily: 'MaterialIcons'),
+        shape: player1Shape,
       );
       player2Config = PlayerConfig(
         color: Color(player2Color),
-        shape: IconData(player2Shape, fontFamily: 'MaterialIcons'),
+        shape: player2Shape,
       );
       isLoading = false;
     });
@@ -71,8 +82,8 @@ class _PlayerSetupState extends State<PlayerSetup> {
   void _savePrefs() async {
     prefs = await SharedPreferences.getInstance();
 
-    prefs.setInt('player1Shape', player1Config.shape.codePoint);
-    prefs.setInt('player2Shape', player2Config.shape.codePoint);
+    prefs.setString('player1Shape', player1Config.shape.name);
+    prefs.setString('player2Shape', player2Config.shape.name);
     prefs.setInt('player1Color', player1Config.color.toARGB32());
     prefs.setInt('player2Color', player2Config.color.toARGB32());
     prefs.setBool('isPlayer1First', isPlayer1First);
