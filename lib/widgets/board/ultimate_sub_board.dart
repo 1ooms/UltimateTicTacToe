@@ -109,7 +109,10 @@ class SubBoard extends StatelessWidget {
         ),
         child: LayoutBuilder(
           builder: (context, constraints) {
-            final double iconSize = constraints.maxWidth;
+            double iconSize = constraints.maxWidth;
+            if (borderThickness == 1) {
+              iconSize -= 2;
+            }
             Icon? symbol;
             if (player == Player.one) {
               symbol = buildIcon(player1.shape, player1.color, iconSize);
