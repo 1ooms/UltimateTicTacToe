@@ -28,7 +28,7 @@ class PlayerCustomizer extends StatelessWidget {
             borderRadius: BorderRadius.circular(12),
             color: colorScheme.surface,
           ),
-          child: buildIcon(config1.shape.icon, config1.color, 32),
+          child: buildIcon(config1.shape, config1.color, 32),
         ),
         IconButton(
           icon: const Icon(Icons.edit),

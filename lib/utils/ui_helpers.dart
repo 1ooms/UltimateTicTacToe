@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:ultimate_tic_tac_toe/models/enum/player_shape.dart';
 
 void showCustomSnackBar(BuildContext context, Text text) {
   final messenger = ScaffoldMessenger.of(context);
@@ -16,6 +17,6 @@ void showCustomSnackBar(BuildContext context, Text text) {
       .then((value) => messenger.clearSnackBars());
 }
 
-Icon buildIcon(IconData shape, Color color, double size) {
-  return Icon(shape, color: color, size: size);
+Icon buildIcon(PlayerShape shape, Color color, double size) {
+  return Icon(shape.icon, color: color, size: size);
 }

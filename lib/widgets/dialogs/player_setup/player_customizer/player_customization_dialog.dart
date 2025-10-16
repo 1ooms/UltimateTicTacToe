@@ -23,13 +23,13 @@ class PlayerCustomizationDialog extends StatefulWidget {
 }
 
 class _PlayerCustomizationDialogState extends State<PlayerCustomizationDialog> {
-  late IconData selectedShape;
+  late PlayerShape selectedShape;
   late Color selectedColor;
 
   @override
   void initState() {
     super.initState();
-    selectedShape = widget.currentConfig.shape.icon;
+    selectedShape = widget.currentConfig.shape;
     selectedColor = widget.currentConfig.color;
   }
 
@@ -53,7 +53,7 @@ class _PlayerCustomizationDialogState extends State<PlayerCustomizationDialog> {
 
   void confirmSelection() {
     final playerShape = PlayerShape.values.firstWhere(
-          (e) => e.name == selectedShape.toString()
+          (e) => e.name == selectedShape.name
     );
 
     widget.onConfirm(PlayerConfig(shape: playerShape, color: selectedColor));
@@ -67,7 +67,7 @@ class _PlayerCustomizationDialogState extends State<PlayerCustomizationDialog> {
 
     final shapeSelector = ShapeSelectorGrid(
       selectedShape: selectedShape,
-      otherShape: widget.otherConfig.shape.icon,
+      otherShape: widget.otherConfig.shape,
       onShapeSelected: (shape) => setState(() => selectedShape = shape),
       expand: isLandscape,
     );

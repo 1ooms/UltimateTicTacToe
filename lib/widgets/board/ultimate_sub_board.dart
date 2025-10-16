@@ -57,7 +57,7 @@ class SubBoard extends StatelessWidget {
                       .withAlpha(102),
                   child: Center(
                     child: buildIcon(
-                      winner == Player.one ? player1.shape.icon : player2.shape.icon,
+                      winner == Player.one ? player1.shape : player2.shape,
                       winner == Player.one ? player1.color : player2.color,
                       constraints.maxWidth
                     ),
@@ -112,9 +112,9 @@ class SubBoard extends StatelessWidget {
             final double iconSize = constraints.maxWidth;
             Icon? symbol;
             if (player == Player.one) {
-              symbol = buildIcon(player1.shape.icon, player1.color, iconSize);
+              symbol = buildIcon(player1.shape, player1.color, iconSize);
             } else if (player == Player.two) {
-              symbol = buildIcon(player2.shape.icon, player2.color, iconSize);
+              symbol = buildIcon(player2.shape, player2.color, iconSize);
             }
             return Center(child: symbol);
           },

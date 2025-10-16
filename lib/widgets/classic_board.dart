@@ -60,9 +60,9 @@ class TicTacToeBoardState extends State<TicTacToeBoard> {
     Widget? symbol;
 
     if (_board[index] == Player.one) {
-      symbol = buildIcon(widget.player1.shape.icon, widget.player1.color, 48);
+      symbol = buildIcon(widget.player1.shape, widget.player1.color, 48);
     } else if (_board[index] == Player.two) {
-      symbol = buildIcon(widget.player2.shape.icon, widget.player2.color, 48);
+      symbol = buildIcon(widget.player2.shape, widget.player2.color, 48);
     }
 
     return GestureDetector(
@@ -199,8 +199,8 @@ class TicTacToeBoardState extends State<TicTacToeBoard> {
               style: Theme.of(context).textTheme.titleMedium,
             ),
             _currentPlayer == Player.one
-                ? buildIcon(widget.player1.shape.icon, widget.player1.color, 28)
-                : buildIcon(widget.player2.shape.icon, widget.player2.color, 28),
+                ? buildIcon(widget.player1.shape, widget.player1.color, 28)
+                : buildIcon(widget.player2.shape, widget.player2.color, 28),
           ],
         ),
         const SizedBox(height: 16),

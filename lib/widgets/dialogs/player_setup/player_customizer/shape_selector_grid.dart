@@ -4,9 +4,9 @@ import '../../../../models/enum/player_shape.dart';
 import '../../../../utils/ui_helpers.dart';
 
 class ShapeSelectorGrid extends StatelessWidget {
-  final IconData selectedShape;
-  final IconData otherShape;
-  final void Function(IconData) onShapeSelected;
+  final PlayerShape selectedShape;
+  final PlayerShape otherShape;
+  final void Function(PlayerShape) onShapeSelected;
   final bool expand;
   final String label;
 
@@ -22,7 +22,7 @@ class ShapeSelectorGrid extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    final shapes = PlayerShape.values.map((e) => e.icon).toList();
+    final shapes = PlayerShape.values.map((e) => e).toList();
 
     final content = Column(
       mainAxisSize: MainAxisSize.min,
