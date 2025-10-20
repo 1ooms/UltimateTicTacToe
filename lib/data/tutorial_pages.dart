@@ -11,7 +11,7 @@ final List<TutorialPageData> pages = [
   ),
   TutorialPageData(
     explanation:
-        "The square that a player chooses determines which smaller board the other player must play on next.",
+        "The square that a player chooses determines which smaller board the other player must play on next.\n\nBoth the previous move and valid next moves are highlighted.",
     moves: [Move(4, 0, Player.one, null)],
   ),
   TutorialPageData(
@@ -47,7 +47,7 @@ final List<TutorialPageData> pages = [
   ),
   TutorialPageData(
     explanation:
-        "The first player to win three of the smaller boards in a row on the larger grid wins the game.",
+        "The first player to win three of the smaller boards in a row on the larger board wins the game.",
     moves: [
       Move(4, 0, Player.one, null),
       Move(0, 6, Player.two, null),
