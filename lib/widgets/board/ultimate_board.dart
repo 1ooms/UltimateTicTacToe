@@ -180,9 +180,23 @@ class BoardState extends State<Board> {
 
               SizedBox(
                 width: sidePanelWidth,
-                child: const Padding(
-                  padding: EdgeInsets.all(16.0),
-                  child: BannerAdWidget(),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    vertical: 24.0,
+                    horizontal: 12.0,
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      RotatedBox(
+                        quarterTurns: 1,
+                        child: FittedBox(
+                          fit: BoxFit.contain,
+                          child: BannerAdWidget(),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ],

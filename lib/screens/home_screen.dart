@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:ultimate_tic_tac_toe/models/enum/game_mode.dart';
 import 'package:ultimate_tic_tac_toe/widgets/app_drawer.dart';
 import 'package:ultimate_tic_tac_toe/widgets/game_mode_card.dart';
@@ -26,7 +25,7 @@ class HomeScreen extends StatelessWidget {
         MediaQuery.of(context).orientation == Orientation.landscape;
 
     Widget buildGameModeCards() {
-      final double cardWidth = 200.0;
+      final double cardWidth = 220.0;
 
       return ListView(
         scrollDirection: isLandscape ? Axis.horizontal : Axis.vertical,
@@ -100,16 +99,9 @@ class HomeScreen extends StatelessWidget {
                 ),
               ),
             ),
-            Container(
-              width: 100.0,
-              padding: const EdgeInsets.symmetric(
-                vertical: 24.0,
-                horizontal: 12.0,
-              ),
-              child: const Align(
-                alignment: Alignment.center,
-                child: BannerAdWidget(adSize: AdSize.largeBanner),
-              ),
+            RotatedBox(
+              quarterTurns: 1,
+              child: FittedBox(fit: BoxFit.contain, child: BannerAdWidget()),
             ),
           ],
         );
