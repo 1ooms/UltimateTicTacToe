@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:ultimate_tic_tac_toe/models/tutorial_page_data.dart';
 import 'package:ultimate_tic_tac_toe/widgets/tutorial/static_board.dart';
 import 'package:ultimate_tic_tac_toe/data/tutorial_pages.dart';
 
@@ -52,6 +53,8 @@ class _TutorialWizardState extends State<TutorialWizard> {
 
   @override
   Widget build(BuildContext context) {
+    final isLandscape =
+        MediaQuery.of(context).orientation == Orientation.landscape;
     return Column(
       children: [
         Expanded(
@@ -68,23 +71,50 @@ class _TutorialWizardState extends State<TutorialWizard> {
               final page = pages[index];
               return Padding(
                 padding: const EdgeInsets.all(16),
-                child: Column(
-                  children: [
-                    Expanded(
-                      child: StaticBoard(
-                        moveHistory: page.moves,
-                        player1: player1,
-                        player2: player2,
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    Text(
-                      page.explanation,
-                      style: Theme.of(context).textTheme.bodyLarge,
-                      textAlign: TextAlign.center,
-                    ),
-                  ],
-                ),
+                child:
+                    !isLandscape
+                        ? Column(
+                          children: [
+                            Expanded(
+                              child: StaticBoard(
+                                moveHistory: page.moves,
+                                player1: player1,
+                                player2: player2,
+                                gameFinished:
+                                    (_currentPage == pages.length - 1),
+                              ),
+                            ),
+                            const SizedBox(height: 16),
+                            Text(
+                              page.explanation,
+                              style: Theme.of(context).textTheme.bodyLarge,
+                              textAlign: TextAlign.center,
+                            ),
+                          ],
+                        )
+                        : Row(
+                          children: [
+                            SizedBox(
+                              width: MediaQuery.of(context).size.width * 0.4,
+                              child: Text(
+                                page.explanation,
+                                style: Theme.of(context).textTheme.bodyLarge,
+                                textAlign: TextAlign.center,
+                              ),
+                            ),
+                            const SizedBox(width: 16),
+                            Expanded(
+                              child: Center(
+                                child: StaticBoard(
+                                  moveHistory: page.moves,
+                                  player1: player1,
+                                  player2: player2,
+                                  gameFinished: (_currentPage == pages.length - 1),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
               );
             },
           ),
@@ -116,11 +146,11 @@ class _TutorialWizardState extends State<TutorialWizard> {
                 height: isActive ? 12 : 8,
                 decoration: BoxDecoration(
                   color:
-                  isActive
-                      ? Theme.of(context).colorScheme.primary
-                      : Theme.of(
-                    context,
-                  ).colorScheme.onSurface.withAlpha(100),
+                      isActive
+                          ? Theme.of(context).colorScheme.primary
+                          : Theme.of(
+                            context,
+                          ).colorScheme.onSurface.withAlpha(100),
                   shape: BoxShape.circle,
                 ),
               );
