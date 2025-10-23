@@ -1,10 +1,16 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:ultimate_tic_tac_toe/data/tutorial_pages.dart';
+import 'package:ultimate_tic_tac_toe/models/enum/player.dart';
 import 'package:ultimate_tic_tac_toe/widgets/tutorial/static_board.dart';
+import 'package:ultimate_tic_tac_toe/widgets/tutorial/static_board_state.dart';
 
 import '../../main.dart';
 import '../../models/enum/player_shape.dart';
 import '../../models/player_config.dart';
+import '../board/current_player_indicator.dart';
+import '../board/winner_indicator.dart';
 
 class TutorialWizard extends StatefulWidget {
   const TutorialWizard({super.key});
@@ -68,12 +74,31 @@ class _TutorialWizardState extends State<TutorialWizard> {
             },
             itemBuilder: (ctx, index) {
               final page = pages[index];
+              final boardState = buildStaticBoardState(page.moves);
+              final gameFinished = _currentPage == pages.length - 1;
+
+              Widget playerStatusIndicator = gameFinished
+                  ? WinnerIndicator(
+                overallWinner: Player.two,
+                player1: player1,
+                player2: player2,
+                playingAgainstAI: false,
+              )
+                  : CurrentPlayerIndicator(
+                currentPlayer: boardState.currentPlayer,
+                player1: player1,
+                player2: player2,
+                playingAgainstAI: false,
+              );
+
               return Padding(
                 padding: const EdgeInsets.all(16),
                 child:
                     !isLandscape
                         ? Column(
                           children: [
+                            playerStatusIndicator,
+                            const SizedBox(height: 16),
                             Expanded(
                               child: StaticBoard(
                                 moveHistory: page.moves,
@@ -91,29 +116,62 @@ class _TutorialWizardState extends State<TutorialWizard> {
                             ),
                           ],
                         )
-                        : Row(
-                          children: [
-                            SizedBox(
-                              width: MediaQuery.of(context).size.width * 0.4,
-                              child: Text(
-                                page.explanation,
-                                style: Theme.of(context).textTheme.bodyLarge,
-                                textAlign: TextAlign.center,
-                              ),
-                            ),
-                            const SizedBox(width: 16),
-                            Expanded(
-                              child: Center(
-                                child: StaticBoard(
-                                  moveHistory: page.moves,
-                                  player1: player1,
-                                  player2: player2,
-                                  gameFinished:
-                                      (_currentPage == pages.length - 1),
+                        : LayoutBuilder(
+                          builder: (context, constraints) {
+                            final totalWidth = constraints.maxWidth;
+                            final totalHeight = constraints.maxHeight;
+
+                            final boardSize = totalHeight;
+                            final leftPanelWidth = totalWidth*0.5;
+                            final rightPanelWidth = totalWidth - boardSize - leftPanelWidth;
+
+                            return Row(
+                              children: [
+                                SizedBox(
+                                  width: leftPanelWidth,
+                                  child: Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 32.0,
+                                    ),
+                                    child: Center(
+                                      child: Text(
+                                        page.explanation,
+                                        style:
+                                            Theme.of(
+                                              context,
+                                            ).textTheme.bodyLarge,
+                                        textAlign: TextAlign.center,
+                                      ),
+                                    ),
+                                  ),
                                 ),
-                              ),
-                            ),
-                          ],
+                                SizedBox(
+                                  width: boardSize,
+                                  height: boardSize,
+                                  child: StaticBoard(
+                                    moveHistory: page.moves,
+                                    player1: player1,
+                                    player2: player2,
+                                    gameFinished:
+                                        (_currentPage == pages.length - 1),
+                                  ),
+                                ),
+                                SizedBox(
+                                  width: rightPanelWidth,
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(16.0),
+                                    child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        playerStatusIndicator
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            );
+                          },
                         ),
               );
             },
