@@ -26,7 +26,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   void saveSoundSettings() {
-    print(soundSetting);
     audioController.toggleSound();
   }
 
