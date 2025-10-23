@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:ultimate_tic_tac_toe/models/tutorial_page_data.dart';
-import 'package:ultimate_tic_tac_toe/widgets/tutorial/static_board.dart';
 import 'package:ultimate_tic_tac_toe/data/tutorial_pages.dart';
+import 'package:ultimate_tic_tac_toe/widgets/tutorial/static_board.dart';
 
 import '../../main.dart';
 import '../../models/enum/player_shape.dart';
@@ -109,7 +108,8 @@ class _TutorialWizardState extends State<TutorialWizard> {
                                   moveHistory: page.moves,
                                   player1: player1,
                                   player2: player2,
-                                  gameFinished: (_currentPage == pages.length - 1),
+                                  gameFinished:
+                                      (_currentPage == pages.length - 1),
                                 ),
                               ),
                             ),

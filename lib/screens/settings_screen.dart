@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:ultimate_tic_tac_toe/utils/audio_controller.dart';
 
 class SettingsScreen extends StatefulWidget {
@@ -21,7 +20,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   final audioController = AudioController();
   late bool soundSetting;
-
 
   void getSoundSetting() {
     soundSetting = audioController.soundSetting;
@@ -118,7 +116,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   });
                 },
               ),
-            )
+            ),
           ],
         ),
       ),

@@ -94,7 +94,12 @@ class _GameScreenState extends State<GameScreen> {
         ],
       ),
       body: Padding(
-        padding: const EdgeInsets.only(left: 16.0, right: 16.0, top: 8.0, bottom: 16),
+        padding: const EdgeInsets.only(
+          left: 16.0,
+          right: 16.0,
+          top: 8.0,
+          bottom: 16,
+        ),
         child: buildBodyContent(),
       ),
     );

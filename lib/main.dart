@@ -47,7 +47,7 @@ void main() async {
   await audioController.initialize();
 
   // runApp(Provider.value(value: FirebaseFirestore.instance, child: App()));
-  runApp(ProviderScope(child: App(audioController: audioController),));
+  runApp(ProviderScope(child: App(audioController: audioController)));
 }
 
 class App extends StatefulWidget {

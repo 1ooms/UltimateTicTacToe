@@ -17,7 +17,7 @@ class StaticBoard extends StatelessWidget {
     required this.moveHistory,
     required this.player1,
     required this.player2,
-    required this.gameFinished
+    required this.gameFinished,
   });
 
   @override

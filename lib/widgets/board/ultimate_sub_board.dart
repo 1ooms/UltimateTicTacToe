@@ -47,23 +47,23 @@ class SubBoard extends StatelessWidget {
         ),
         if (winner != null)
           LayoutBuilder(
-              builder: (context, constraints) {
-                return Container(
-                  color:
-                  Theme.of(context).brightness == Brightness.dark
-                      ? (winner == Player.one ? player1.color : player2.color)
-                      .withAlpha(130)
-                      : (winner == Player.one ? player1.color : player2.color)
-                      .withAlpha(102),
-                  child: Center(
-                    child: buildIcon(
-                      winner == Player.one ? player1.shape : player2.shape,
-                      winner == Player.one ? player1.color : player2.color,
-                      constraints.maxWidth
-                    ),
+            builder: (context, constraints) {
+              return Container(
+                color:
+                    Theme.of(context).brightness == Brightness.dark
+                        ? (winner == Player.one ? player1.color : player2.color)
+                            .withAlpha(130)
+                        : (winner == Player.one ? player1.color : player2.color)
+                            .withAlpha(102),
+                child: Center(
+                  child: buildIcon(
+                    winner == Player.one ? player1.shape : player2.shape,
+                    winner == Player.one ? player1.color : player2.color,
+                    constraints.maxWidth,
                   ),
-                );
-              }
+                ),
+              );
+            },
           ),
       ],
     );

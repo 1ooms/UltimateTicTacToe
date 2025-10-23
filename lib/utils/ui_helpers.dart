@@ -8,9 +8,7 @@ void showCustomSnackBar(BuildContext context, Text text) {
       .showSnackBar(
         SnackBar(
           duration: Duration(milliseconds: 1000),
-          content: Center(
-            child: text,
-          ),
+          content: Center(child: text),
         ),
       )
       .closed

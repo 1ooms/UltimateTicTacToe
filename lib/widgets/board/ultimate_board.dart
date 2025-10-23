@@ -7,12 +7,12 @@ import 'package:ultimate_tic_tac_toe/widgets/board/current_player_indicator.dart
 import 'package:ultimate_tic_tac_toe/widgets/board/ultimate_sub_board.dart';
 import 'package:ultimate_tic_tac_toe/widgets/board/winner_indicator.dart';
 
+import '../../data/win_patterns.dart';
 import '../../models/ai_player/ai_isolate.dart';
 import '../../models/enum/player.dart';
 import '../../models/move.dart';
 import '../../models/move_parameters.dart';
 import '../../models/player_config.dart';
-import '../../data/win_patterns.dart';
 import '../../utils/audio_controller.dart';
 import '../../utils/ui_helpers.dart';
 import '../ads/banner_ad_widget.dart';

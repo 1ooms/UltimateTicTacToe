@@ -57,12 +57,12 @@ class _PlayerSetupState extends State<PlayerSetup> {
     }
 
     final player1Shape = PlayerShape.values.firstWhere(
-          (e) => e.name == player1ShapeName,
+      (e) => e.name == player1ShapeName,
       orElse: () => PlayerShape.cross,
     );
 
     final player2Shape = PlayerShape.values.firstWhere(
-          (e) => e.name == player2ShapeName,
+      (e) => e.name == player2ShapeName,
       orElse: () => PlayerShape.circle,
     );
 

@@ -19,7 +19,8 @@ class PlayerCustomizationDialog extends StatefulWidget {
   });
 
   @override
-  State<PlayerCustomizationDialog> createState() => _PlayerCustomizationDialogState();
+  State<PlayerCustomizationDialog> createState() =>
+      _PlayerCustomizationDialogState();
 }
 
 class _PlayerCustomizationDialogState extends State<PlayerCustomizationDialog> {
@@ -53,7 +54,7 @@ class _PlayerCustomizationDialogState extends State<PlayerCustomizationDialog> {
 
   void confirmSelection() {
     final playerShape = PlayerShape.values.firstWhere(
-          (e) => e.name == selectedShape.name
+      (e) => e.name == selectedShape.name,
     );
 
     widget.onConfirm(PlayerConfig(shape: playerShape, color: selectedColor));
@@ -63,7 +64,8 @@ class _PlayerCustomizationDialogState extends State<PlayerCustomizationDialog> {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    final isLandscape = MediaQuery.of(context).orientation == Orientation.landscape;
+    final isLandscape =
+        MediaQuery.of(context).orientation == Orientation.landscape;
 
     final shapeSelector = ShapeSelectorGrid(
       selectedShape: selectedShape,
@@ -81,27 +83,28 @@ class _PlayerCustomizationDialogState extends State<PlayerCustomizationDialog> {
 
     final preview = buildPreview(colorScheme);
 
-    final layout = isLandscape
-        ? Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        shapeSelector,
-        const SizedBox(width: 12),
-        colorSelector,
-        const SizedBox(width: 12),
-        preview,
-      ],
-    )
-        : Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        shapeSelector,
-        const SizedBox(height: 12),
-        colorSelector,
-        const SizedBox(height: 16),
-        preview,
-      ],
-    );
+    final layout =
+        isLandscape
+            ? Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                shapeSelector,
+                const SizedBox(width: 12),
+                colorSelector,
+                const SizedBox(width: 12),
+                preview,
+              ],
+            )
+            : Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                shapeSelector,
+                const SizedBox(height: 12),
+                colorSelector,
+                const SizedBox(height: 16),
+                preview,
+              ],
+            );
 
     return AlertDialog(
       title: const Text('Customize player'),
@@ -111,10 +114,7 @@ class _PlayerCustomizationDialogState extends State<PlayerCustomizationDialog> {
           onPressed: () => Navigator.pop(context),
           child: const Text("Cancel"),
         ),
-        ElevatedButton(
-          onPressed: confirmSelection,
-          child: const Text("Save"),
-        ),
+        ElevatedButton(onPressed: confirmSelection, child: const Text("Save")),
       ],
     );
   }
