@@ -99,10 +99,6 @@ class HomeScreen extends StatelessWidget {
                 ),
               ),
             ),
-            RotatedBox(
-              quarterTurns: 1,
-              child: FittedBox(fit: BoxFit.contain, child: BannerAdWidget()),
-            ),
           ],
         );
       } else {
@@ -120,10 +116,6 @@ class HomeScreen extends StatelessWidget {
                   ],
                 ),
               ),
-            ),
-            const Padding(
-              padding: EdgeInsets.all(24.0),
-              child: BannerAdWidget(),
             ),
           ],
         );
@@ -146,6 +138,7 @@ class HomeScreen extends StatelessWidget {
         themeMode: themeMode,
       ),
       body: SafeArea(child: buildBodyContent()),
+      bottomNavigationBar: BannerAdWidget(),
     );
   }
 }
