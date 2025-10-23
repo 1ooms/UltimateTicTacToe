@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:ultimate_tic_tac_toe/models/enum/ai_difficulty.dart';
 import 'package:ultimate_tic_tac_toe/models/enum/player_shape.dart';
-import 'package:ultimate_tic_tac_toe/widgets/dialogs/game_setup/player_icon_preview.dart';
-import 'package:ultimate_tic_tac_toe/widgets/difficulty_slider.dart';
+import 'package:ultimate_tic_tac_toe/screens/game_screen/game_setup/difficulty_slider.dart';
+import 'package:ultimate_tic_tac_toe/screens/game_screen/game_setup/player_icon_preview.dart';
 
 import '../../../models/enum/game_mode.dart';
 import '../../../models/player_config.dart';

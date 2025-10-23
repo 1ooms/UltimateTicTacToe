@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:ultimate_tic_tac_toe/models/enum/player.dart';
-import 'package:ultimate_tic_tac_toe/widgets/board/ultimate_sub_board.dart';
+import 'package:ultimate_tic_tac_toe/screens/game_screen/board/ultimate_sub_board.dart';
 
-import '../../models/move.dart';
-import '../../models/player_config.dart';
+import '../../../models/move.dart';
+import '../../../models/player_config.dart';
 
 class UltimateBoard extends StatelessWidget {
   const UltimateBoard({

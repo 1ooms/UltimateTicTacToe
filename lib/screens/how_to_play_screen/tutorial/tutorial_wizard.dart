@@ -1,16 +1,14 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:ultimate_tic_tac_toe/data/tutorial_pages.dart';
 import 'package:ultimate_tic_tac_toe/models/enum/player.dart';
-import 'package:ultimate_tic_tac_toe/widgets/tutorial/static_board.dart';
-import 'package:ultimate_tic_tac_toe/widgets/tutorial/static_board_state.dart';
+import 'package:ultimate_tic_tac_toe/screens/how_to_play_screen/tutorial/static_board.dart';
+import 'package:ultimate_tic_tac_toe/screens/how_to_play_screen/tutorial/static_board_state.dart';
 
-import '../../main.dart';
-import '../../models/enum/player_shape.dart';
-import '../../models/player_config.dart';
-import '../board/current_player_indicator.dart';
-import '../board/winner_indicator.dart';
+import '../../../main.dart';
+import '../../../models/enum/player_shape.dart';
+import '../../../models/player_config.dart';
+import '../../game_screen/board/current_player_indicator.dart';
+import '../../game_screen/board/winner_indicator.dart';
 
 class TutorialWizard extends StatefulWidget {
   const TutorialWizard({super.key});
@@ -77,19 +75,20 @@ class _TutorialWizardState extends State<TutorialWizard> {
               final boardState = buildStaticBoardState(page.moves);
               final gameFinished = _currentPage == pages.length - 1;
 
-              Widget playerStatusIndicator = gameFinished
-                  ? WinnerIndicator(
-                overallWinner: Player.two,
-                player1: player1,
-                player2: player2,
-                playingAgainstAI: false,
-              )
-                  : CurrentPlayerIndicator(
-                currentPlayer: boardState.currentPlayer,
-                player1: player1,
-                player2: player2,
-                playingAgainstAI: false,
-              );
+              Widget playerStatusIndicator =
+                  gameFinished
+                      ? WinnerIndicator(
+                        overallWinner: Player.two,
+                        player1: player1,
+                        player2: player2,
+                        playingAgainstAI: false,
+                      )
+                      : CurrentPlayerIndicator(
+                        currentPlayer: boardState.currentPlayer,
+                        player1: player1,
+                        player2: player2,
+                        playingAgainstAI: false,
+                      );
 
               return Padding(
                 padding: const EdgeInsets.all(16),
@@ -122,8 +121,9 @@ class _TutorialWizardState extends State<TutorialWizard> {
                             final totalHeight = constraints.maxHeight;
 
                             final boardSize = totalHeight;
-                            final leftPanelWidth = totalWidth*0.5;
-                            final rightPanelWidth = totalWidth - boardSize - leftPanelWidth;
+                            final leftPanelWidth = totalWidth * 0.5;
+                            final rightPanelWidth =
+                                totalWidth - boardSize - leftPanelWidth;
 
                             return Row(
                               children: [
@@ -163,9 +163,7 @@ class _TutorialWizardState extends State<TutorialWizard> {
                                     child: Column(
                                       mainAxisAlignment:
                                           MainAxisAlignment.center,
-                                      children: [
-                                        playerStatusIndicator
-                                      ],
+                                      children: [playerStatusIndicator],
                                     ),
                                   ),
                                 ),

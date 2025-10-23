@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:ultimate_tic_tac_toe/models/enum/game_mode.dart';
-import 'package:ultimate_tic_tac_toe/widgets/app_drawer.dart';
-import 'package:ultimate_tic_tac_toe/widgets/game_mode_card.dart';
+import 'package:ultimate_tic_tac_toe/screens/home_screen/game_mode_card.dart';
+import 'package:ultimate_tic_tac_toe/screens/home_screen/app_drawer.dart';
 
-import '../utils/ui_helpers.dart';
-import '../widgets/ads/banner_ad_widget.dart';
-import 'game_screen.dart';
+import '../../utils/ui_helpers.dart';
+import '../../widgets/ads/banner_ad_widget.dart';
+import '../game_screen/game_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   HomeScreen({

@@ -3,16 +3,16 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:ultimate_tic_tac_toe/extensions/string_extension.dart';
 import 'package:ultimate_tic_tac_toe/models/enum/game_mode.dart';
-import 'package:ultimate_tic_tac_toe/widgets/board/current_player_indicator.dart';
-import 'package:ultimate_tic_tac_toe/widgets/board/winner_indicator.dart';
 
-import '../models/enum/ai_difficulty.dart';
-import '../models/enum/player.dart';
-import '../models/player_config.dart';
-import '../models/player_setup_result.dart';
-import '../widgets/ads/banner_ad_widget.dart';
-import '../widgets/board/game_state.dart';
-import '../widgets/dialogs/game_setup/game_setup.dart';
+import '../../models/enum/ai_difficulty.dart';
+import '../../models/enum/player.dart';
+import '../../models/player_config.dart';
+import '../../models/player_setup_result.dart';
+import '../../widgets/ads/banner_ad_widget.dart';
+import 'board/current_player_indicator.dart';
+import 'board/game_state.dart';
+import 'board/winner_indicator.dart';
+import 'game_setup/game_setup.dart';
 
 class GameScreen extends StatefulWidget {
   const GameScreen({super.key, required this.gameMode});

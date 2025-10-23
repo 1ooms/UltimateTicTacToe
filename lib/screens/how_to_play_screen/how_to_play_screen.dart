@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:ultimate_tic_tac_toe/widgets/tutorial/tutorial_wizard.dart';
+import 'package:ultimate_tic_tac_toe/screens/how_to_play_screen/tutorial/tutorial_wizard.dart';
 
 class HowToPlayScreen extends StatelessWidget {
   const HowToPlayScreen({super.key});

@@ -1,8 +1,8 @@
 import 'package:confetti/confetti.dart';
 import 'package:flutter/material.dart';
 
-import '../../models/enum/player.dart';
-import '../../models/player_config.dart';
+import '../../../models/enum/player.dart';
+import '../../../models/player_config.dart';
 
 class WinDialog extends StatelessWidget {
   const WinDialog({

@@ -9,5 +9,6 @@ enum PlayerShape {
   heart(Icons.favorite_outline);
 
   final IconData icon;
+
   const PlayerShape(this.icon);
 }

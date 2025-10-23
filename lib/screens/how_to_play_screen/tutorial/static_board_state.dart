@@ -1,6 +1,6 @@
-import '../../data/win_patterns.dart';
-import '../../models/enum/player.dart';
-import '../../models/move.dart';
+import '../../../data/win_patterns.dart';
+import '../../../models/enum/player.dart';
+import '../../../models/move.dart';
 
 class StaticBoardState {
   final List<List<Player?>> subBoards;

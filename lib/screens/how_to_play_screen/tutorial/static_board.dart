@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:ultimate_tic_tac_toe/widgets/tutorial/static_board_state.dart';
+import 'package:ultimate_tic_tac_toe/screens/how_to_play_screen/tutorial/static_board_state.dart';
 
-import '../../models/move.dart';
-import '../../models/player_config.dart';
-import '../board/ultimate_sub_board.dart';
+import '../../../models/move.dart';
+import '../../../models/player_config.dart';
+import '../../game_screen/board/ultimate_sub_board.dart';
 
 class StaticBoard extends StatelessWidget {
   final List<Move> moveHistory;
@@ -42,7 +42,8 @@ class StaticBoard extends StatelessWidget {
             player2: player2,
             currentPlayer: boardState.currentPlayer,
             isValidMove: (boardIdx, cellIdx) {
-              final valid = boardState.subBoardWinners[boardIdx] == null &&
+              final valid =
+                  boardState.subBoardWinners[boardIdx] == null &&
                   (boardState.activeSubBoardIndex == null ||
                       boardIdx == boardState.activeSubBoardIndex) &&
                   boardState.subBoards[boardIdx][cellIdx] == null;
