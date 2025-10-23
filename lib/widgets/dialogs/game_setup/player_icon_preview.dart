@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:ultimate_tic_tac_toe/widgets/dialogs/player_setup/player_customizer/player_customization_dialog.dart';
+import 'package:ultimate_tic_tac_toe/widgets/dialogs/game_setup/player_customizer/player_customization_dialog.dart';
 
 import '../../../models/player_config.dart';
 import '../../../utils/ui_helpers.dart';

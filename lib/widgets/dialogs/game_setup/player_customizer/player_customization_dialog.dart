@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:ultimate_tic_tac_toe/widgets/dialogs/player_setup/player_customizer/shape_selector_grid.dart';
+import 'package:ultimate_tic_tac_toe/widgets/dialogs/game_setup/player_customizer/shape_selector_grid.dart';
 
 import '../../../../models/enum/player_shape.dart';
 import '../../../../models/player_config.dart';

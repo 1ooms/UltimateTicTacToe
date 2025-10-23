@@ -2,15 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:ultimate_tic_tac_toe/models/enum/ai_difficulty.dart';
 import 'package:ultimate_tic_tac_toe/models/enum/player_shape.dart';
-import 'package:ultimate_tic_tac_toe/widgets/dialogs/player_setup/player_preview.dart';
+import 'package:ultimate_tic_tac_toe/widgets/dialogs/game_setup/player_icon_preview.dart';
 import 'package:ultimate_tic_tac_toe/widgets/difficulty_slider.dart';
 
 import '../../../models/enum/game_mode.dart';
 import '../../../models/player_config.dart';
 import '../../../models/player_setup_result.dart';
 
-class PlayerSetup extends StatefulWidget {
-  const PlayerSetup({
+class GameSetup extends StatefulWidget {
+  const GameSetup({
     super.key,
     required this.gameMode,
     required this.gameStarted,
@@ -20,10 +20,10 @@ class PlayerSetup extends StatefulWidget {
   final bool gameStarted;
 
   @override
-  State<PlayerSetup> createState() => _PlayerSetupState();
+  State<GameSetup> createState() => _GameSetupState();
 }
 
-class _PlayerSetupState extends State<PlayerSetup> {
+class _GameSetupState extends State<GameSetup> {
   late SharedPreferences prefs;
 
   late bool isPlayer1First;
@@ -97,6 +97,96 @@ class _PlayerSetupState extends State<PlayerSetup> {
     }
 
     ThemeData theme = Theme.of(context);
+    final isLandscape =
+        MediaQuery.of(context).orientation == Orientation.landscape;
+
+    final playerSetup = Column(
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
+            Text('Players', style: theme.textTheme.titleSmall),
+            Text('Who starts?', style: theme.textTheme.titleSmall),
+          ],
+        ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Row(
+              children: [
+                const Icon(Icons.person_outline),
+                const SizedBox(width: 10),
+                PlayerCustomizer(
+                  config1: player1Config,
+                  config2: player2Config,
+                  onChanged: (config) {
+                    setState(() {
+                      player1Config = config;
+                    });
+                  },
+                ),
+              ],
+            ),
+
+            Radio<bool>(
+              value: true,
+              groupValue: isPlayer1First,
+              onChanged: (value) {
+                setState(() {
+                  isPlayer1First = true;
+                });
+              },
+            ),
+          ],
+        ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Row(
+              children: [
+                widget.gameMode == GameMode.computer
+                    ? Icon(Icons.smart_toy_outlined)
+                    : widget.gameMode == GameMode.online
+                    ? Icon(Icons.language)
+                    : Icon(Icons.person_outline),
+                const SizedBox(width: 10),
+                PlayerCustomizer(
+                  config1: player2Config,
+                  config2: player1Config,
+                  onChanged: (config) {
+                    setState(() {
+                      player2Config = config;
+                    });
+                  },
+                ),
+              ],
+            ),
+            Radio<bool>(
+              value: false,
+              groupValue: isPlayer1First,
+              onChanged: (value) {
+                setState(() {
+                  isPlayer1First = false;
+                });
+              },
+            ),
+          ],
+        ),
+      ],
+    );
+
+    final difficultyWidget =
+        widget.gameMode == GameMode.computer
+            ? DifficultySlider(
+              selectedDifficulty: aiDifficulty,
+              onChanged: (difficulty) {
+                setState(() {
+                  aiDifficulty = difficulty;
+                });
+              },
+            )
+            : Container();
 
     return StatefulBuilder(
       builder: (context, setState) {
@@ -111,93 +201,27 @@ class _PlayerSetupState extends State<PlayerSetup> {
                 }
               },
               child: AlertDialog(
-                title: Text('Player Setup', style: theme.textTheme.titleLarge),
-                content: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text('Players', style: theme.textTheme.titleSmall),
-                        Text('Who starts?', style: theme.textTheme.titleSmall),
-                      ],
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Row(
+                scrollable: true,
+                title: Text('Setup', style: theme.textTheme.titleLarge),
+                content:
+                    !isLandscape
+                        ? Column(
+                          mainAxisSize: MainAxisSize.min,
                           children: [
-                            const Icon(Icons.person_outline),
-                            const SizedBox(width: 10),
-                            PlayerCustomizer(
-                              config1: player1Config,
-                              config2: player2Config,
-                              onChanged: (config) {
-                                setState(() {
-                                  player1Config = config;
-                                });
-                              },
-                            ),
+                            playerSetup,
+                            const SizedBox(height: 32),
+                            difficultyWidget,
                           ],
-                        ),
-
-                        Radio<bool>(
-                          value: true,
-                          groupValue: isPlayer1First,
-                          onChanged: (value) {
-                            setState(() {
-                              isPlayer1First = true;
-                            });
-                          },
-                        ),
-                      ],
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Row(
-                          children: [
-                            widget.gameMode == GameMode.computer
-                                ? Icon(Icons.smart_toy_outlined)
-                                : widget.gameMode == GameMode.online
-                                ? Icon(Icons.language)
-                                : Icon(Icons.person_outline),
-                            const SizedBox(width: 10),
-                            PlayerCustomizer(
-                              config1: player2Config,
-                              config2: player1Config,
-                              onChanged: (config) {
-                                setState(() {
-                                  player2Config = config;
-                                });
-                              },
-                            ),
-                          ],
-                        ),
-                        Radio<bool>(
-                          value: false,
-                          groupValue: isPlayer1First,
-                          onChanged: (value) {
-                            setState(() {
-                              isPlayer1First = false;
-                            });
-                          },
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 16),
-                    widget.gameMode == GameMode.computer
-                        ? DifficultySlider(
-                          selectedDifficulty: aiDifficulty,
-                          onChanged: (difficulty) {
-                            setState(() {
-                              aiDifficulty = difficulty;
-                            });
-                          },
                         )
-                        : Container(),
-                  ],
-                ),
+                        : Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Expanded(child: playerSetup),
+                            const SizedBox(width: 64),
+                            Expanded(child: difficultyWidget),
+                          ],
+                        ),
                 actions: [
                   TextButton(
                     onPressed: () {
