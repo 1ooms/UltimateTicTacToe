@@ -8,6 +8,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:ultimate_tic_tac_toe/screens/home_screen.dart';
+import 'package:ultimate_tic_tac_toe/utils/audio_controller.dart';
 
 import 'firebase_options.dart';
 // import 'package:provider/provider.dart';
@@ -42,12 +43,17 @@ void main() async {
 
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
+  final audioController = AudioController();
+  await audioController.initialize();
+
   // runApp(Provider.value(value: FirebaseFirestore.instance, child: App()));
-  runApp(const ProviderScope(child: App()));
+  runApp(ProviderScope(child: App(audioController: audioController),));
 }
 
 class App extends StatefulWidget {
-  const App({super.key});
+  const App({required this.audioController, super.key});
+
+  final AudioController audioController;
 
   @override
   State<App> createState() => _AppState();

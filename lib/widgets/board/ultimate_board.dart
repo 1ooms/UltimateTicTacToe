@@ -13,6 +13,7 @@ import '../../models/move.dart';
 import '../../models/move_parameters.dart';
 import '../../models/player_config.dart';
 import '../../data/win_patterns.dart';
+import '../../utils/audio_controller.dart';
 import '../../utils/ui_helpers.dart';
 import '../ads/banner_ad_widget.dart';
 import '../dialogs/draw_dialog.dart';
@@ -52,6 +53,8 @@ class BoardState extends State<Board> {
   Color _winnerColor = Colors.transparent;
   final _confettiController = ConfettiController();
   late final AIIsolate _aiIsolate;
+
+  AudioController audioController = AudioController();
 
   @override
   void initState() {
@@ -291,6 +294,8 @@ class BoardState extends State<Board> {
 
     if (!_isValidMove(boardIndex, cellIndex)) return;
 
+    audioController.playSound("assets/sounds/tap.wav");
+
     setState(() {
       _subBoards[boardIndex][cellIndex] = _currentPlayer;
       _moveHistory.add(
@@ -441,6 +446,10 @@ class BoardState extends State<Board> {
 
   void undoMove() {
     if (_moveHistory.isEmpty || _aiThinking) return;
+
+    audioController.playSound("assets/sounds/tap.wav");
+
+    Theme.of(context).colorScheme.onSurface;
 
     setState(() {
       int movesToUndo = widget.playingAgainstAI ? 2 : 1;

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:ultimate_tic_tac_toe/utils/audio_controller.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({
@@ -17,10 +19,24 @@ class SettingsScreen extends StatefulWidget {
 class _SettingsScreenState extends State<SettingsScreen> {
   late ThemeMode themeMode;
 
+  final audioController = AudioController();
+  late bool soundSetting;
+
+
+  void getSoundSetting() {
+    soundSetting = audioController.soundSetting;
+  }
+
+  void saveSoundSettings() {
+    print(soundSetting);
+    audioController.toggleSound();
+  }
+
   @override
   void initState() {
     super.initState();
     themeMode = widget.themeMode;
+    soundSetting = audioController.soundSetting;
   }
 
   @override
@@ -74,6 +90,35 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 },
               ),
             ),
+            const SizedBox(height: 24),
+            Text('Sound', style: Theme.of(context).textTheme.titleLarge),
+            const SizedBox(height: 16),
+            ListTile(
+              title: const Text('On'),
+              leading: Radio<bool>(
+                value: true,
+                groupValue: soundSetting,
+                onChanged: (bool? value) {
+                  setState(() {
+                    soundSetting = value!;
+                    saveSoundSettings();
+                  });
+                },
+              ),
+            ),
+            ListTile(
+              title: const Text('Off'),
+              leading: Radio<bool>(
+                value: false,
+                groupValue: soundSetting,
+                onChanged: (bool? value) {
+                  setState(() {
+                    soundSetting = value!;
+                    saveSoundSettings();
+                  });
+                },
+              ),
+            )
           ],
         ),
       ),
