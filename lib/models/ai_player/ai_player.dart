@@ -100,7 +100,7 @@ class AIPlayer {
     required int maxDepth,
   }) {
     int bestScore = -1000000;
-    List<Move> bestMoves = List<Move>.empty(growable: true);
+    List<Move> bestMoves = [];
 
     // Handle full or won sub-board
     if (activeSubBoardIndex != null &&
@@ -109,10 +109,11 @@ class AIPlayer {
       activeSubBoardIndex = null;
     }
 
-    for (final move in _getValidMoves(
+    for (final move in _getOrderedValidMoves(
       board,
       subBoardWinners,
       activeSubBoardIndex,
+      aiPlayer,
     )) {
       final prevWinner = subBoardWinners[move.boardIndex];
       _applyMove(board, subBoardWinners, move, aiPlayer);
@@ -139,6 +140,9 @@ class AIPlayer {
         bestMoves.add(move);
       }
     }
+
+    if (bestMoves.isEmpty)
+      return randomMove(board, subBoardWinners, activeSubBoardIndex);
 
     Random random = Random();
     int randomBestMoveIndex = random.nextInt(bestMoves.length);
@@ -186,10 +190,11 @@ class AIPlayer {
 
     if (currentPlayer == aiPlayer) {
       int maxEval = -1000000;
-      for (final move in _getValidMoves(
+      for (final move in _getOrderedValidMoves(
         board,
         subBoardWinners,
         activeSubBoardIndex,
+        currentPlayer,
       )) {
         final prevWinner = subBoardWinners[move.boardIndex];
         _applyMove(board, subBoardWinners, move, currentPlayer);
@@ -212,10 +217,11 @@ class AIPlayer {
       return maxEval;
     } else {
       int minEval = 1000000;
-      for (final move in _getValidMoves(
+      for (final move in _getOrderedValidMoves(
         board,
         subBoardWinners,
         activeSubBoardIndex,
+        currentPlayer,
       )) {
         final prevWinner = subBoardWinners[move.boardIndex];
         _applyMove(board, subBoardWinners, move, currentPlayer);
@@ -341,5 +347,66 @@ class AIPlayer {
     }
 
     return score;
+  }
+
+  List<Move> _getOrderedValidMoves(
+    List<List<Player?>> board,
+    List<Player?> subBoardWinners,
+    int? activeSubBoardIndex,
+    Player currentPlayer,
+  ) {
+    final moves = <Move>[];
+    Player opponent = _switchPlayer(currentPlayer);
+
+    if (activeSubBoardIndex != null &&
+        (subBoardWinners[activeSubBoardIndex] != null ||
+            board[activeSubBoardIndex].every((cell) => cell != null))) {
+      activeSubBoardIndex = null;
+    }
+
+    for (int boardIndex = 0; boardIndex < 9; boardIndex++) {
+      if (subBoardWinners[boardIndex] != null) continue;
+      if (activeSubBoardIndex != null && boardIndex != activeSubBoardIndex) {
+        continue;
+      }
+
+      for (int cellIndex = 0; cellIndex < 9; cellIndex++) {
+        if (board[boardIndex][cellIndex] == null) {
+          moves.add(
+            Move(boardIndex, cellIndex, currentPlayer, activeSubBoardIndex),
+          );
+        }
+      }
+    }
+
+    moves.sort((a, b) {
+      int scoreA = 0;
+      int scoreB = 0;
+
+      _applyMove(board, subBoardWinners, a, currentPlayer);
+      if (checkOverallWinner(subBoardWinners) == currentPlayer) scoreA += 1000;
+      if (subBoardWinners[a.boardIndex] == currentPlayer) scoreA += 100;
+      _undoMove(board, subBoardWinners, a, subBoardWinners[a.boardIndex]);
+
+      _applyMove(board, subBoardWinners, b, currentPlayer);
+      if (checkOverallWinner(subBoardWinners) == currentPlayer) scoreB += 1000;
+      if (subBoardWinners[b.boardIndex] == currentPlayer) scoreB += 100;
+      _undoMove(board, subBoardWinners, b, subBoardWinners[b.boardIndex]);
+
+      _applyMove(board, subBoardWinners, a, opponent);
+      if (subBoardWinners[a.boardIndex] == opponent) scoreA += 50;
+      _undoMove(board, subBoardWinners, a, subBoardWinners[a.boardIndex]);
+
+      _applyMove(board, subBoardWinners, b, opponent);
+      if (subBoardWinners[b.boardIndex] == opponent) scoreB += 50;
+      _undoMove(board, subBoardWinners, b, subBoardWinners[a.boardIndex]);
+
+      if (a.cellIndex == 4) scoreA += 5;
+      if (b.cellIndex == 4) scoreB += 5;
+
+      return scoreB.compareTo(scoreA);
+    });
+
+    return moves;
   }
 }
