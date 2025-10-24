@@ -50,8 +50,6 @@ class _GameScreenState extends State<GameScreen> {
               GameSetup(gameMode: widget.gameMode, gameStarted: gameStarted),
     );
 
-    print('game screen: ${result?.player1Starts}');
-
     if (result != null) {
       setState(() {
         player1 = result.player1;
@@ -61,7 +59,6 @@ class _GameScreenState extends State<GameScreen> {
         gameStarted = true;
       });
 
-      print("calling resetAndStartNewGame");
       _boardKey.currentState?.resetAndStartNewGame(result);
     }
   }

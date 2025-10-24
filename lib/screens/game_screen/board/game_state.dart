@@ -16,7 +16,7 @@ import '../dialogs/draw_dialog.dart';
 import '../dialogs/win_dialog.dart';
 
 class GameState extends StatefulWidget {
-  GameState({
+  const GameState({
     super.key,
     required this.playingAgainstAI,
     required this.layoutBuilder,
@@ -77,7 +77,6 @@ class GameStateState extends State<GameState> {
     _subBoards = List.generate(9, (ctx) => List<Player?>.filled(9, null));
     _subBoardWinners = List<Player?>.filled(9, null);
     _currentPlayer = widget.gameSetup.player1Starts ? Player.one : Player.two;
-    print("initalize game: ${widget.gameSetup.player1Starts}");
     _activeSubBoardIndex = null;
     gameFinished = false;
     overallWinner = null;
@@ -90,7 +89,6 @@ class GameStateState extends State<GameState> {
       widget.gameSetup.player1Starts = setup.player1Starts;
       widget.gameSetup.aiDifficulty = setup.aiDifficulty;
 
-      print('game state: ${widget.gameSetup.player1Starts}');
       _moveHistory.clear();
       _initializeGame();
       if (widget.playingAgainstAI && _currentPlayer == Player.two) {

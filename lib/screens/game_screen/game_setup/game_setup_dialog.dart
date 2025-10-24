@@ -237,7 +237,6 @@ class _GameSetupState extends State<GameSetup> {
                   ElevatedButton(
                     onPressed: () {
                       _savePrefs();
-                      print('game setup: $isPlayer1First');
                       Navigator.of(context).pop(
                         PlayerSetupResult(
                           player1: player1Config,
