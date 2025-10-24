@@ -399,7 +399,7 @@ class AIPlayer {
 
       _applyMove(board, subBoardWinners, b, opponent);
       if (subBoardWinners[b.boardIndex] == opponent) scoreB += 50;
-      _undoMove(board, subBoardWinners, b, subBoardWinners[a.boardIndex]);
+      _undoMove(board, subBoardWinners, b, subBoardWinners[b.boardIndex]);
 
       if (a.cellIndex == 4) scoreA += 5;
       if (b.cellIndex == 4) scoreB += 5;
