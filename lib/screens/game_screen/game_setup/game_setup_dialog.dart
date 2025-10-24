@@ -7,7 +7,7 @@ import 'package:ultimate_tic_tac_toe/screens/game_screen/game_setup/player_icon_
 
 import '../../../models/enum/game_mode.dart';
 import '../../../models/player_config.dart';
-import '../../../models/player_setup_result.dart';
+import '../../../models/game_setup.dart';
 
 class GameSetup extends StatefulWidget {
   const GameSetup({
@@ -237,6 +237,7 @@ class _GameSetupState extends State<GameSetup> {
                   ElevatedButton(
                     onPressed: () {
                       _savePrefs();
+                      print('game setup: $isPlayer1First');
                       Navigator.of(context).pop(
                         PlayerSetupResult(
                           player1: player1Config,

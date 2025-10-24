@@ -2,7 +2,6 @@ import 'dart:math';
 
 import 'package:confetti/confetti.dart';
 import 'package:flutter/material.dart';
-import 'package:ultimate_tic_tac_toe/models/enum/ai_difficulty.dart';
 import 'package:ultimate_tic_tac_toe/screens/game_screen/board/ultimate_board.dart';
 
 import '../../../data/win_patterns.dart';
@@ -10,36 +9,31 @@ import '../../../models/ai_player/ai_isolate.dart';
 import '../../../models/enum/player.dart';
 import '../../../models/move.dart';
 import '../../../models/move_parameters.dart';
-import '../../../models/player_config.dart';
+import '../../../models/game_setup.dart';
 import '../../../utils/audio_controller.dart';
 import '../../../utils/ui_helpers.dart';
 import '../dialogs/draw_dialog.dart';
 import '../dialogs/win_dialog.dart';
 
 class GameState extends StatefulWidget {
-  const GameState({
+  GameState({
     super.key,
-    required this.player1,
-    required this.player2,
-    required this.player1Starts,
     required this.playingAgainstAI,
-    this.aiDifficulty,
     required this.layoutBuilder,
+    required this.onPlayAgain,
+    required this.gameSetup
   });
 
-  final PlayerConfig player1;
-  final PlayerConfig player2;
-  final bool player1Starts;
   final bool playingAgainstAI;
-  final AIDifficulty? aiDifficulty;
+  final VoidCallback onPlayAgain;
+  final PlayerSetupResult gameSetup;
 
   final Widget Function({
     required Widget boardWidget,
     required Player currentPlayer,
     required bool gameFinished,
-    required Player overallWinner,
+    required Player? overallWinner,
     required bool aiThinking,
-    required VoidCallback resetGame,
     required bool showPlayAgainButton,
   })
   layoutBuilder;
@@ -53,7 +47,7 @@ class GameStateState extends State<GameState> {
   late List<Player?> _subBoardWinners;
   late Player _currentPlayer;
   int? _activeSubBoardIndex;
-  late Player overallWinner;
+  late Player? overallWinner;
 
   final List<Move> _moveHistory = [];
   bool _aiThinking = false;
@@ -71,7 +65,7 @@ class GameStateState extends State<GameState> {
     _initializeGame();
 
     if (widget.playingAgainstAI) {
-      _aiIsolate = AIIsolate(widget.aiDifficulty!);
+      _aiIsolate = AIIsolate(widget.gameSetup.aiDifficulty!);
 
       if (_currentPlayer == Player.two) {
         _makeAIMove();
@@ -82,16 +76,26 @@ class GameStateState extends State<GameState> {
   void _initializeGame() {
     _subBoards = List.generate(9, (ctx) => List<Player?>.filled(9, null));
     _subBoardWinners = List<Player?>.filled(9, null);
-    _currentPlayer = widget.player1Starts ? Player.one : Player.two;
+    _currentPlayer = widget.gameSetup.player1Starts ? Player.one : Player.two;
+    print("initalize game: ${widget.gameSetup.player1Starts}");
     _activeSubBoardIndex = null;
     gameFinished = false;
-    overallWinner = Player.one;
+    overallWinner = null;
   }
 
-  void _resetGame() {
+  void resetAndStartNewGame(PlayerSetupResult setup) {
     setState(() {
-      _initializeGame();
+      widget.gameSetup.player1 = setup.player1;
+      widget.gameSetup.player2 = setup.player2;
+      widget.gameSetup.player1Starts = setup.player1Starts;
+      widget.gameSetup.aiDifficulty = setup.aiDifficulty;
+
+      print('game state: ${widget.gameSetup.player1Starts}');
       _moveHistory.clear();
+      _initializeGame();
+      if (widget.playingAgainstAI && _currentPlayer == Player.two) {
+        _makeAIMove();
+      }
     });
   }
 
@@ -161,7 +165,7 @@ class GameStateState extends State<GameState> {
       _subBoardWinners,
       Player.two,
       _activeSubBoardIndex,
-      widget.aiDifficulty!,
+      widget.gameSetup.aiDifficulty!,
     );
 
     final move = await _aiIsolate.computeMove(moveParameters);
@@ -203,7 +207,7 @@ class GameStateState extends State<GameState> {
 
   void _showWinDialog(Player winner) {
     _winnerColor =
-        winner == Player.one ? widget.player1.color : widget.player2.color;
+        winner == Player.one ? widget.gameSetup.player1.color : widget.gameSetup.player2.color;
 
     showDialog(
       context: context,
@@ -215,10 +219,10 @@ class GameStateState extends State<GameState> {
               WinDialog(
                 winningPlayer: winner,
                 winnerConfig:
-                    winner == Player.one ? widget.player1 : widget.player2,
+                    winner == Player.one ? widget.gameSetup.player1 : widget.gameSetup.player2,
                 viewingBoard: gameFinished,
                 confettiController: _confettiController,
-                onPlayAgain: _resetGame,
+                onPlayAgain: widget.onPlayAgain,
                 onViewBoard: _showPlayAgainButton,
                 buildIcon: buildIcon,
               ),
@@ -247,7 +251,7 @@ class GameStateState extends State<GameState> {
       barrierDismissible: false,
       builder:
           (ctx) => DrawDialog(
-            onPlayAgain: _resetGame,
+            onPlayAgain: widget.onPlayAgain,
             onViewBoard: _showPlayAgainButton,
           ),
     );
@@ -284,8 +288,8 @@ class GameStateState extends State<GameState> {
     final boardWidget = UltimateBoard(
       subBoards: _subBoards,
       subBoardWinners: _subBoardWinners,
-      player1: widget.player1,
-      player2: widget.player2,
+      player1: widget.gameSetup.player1,
+      player2: widget.gameSetup.player2,
       currentPlayer: _currentPlayer,
       isValidMove: _isValidMove,
       onCellTap: _handleTap,
@@ -299,7 +303,6 @@ class GameStateState extends State<GameState> {
       gameFinished: gameFinished,
       overallWinner: overallWinner,
       aiThinking: _aiThinking,
-      resetGame: _resetGame,
       showPlayAgainButton: gameFinished,
     );
   }

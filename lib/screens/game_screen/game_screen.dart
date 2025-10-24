@@ -7,12 +7,12 @@ import 'package:ultimate_tic_tac_toe/models/enum/game_mode.dart';
 import '../../models/enum/ai_difficulty.dart';
 import '../../models/enum/player.dart';
 import '../../models/player_config.dart';
-import '../../models/player_setup_result.dart';
+import '../../models/game_setup.dart';
 import '../../widgets/ads/banner_ad_widget.dart';
 import 'board/current_player_indicator.dart';
 import 'board/game_state.dart';
 import 'board/winner_indicator.dart';
-import 'game_setup/game_setup.dart';
+import 'game_setup/game_setup_dialog.dart';
 
 class GameScreen extends StatefulWidget {
   const GameScreen({super.key, required this.gameMode});
@@ -50,6 +50,8 @@ class _GameScreenState extends State<GameScreen> {
               GameSetup(gameMode: widget.gameMode, gameStarted: gameStarted),
     );
 
+    print('game screen: ${result?.player1Starts}');
+
     if (result != null) {
       setState(() {
         player1 = result.player1;
@@ -58,6 +60,9 @@ class _GameScreenState extends State<GameScreen> {
         aiDifficulty = result.aiDifficulty;
         gameStarted = true;
       });
+
+      print("calling resetAndStartNewGame");
+      _boardKey.currentState?.resetAndStartNewGame(result);
     }
   }
 
@@ -65,9 +70,8 @@ class _GameScreenState extends State<GameScreen> {
     required Widget boardWidget,
     required Player currentPlayer,
     required bool gameFinished,
-    required Player overallWinner,
+    required Player? overallWinner,
     required bool aiThinking,
-    required VoidCallback resetGame,
     required bool showPlayAgainButton,
   }) {
     final isLandscape =
@@ -94,7 +98,13 @@ class _GameScreenState extends State<GameScreen> {
 
     Widget playAgainButton = Visibility(
       visible: showPlayAgainButton,
-      child: TextButton(onPressed: resetGame, child: const Text("Play again")),
+      child: TextButton(
+        onPressed: () {
+          gameStarted = false;
+          _showPlayerSetupDialog(context);
+        },
+        child: const Text("Play again"),
+      ),
     );
 
     Widget aiThinkingIndicator = Visibility(
@@ -183,19 +193,24 @@ class _GameScreenState extends State<GameScreen> {
       if (gameStarted) {
         return GameState(
           key: _boardKey,
-          player1: player1,
-          player2: player2,
-          player1Starts: player1Starts,
+          gameSetup: PlayerSetupResult(
+            player1: player1,
+            player2: player2,
+            player1Starts: player1Starts,
+            aiDifficulty: aiDifficulty
+          ),
           playingAgainstAI: widget.gameMode == GameMode.computer,
-          aiDifficulty: aiDifficulty,
+          onPlayAgain: () {
+            gameStarted = false;
+            _showPlayerSetupDialog(context);
+          },
           layoutBuilder:
               ({
                 required Widget boardWidget,
                 required Player currentPlayer,
                 required bool gameFinished,
-                required Player overallWinner,
+                required Player? overallWinner,
                 required bool aiThinking,
-                required VoidCallback resetGame,
                 required bool showPlayAgainButton,
               }) => _buildGameLayout(
                 boardWidget: boardWidget,
@@ -203,7 +218,6 @@ class _GameScreenState extends State<GameScreen> {
                 gameFinished: gameFinished,
                 overallWinner: overallWinner,
                 aiThinking: aiThinking,
-                resetGame: resetGame,
                 showPlayAgainButton: showPlayAgainButton,
               ),
         );
