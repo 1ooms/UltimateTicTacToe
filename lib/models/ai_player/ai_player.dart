@@ -141,8 +141,9 @@ class AIPlayer {
       }
     }
 
-    if (bestMoves.isEmpty)
+    if (bestMoves.isEmpty) {
       return randomMove(board, subBoardWinners, activeSubBoardIndex);
+    }
 
     Random random = Random();
     int randomBestMoveIndex = random.nextInt(bestMoves.length);
