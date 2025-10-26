@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:ultimate_tic_tac_toe/screens/game_screen/game_setup/player_customizer/player_customization_dialog.dart';
 
-import '../../../models/player_config.dart';
-import '../../../utils/ui_helpers.dart';
+import '../../../../models/player_config.dart';
+import '../../../../utils/ui_helpers.dart';
+import '../player_customizer/player_customization_dialog.dart';
 
 class PlayerCustomizer extends StatelessWidget {
   final PlayerConfig config1;

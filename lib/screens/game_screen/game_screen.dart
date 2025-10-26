@@ -6,13 +6,15 @@ import 'package:ultimate_tic_tac_toe/models/enum/game_mode.dart';
 
 import '../../models/enum/ai_difficulty.dart';
 import '../../models/enum/player.dart';
+import '../../models/online_setup.dart';
 import '../../models/player_config.dart';
 import '../../models/game_setup.dart';
 import '../../widgets/ads/banner_ad_widget.dart';
 import 'board/current_player_indicator.dart';
 import 'board/game_state.dart';
 import 'board/winner_indicator.dart';
-import 'game_setup/game_setup_dialog.dart';
+import 'game_setup_dialogs/game_setup/game_setup_dialog.dart';
+import 'game_setup_dialogs/online_setup/online_setup_dialog.dart';
 
 class GameScreen extends StatefulWidget {
   const GameScreen({super.key, required this.gameMode});
@@ -41,13 +43,15 @@ class _GameScreenState extends State<GameScreen> {
     });
   }
 
-  Future<void> _showPlayerSetupDialog(BuildContext context) async {
-    final result = await showDialog<PlayerSetupResult>(
+  Future<void> _showGameSetupDialog(BuildContext context) async {
+    final result = await showDialog<GameSetup>(
       barrierDismissible: false,
       context: context,
       builder:
-          (context) =>
-              GameSetup(gameMode: widget.gameMode, gameStarted: gameStarted),
+          (context) => GameSetupDialog(
+            gameMode: widget.gameMode,
+            gameStarted: gameStarted,
+          ),
     );
 
     if (result != null) {
@@ -98,7 +102,7 @@ class _GameScreenState extends State<GameScreen> {
       child: TextButton(
         onPressed: () {
           gameStarted = false;
-          _showPlayerSetupDialog(context);
+          _showGameSetupDialog(context);
         },
         child: const Text("Play again"),
       ),
@@ -190,16 +194,16 @@ class _GameScreenState extends State<GameScreen> {
       if (gameStarted) {
         return GameState(
           key: _boardKey,
-          gameSetup: PlayerSetupResult(
+          gameSetup: GameSetup(
             player1: player1,
             player2: player2,
             player1Starts: player1Starts,
-            aiDifficulty: aiDifficulty
+            aiDifficulty: aiDifficulty,
           ),
           playingAgainstAI: widget.gameMode == GameMode.computer,
           onPlayAgain: () {
             gameStarted = false;
-            _showPlayerSetupDialog(context);
+            _showGameSetupDialog(context);
           },
           layoutBuilder:
               ({
@@ -238,7 +242,7 @@ class _GameScreenState extends State<GameScreen> {
 
           IconButton(
             onPressed: () {
-              _showPlayerSetupDialog(context);
+              _showGameSetupDialog(context);
             },
             icon: const Icon(Icons.palette),
           ),

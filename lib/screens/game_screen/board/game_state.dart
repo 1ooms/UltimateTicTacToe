@@ -26,7 +26,7 @@ class GameState extends StatefulWidget {
 
   final bool playingAgainstAI;
   final VoidCallback onPlayAgain;
-  final PlayerSetupResult gameSetup;
+  final GameSetup gameSetup;
 
   final Widget Function({
     required Widget boardWidget,
@@ -82,7 +82,7 @@ class GameStateState extends State<GameState> {
     overallWinner = null;
   }
 
-  void resetAndStartNewGame(PlayerSetupResult setup) {
+  void resetAndStartNewGame(GameSetup setup) {
     setState(() {
       widget.gameSetup.player1 = setup.player1;
       widget.gameSetup.player2 = setup.player2;

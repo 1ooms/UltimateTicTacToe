@@ -2,15 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:ultimate_tic_tac_toe/models/enum/ai_difficulty.dart';
 import 'package:ultimate_tic_tac_toe/models/enum/player_shape.dart';
-import 'package:ultimate_tic_tac_toe/screens/game_screen/game_setup/difficulty_slider.dart';
-import 'package:ultimate_tic_tac_toe/screens/game_screen/game_setup/player_icon_preview.dart';
+import 'package:ultimate_tic_tac_toe/screens/game_screen/game_setup_dialogs/game_setup/player_icon_preview.dart';
 
-import '../../../models/enum/game_mode.dart';
-import '../../../models/player_config.dart';
-import '../../../models/game_setup.dart';
+import '../../../../models/enum/game_mode.dart';
+import '../../../../models/player_config.dart';
+import '../../../../models/game_setup.dart';
+import 'difficulty_slider.dart';
 
-class GameSetup extends StatefulWidget {
-  const GameSetup({
+class GameSetupDialog extends StatefulWidget {
+  const GameSetupDialog({
     super.key,
     required this.gameMode,
     required this.gameStarted,
@@ -20,10 +20,10 @@ class GameSetup extends StatefulWidget {
   final bool gameStarted;
 
   @override
-  State<GameSetup> createState() => _GameSetupState();
+  State<GameSetupDialog> createState() => _GameSetupDialogState();
 }
 
-class _GameSetupState extends State<GameSetup> {
+class _GameSetupDialogState extends State<GameSetupDialog> {
   late SharedPreferences prefs;
 
   late bool isPlayer1First;
@@ -100,7 +100,7 @@ class _GameSetupState extends State<GameSetup> {
     final isLandscape =
         MediaQuery.of(context).orientation == Orientation.landscape;
 
-    final playerSetup = Column(
+    final gameSetup = Column(
       children: [
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -208,7 +208,7 @@ class _GameSetupState extends State<GameSetup> {
                         ? Column(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            playerSetup,
+                            gameSetup,
                             const SizedBox(height: 32),
                             difficultyWidget,
                           ],
@@ -217,7 +217,7 @@ class _GameSetupState extends State<GameSetup> {
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Expanded(child: playerSetup),
+                            Expanded(child: gameSetup),
                             const SizedBox(width: 64),
                             Expanded(child: difficultyWidget),
                           ],
@@ -238,7 +238,7 @@ class _GameSetupState extends State<GameSetup> {
                     onPressed: () {
                       _savePrefs();
                       Navigator.of(context).pop(
-                        PlayerSetupResult(
+                        GameSetup(
                           player1: player1Config,
                           player2: player2Config,
                           player1Starts: isPlayer1First,
