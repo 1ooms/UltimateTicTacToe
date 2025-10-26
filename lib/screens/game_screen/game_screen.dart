@@ -38,9 +38,15 @@ class _GameScreenState extends State<GameScreen> {
   void initState() {
     super.initState();
 
-    WidgetsBinding.instance.addPostFrameCallback((ctx) {
-      _showPlayerSetupDialog(context);
-    });
+    if (widget.gameMode == GameMode.online) {
+      WidgetsBinding.instance.addPostFrameCallback((ctx) {
+        _showOnlineSetupDialog(context);
+      });
+    } else {
+      WidgetsBinding.instance.addPostFrameCallback((ctx) {
+        _showGameSetupDialog(context);
+      });
+    }
   }
 
   Future<void> _showGameSetupDialog(BuildContext context) async {
@@ -65,6 +71,14 @@ class _GameScreenState extends State<GameScreen> {
 
       _boardKey.currentState?.resetAndStartNewGame(result);
     }
+  }
+
+  Future<void> _showOnlineSetupDialog(BuildContext context) async {
+    final result = await showDialog<OnlineSetup>(
+      barrierDismissible: false,
+      context: context,
+      builder: (context) => OnlineSetupDialog(),
+    );
   }
 
   Widget _buildGameLayout({

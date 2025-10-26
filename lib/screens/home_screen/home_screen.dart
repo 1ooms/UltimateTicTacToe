@@ -51,15 +51,21 @@ class HomeScreen extends StatelessWidget {
               title: 'Online',
               icon: Icons.public,
               onTap: () {
-                showCustomSnackBar(
+                Navigator.push(
                   context,
-                  Text(
-                    'Coming soon!',
-                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                      color: Theme.of(context).colorScheme.onInverseSurface,
-                    ),
+                  MaterialPageRoute(
+                    builder: (ctx) => GameScreen(gameMode: GameMode.online),
                   ),
                 );
+                // showCustomSnackBar(
+                //   context,
+                //   Text(
+                //     'Coming soon!',
+                //     style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                //       color: Theme.of(context).colorScheme.onInverseSurface,
+                //     ),
+                //   ),
+                // );
               },
             ),
           ),
