@@ -66,10 +66,15 @@ class _GameScreenState extends State<GameScreen> {
         player2 = result.player2;
         player1Starts = result.player1Starts;
         aiDifficulty = result.aiDifficulty;
-        gameStarted = true;
       });
 
-      _boardKey.currentState?.resetAndStartNewGame(result);
+      if (!gameStarted) {
+        _boardKey.currentState?.resetAndStartNewGame(result);
+      }
+
+      setState(() {
+        gameStarted = true;
+      });
     }
   }
 

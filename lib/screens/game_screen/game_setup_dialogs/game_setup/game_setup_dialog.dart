@@ -5,8 +5,8 @@ import 'package:ultimate_tic_tac_toe/models/enum/player_shape.dart';
 import 'package:ultimate_tic_tac_toe/screens/game_screen/game_setup_dialogs/game_setup/player_icon_preview.dart';
 
 import '../../../../models/enum/game_mode.dart';
-import '../../../../models/player_config.dart';
 import '../../../../models/game_setup.dart';
+import '../../../../models/player_config.dart';
 import 'difficulty_slider.dart';
 
 class GameSetupDialog extends StatefulWidget {
@@ -195,9 +195,11 @@ class _GameSetupDialogState extends State<GameSetupDialog> {
             PopScope(
               canPop: false,
               onPopInvokedWithResult: (didPop, result) {
-                if (!didPop) {
+                if (!didPop && !widget.gameStarted) {
                   Navigator.of(context).pop(); // Pop the dialog
                   Navigator.of(context).pop(); // Pop the screen
+                } else if (!didPop && widget.gameStarted) {
+                  Navigator.of(context).pop();
                 }
               },
               child: AlertDialog(
@@ -234,23 +236,35 @@ class _GameSetupDialogState extends State<GameSetupDialog> {
                     },
                     child: const Text('Cancel'),
                   ),
-                  ElevatedButton(
-                    onPressed: () {
-                      _savePrefs();
-                      Navigator.of(context).pop(
-                        GameSetup(
-                          player1: player1Config,
-                          player2: player2Config,
-                          player1Starts: isPlayer1First,
-                          aiDifficulty: aiDifficulty,
-                        ),
-                      );
-                    },
-                    child:
-                        widget.gameStarted
-                            ? const Text('Continue game')
-                            : const Text('Start Game'),
-                  ),
+                  widget.gameStarted
+                      ? ElevatedButton(
+                        onPressed: () {
+                          _savePrefs();
+                          Navigator.of(context).pop(
+                            GameSetup(
+                              player1: player1Config,
+                              player2: player2Config,
+                              player1Starts: isPlayer1First,
+                              aiDifficulty: aiDifficulty,
+                            ),
+                          );
+                        },
+                        child: const Text('Continue game'),
+                      )
+                      : ElevatedButton(
+                        onPressed: () {
+                          _savePrefs();
+                          Navigator.of(context).pop(
+                            GameSetup(
+                              player1: player1Config,
+                              player2: player2Config,
+                              player1Starts: isPlayer1First,
+                              aiDifficulty: aiDifficulty,
+                            ),
+                          );
+                        },
+                        child: const Text('Start Game'),
+                      ),
                 ],
               ),
             ),
