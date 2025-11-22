@@ -7,9 +7,9 @@ import 'package:ultimate_tic_tac_toe/screens/game_screen/board/ultimate_board.da
 import '../../../data/win_patterns.dart';
 import '../../../models/ai_player/ai_isolate.dart';
 import '../../../models/enum/player.dart';
+import '../../../models/game_setup.dart';
 import '../../../models/move.dart';
 import '../../../models/move_parameters.dart';
-import '../../../models/game_setup.dart';
 import '../../../utils/audio_controller.dart';
 import '../../../utils/ui_helpers.dart';
 import '../dialogs/draw_dialog.dart';

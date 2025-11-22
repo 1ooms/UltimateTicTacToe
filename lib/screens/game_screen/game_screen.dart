@@ -6,9 +6,9 @@ import 'package:ultimate_tic_tac_toe/models/enum/game_mode.dart';
 
 import '../../models/enum/ai_difficulty.dart';
 import '../../models/enum/player.dart';
+import '../../models/game_setup.dart';
 import '../../models/online_setup.dart';
 import '../../models/player_config.dart';
-import '../../models/game_setup.dart';
 import '../../widgets/ads/banner_ad_widget.dart';
 import 'board/current_player_indicator.dart';
 import 'board/game_state.dart';
