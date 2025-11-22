@@ -131,7 +131,7 @@ class HomeScreen extends StatelessWidget {
     return Scaffold(
       key: _scaffoldKey,
       appBar: AppBar(
-        title: const Text('Play'),
+        title: const Text('Ultimate Tic Tac Toe'),
         leading: IconButton(
           icon: const Icon(Icons.menu),
           onPressed: () {
