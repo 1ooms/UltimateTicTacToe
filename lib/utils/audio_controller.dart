@@ -25,9 +25,7 @@ class AudioController {
   }
 
   Future<void> _loadSounds() async {
-    final soundAssets = [
-      "assets/sounds/tap.wav"
-    ];
+    final soundAssets = ["assets/sounds/tap.wav"];
 
     for (final asset in soundAssets) {
       final source = await _soLoud!.loadAsset(asset);

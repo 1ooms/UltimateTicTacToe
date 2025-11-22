@@ -21,7 +21,7 @@ class GameState extends StatefulWidget {
     required this.playingAgainstAI,
     required this.layoutBuilder,
     required this.onPlayAgain,
-    required this.gameSetup
+    required this.gameSetup,
   });
 
   final bool playingAgainstAI;
@@ -205,7 +205,9 @@ class GameStateState extends State<GameState> {
 
   void _showWinDialog(Player winner) {
     _winnerColor =
-        winner == Player.one ? widget.gameSetup.player1.color : widget.gameSetup.player2.color;
+        winner == Player.one
+            ? widget.gameSetup.player1.color
+            : widget.gameSetup.player2.color;
 
     showDialog(
       context: context,
@@ -217,7 +219,9 @@ class GameStateState extends State<GameState> {
               WinDialog(
                 winningPlayer: winner,
                 winnerConfig:
-                    winner == Player.one ? widget.gameSetup.player1 : widget.gameSetup.player2,
+                    winner == Player.one
+                        ? widget.gameSetup.player1
+                        : widget.gameSetup.player2,
                 viewingBoard: gameFinished,
                 confettiController: _confettiController,
                 onPlayAgain: widget.onPlayAgain,
