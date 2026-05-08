@@ -78,10 +78,10 @@ class AIPlayer {
   final Random _random = Random();
 
   Move? randomMove(
-    List<List<Player?>> board,
-    List<Player?> subBoardWinners,
-    int? activeSubBoardIndex,
-  ) {
+      List<List<Player?>> board,
+      List<Player?> subBoardWinners,
+      int? activeSubBoardIndex,
+      ) {
     final validMoves = _getValidMoves(
       board,
       subBoardWinners,
@@ -93,14 +93,14 @@ class AIPlayer {
   }
 
   Move? minimaxMove(
-    List<List<Player?>> board,
-    List<Player?> subBoardWinners,
-    Player aiPlayer,
-    int? activeSubBoardIndex, {
-    required int maxDepth,
-  }) {
+      List<List<Player?>> board,
+      List<Player?> subBoardWinners,
+      Player aiPlayer,
+      int? activeSubBoardIndex, {
+        required int maxDepth,
+      }) {
     int bestScore = -1000000;
-    List<Move> bestMoves = [];
+    List<Move> bestMoves = List<Move>.empty(growable: true);
 
     // Handle full or won sub-board
     if (activeSubBoardIndex != null &&
@@ -109,11 +109,10 @@ class AIPlayer {
       activeSubBoardIndex = null;
     }
 
-    for (final move in _getOrderedValidMoves(
+    for (final move in _getValidMoves(
       board,
       subBoardWinners,
       activeSubBoardIndex,
-      aiPlayer,
     )) {
       final prevWinner = subBoardWinners[move.boardIndex];
       _applyMove(board, subBoardWinners, move, aiPlayer);
@@ -141,10 +140,6 @@ class AIPlayer {
       }
     }
 
-    if (bestMoves.isEmpty) {
-      return randomMove(board, subBoardWinners, activeSubBoardIndex);
-    }
-
     Random random = Random();
     int randomBestMoveIndex = random.nextInt(bestMoves.length);
 
@@ -158,16 +153,16 @@ class AIPlayer {
   }
 
   int _minimax(
-    List<List<Player?>> board,
-    List<Player?> subBoardWinners,
-    Player currentPlayer,
-    int? activeSubBoardIndex,
-    int depth,
-    int maxDepth,
-    int alpha,
-    int beta,
-    Player aiPlayer,
-  ) {
+      List<List<Player?>> board,
+      List<Player?> subBoardWinners,
+      Player currentPlayer,
+      int? activeSubBoardIndex,
+      int depth,
+      int maxDepth,
+      int alpha,
+      int beta,
+      Player aiPlayer,
+      ) {
     // Fallback if sub-board is unplayable
     if (activeSubBoardIndex != null &&
         (subBoardWinners[activeSubBoardIndex] != null ||
@@ -191,11 +186,10 @@ class AIPlayer {
 
     if (currentPlayer == aiPlayer) {
       int maxEval = -1000000;
-      for (final move in _getOrderedValidMoves(
+      for (final move in _getValidMoves(
         board,
         subBoardWinners,
         activeSubBoardIndex,
-        currentPlayer,
       )) {
         final prevWinner = subBoardWinners[move.boardIndex];
         _applyMove(board, subBoardWinners, move, currentPlayer);
@@ -218,11 +212,10 @@ class AIPlayer {
       return maxEval;
     } else {
       int minEval = 1000000;
-      for (final move in _getOrderedValidMoves(
+      for (final move in _getValidMoves(
         board,
         subBoardWinners,
         activeSubBoardIndex,
-        currentPlayer,
       )) {
         final prevWinner = subBoardWinners[move.boardIndex];
         _applyMove(board, subBoardWinners, move, currentPlayer);
@@ -247,10 +240,10 @@ class AIPlayer {
   }
 
   List<Move> _getValidMoves(
-    List<List<Player?>> board,
-    List<Player?> subBoardWinners,
-    int? activeSubBoardIndex,
-  ) {
+      List<List<Player?>> board,
+      List<Player?> subBoardWinners,
+      int? activeSubBoardIndex,
+      ) {
     final moves = <Move>[];
 
     // Fallback if target board is not playable
@@ -283,11 +276,11 @@ class AIPlayer {
 
   bool checkDraw(subBoards, subBoardWinners) =>
       subBoardWinners.every(
-        (winner) =>
-            winner != null ||
+            (winner) =>
+        winner != null ||
             !subBoards[subBoardWinners.indexOf(winner)].contains(null),
       ) &&
-      checkOverallWinner(subBoardWinners) == null;
+          checkOverallWinner(subBoardWinners) == null;
 
   Player? checkOverallWinner(subBoardWinners) {
     for (final player in [Player.one, Player.two]) {
@@ -299,11 +292,11 @@ class AIPlayer {
   }
 
   void _applyMove(
-    List<List<Player?>> board,
-    List<Player?> subBoardWinners,
-    Move move,
-    Player player,
-  ) {
+      List<List<Player?>> board,
+      List<Player?> subBoardWinners,
+      Move move,
+      Player player,
+      ) {
     board[move.boardIndex][move.cellIndex] = player;
     if (checkWin(board[move.boardIndex], player)) {
       subBoardWinners[move.boardIndex] = player;
@@ -311,11 +304,11 @@ class AIPlayer {
   }
 
   void _undoMove(
-    List<List<Player?>> board,
-    List<Player?> subBoardWinners,
-    Move move,
-    Player? previousWinner,
-  ) {
+      List<List<Player?>> board,
+      List<Player?> subBoardWinners,
+      Move move,
+      Player? previousWinner,
+      ) {
     board[move.boardIndex][move.cellIndex] = null;
     subBoardWinners[move.boardIndex] = previousWinner;
   }
@@ -325,10 +318,10 @@ class AIPlayer {
   }
 
   int _evaluateBoard(
-    List<List<Player?>> board,
-    List<Player?> subBoardWinners,
-    Player aiPlayer,
-  ) {
+      List<List<Player?>> board,
+      List<Player?> subBoardWinners,
+      Player aiPlayer,
+      ) {
     int score = 0;
 
     for (int i = 0; i < 9; i++) {
@@ -348,66 +341,5 @@ class AIPlayer {
     }
 
     return score;
-  }
-
-  List<Move> _getOrderedValidMoves(
-    List<List<Player?>> board,
-    List<Player?> subBoardWinners,
-    int? activeSubBoardIndex,
-    Player currentPlayer,
-  ) {
-    final moves = <Move>[];
-    Player opponent = _switchPlayer(currentPlayer);
-
-    if (activeSubBoardIndex != null &&
-        (subBoardWinners[activeSubBoardIndex] != null ||
-            board[activeSubBoardIndex].every((cell) => cell != null))) {
-      activeSubBoardIndex = null;
-    }
-
-    for (int boardIndex = 0; boardIndex < 9; boardIndex++) {
-      if (subBoardWinners[boardIndex] != null) continue;
-      if (activeSubBoardIndex != null && boardIndex != activeSubBoardIndex) {
-        continue;
-      }
-
-      for (int cellIndex = 0; cellIndex < 9; cellIndex++) {
-        if (board[boardIndex][cellIndex] == null) {
-          moves.add(
-            Move(boardIndex, cellIndex, currentPlayer, activeSubBoardIndex),
-          );
-        }
-      }
-    }
-
-    moves.sort((a, b) {
-      int scoreA = 0;
-      int scoreB = 0;
-
-      _applyMove(board, subBoardWinners, a, currentPlayer);
-      if (checkOverallWinner(subBoardWinners) == currentPlayer) scoreA += 1000;
-      if (subBoardWinners[a.boardIndex] == currentPlayer) scoreA += 100;
-      _undoMove(board, subBoardWinners, a, subBoardWinners[a.boardIndex]);
-
-      _applyMove(board, subBoardWinners, b, currentPlayer);
-      if (checkOverallWinner(subBoardWinners) == currentPlayer) scoreB += 1000;
-      if (subBoardWinners[b.boardIndex] == currentPlayer) scoreB += 100;
-      _undoMove(board, subBoardWinners, b, subBoardWinners[b.boardIndex]);
-
-      _applyMove(board, subBoardWinners, a, opponent);
-      if (subBoardWinners[a.boardIndex] == opponent) scoreA += 50;
-      _undoMove(board, subBoardWinners, a, subBoardWinners[a.boardIndex]);
-
-      _applyMove(board, subBoardWinners, b, opponent);
-      if (subBoardWinners[b.boardIndex] == opponent) scoreB += 50;
-      _undoMove(board, subBoardWinners, b, subBoardWinners[b.boardIndex]);
-
-      if (a.cellIndex == 4) scoreA += 5;
-      if (b.cellIndex == 4) scoreB += 5;
-
-      return scoreB.compareTo(scoreA);
-    });
-
-    return moves;
   }
 }
