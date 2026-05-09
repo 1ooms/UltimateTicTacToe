@@ -6,8 +6,8 @@ import 'package:flutter/material.dart';
 import '../data/win_patterns.dart';
 import '../models/enum/player.dart';
 import '../models/player_config.dart';
-import '../screens/game_screen/dialogs/draw_dialog.dart';
-import '../screens/game_screen/dialogs/win_dialog.dart';
+import '../screens/game_screen/end_dialogs/draw_dialog.dart';
+import '../screens/game_screen/end_dialogs/win_dialog.dart';
 import '../utils/ui_helpers.dart';
 
 // enum Player { one, two }

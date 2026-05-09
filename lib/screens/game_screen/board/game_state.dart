@@ -12,8 +12,8 @@ import '../../../models/move.dart';
 import '../../../models/move_parameters.dart';
 import '../../../utils/audio_controller.dart';
 import '../../../utils/ui_helpers.dart';
-import '../dialogs/draw_dialog.dart';
-import '../dialogs/win_dialog.dart';
+import '../end_dialogs/draw_dialog.dart';
+import '../end_dialogs/win_dialog.dart';
 
 class GameState extends StatefulWidget {
   const GameState({
