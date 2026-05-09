@@ -1,8 +1,8 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:ultimate_tic_tac_toe/extensions/string_extension.dart';
 import 'package:ultimate_tic_tac_toe/models/enum/game_mode.dart';
+import 'package:ultimate_tic_tac_toe/screens/game_screen/play_again_button.dart';
+import 'package:ultimate_tic_tac_toe/screens/game_screen/winner_indicator.dart';
 
 import '../../models/enum/ai_difficulty.dart';
 import '../../models/enum/player.dart';
@@ -10,9 +10,11 @@ import '../../models/game_setup.dart';
 import '../../models/online_setup.dart';
 import '../../models/player_config.dart';
 import '../../widgets/ads/banner_ad_widget.dart';
-import 'board/current_player_indicator.dart';
 import 'board/game_state.dart';
-import 'board/winner_indicator.dart';
+import 'bot_thinking_indicator.dart';
+import 'current_player_indicator.dart';
+import 'game_screen_landscape_layout.dart';
+import 'game_screen_portrait_layout.dart';
 import 'game_setup_dialogs/game_setup/game_setup_dialog.dart';
 import 'game_setup_dialogs/online_setup/online_setup_dialog.dart';
 
@@ -79,11 +81,18 @@ class _GameScreenState extends State<GameScreen> {
   }
 
   Future<void> _showOnlineSetupDialog(BuildContext context) async {
-    final result = await showDialog<OnlineSetup>(
+    await showDialog<OnlineSetup>(
       barrierDismissible: false,
       context: context,
-      builder: (context) => OnlineSetupDialog(),
+      builder: (context) => const OnlineSetupDialog(),
     );
+  }
+
+  void _handlePlayAgain() {
+    setState(() {
+      gameStarted = false;
+    });
+    _showGameSetupDialog(context);
   }
 
   Widget _buildGameLayout({
@@ -95,114 +104,48 @@ class _GameScreenState extends State<GameScreen> {
     required bool showPlayAgainButton,
   }) {
     final isLandscape =
-        MediaQuery.of(context).orientation == Orientation.landscape;
+        MediaQuery
+            .of(context)
+            .orientation == Orientation.landscape;
 
     final PlayerConfig p1 = player1;
     final PlayerConfig p2 = player2;
     final bool playingAgainstAI = widget.gameMode == GameMode.computer;
 
     Widget playerStatusIndicator =
-        gameFinished
-            ? WinnerIndicator(
-              overallWinner: overallWinner,
-              player1: p1,
-              player2: p2,
-              playingAgainstAI: playingAgainstAI,
-            )
-            : CurrentPlayerIndicator(
-              currentPlayer: currentPlayer,
-              player1: p1,
-              player2: p2,
-              playingAgainstAI: playingAgainstAI,
-            );
-
-    Widget playAgainButton = Visibility(
-      visible: showPlayAgainButton,
-      child: TextButton(
-        onPressed: () {
-          gameStarted = false;
-          _showGameSetupDialog(context);
-        },
-        child: const Text("Play again"),
-      ),
+    gameFinished
+        ? WinnerIndicator(
+      overallWinner: overallWinner,
+      player1: p1,
+      player2: p2,
+      playingAgainstAI: playingAgainstAI,
+    )
+        : CurrentPlayerIndicator(
+      currentPlayer: currentPlayer,
+      player1: p1,
+      player2: p2,
+      playingAgainstAI: playingAgainstAI,
     );
 
-    Widget aiThinkingIndicator = Visibility(
-      visible: aiThinking,
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(
-            "AI is thinking",
-            style: Theme.of(context).textTheme.titleMedium,
-          ),
-          const SizedBox(width: 8),
-          SizedBox(
-            height: 25.0,
-            width: 25.0,
-            child: CircularProgressIndicator(
-              color: Theme.of(context).colorScheme.onSurface,
-              strokeWidth: 2,
-            ),
-          ),
-        ],
-      ),
+    final aiThinkingIndicator = BotThinkingIndicator(visible: aiThinking);
+    final playAgainButton = PlayAgainButton(
+      visible: showPlayAgainButton,
+      onPressed: _handlePlayAgain,
     );
 
     if (isLandscape) {
-      return LayoutBuilder(
-        builder: (context, constraints) {
-          final totalWidth = constraints.maxWidth;
-          final totalHeight = constraints.maxHeight;
-
-          final desiredBoardWidth = min(totalWidth * 0.5, 500.0);
-          final boardSize = min(desiredBoardWidth, totalHeight);
-
-          final sidePanelWidth = (totalWidth - boardSize) / 2;
-
-          return Row(
-            children: [
-              SizedBox(
-                width: sidePanelWidth,
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    children: [
-                      playerStatusIndicator,
-                      const SizedBox(height: 16),
-                      playAgainButton,
-                      aiThinkingIndicator,
-                    ],
-                  ),
-                ),
-              ),
-
-              SizedBox(width: boardSize, height: boardSize, child: boardWidget),
-
-              SizedBox(width: sidePanelWidth),
-            ],
-          );
-        },
+      return GameScreenLandscapeLayout(
+        boardWidget: boardWidget,
+        playerStatusIndicator: playerStatusIndicator,
+        playAgainButton: playAgainButton,
+        aiThinkingIndicator: aiThinkingIndicator,
       );
     } else {
-      return Column(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Expanded(
-            child: SingleChildScrollView(
-              child: Column(
-                children: [
-                  playerStatusIndicator,
-                  const SizedBox(height: 16),
-                  AspectRatio(aspectRatio: 1, child: boardWidget),
-                  const SizedBox(height: 16),
-                  playAgainButton,
-                  aiThinkingIndicator,
-                ],
-              ),
-            ),
-          ),
-        ],
+      return GameScreenPortraitLayout(
+        boardWidget: boardWidget,
+        playerStatusIndicator: playerStatusIndicator,
+        playAgainButton: playAgainButton,
+        aiThinkingIndicator: aiThinkingIndicator,
       );
     }
   }
@@ -220,10 +163,7 @@ class _GameScreenState extends State<GameScreen> {
             aiDifficulty: aiDifficulty,
           ),
           playingAgainstAI: widget.gameMode == GameMode.computer,
-          onPlayAgain: () {
-            gameStarted = false;
-            _showGameSetupDialog(context);
-          },
+          onPlayAgain: _handlePlayAgain,
           layoutBuilder:
               ({
                 required Widget boardWidget,
@@ -256,19 +196,12 @@ class _GameScreenState extends State<GameScreen> {
           style: Theme.of(context).textTheme.titleLarge,
         ),
         actions: [
-          isLandscape ? BannerAdWidget() : const SizedBox(),
-          isLandscape ? const SizedBox(width: 120) : const SizedBox(),
-
           IconButton(
-            onPressed: () {
-              _showGameSetupDialog(context);
-            },
+            onPressed: () => _showGameSetupDialog(context),
             icon: const Icon(Icons.palette),
           ),
           IconButton(
-            onPressed: () {
-              _boardKey.currentState?.performUndo();
-            },
+            onPressed: () => _boardKey.currentState?.performUndo(),
             icon: const Icon(Icons.undo),
           ),
         ],

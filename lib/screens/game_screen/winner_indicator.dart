@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
-import '../../../models/enum/player.dart';
-import '../../../models/player_config.dart';
-import '../../../utils/ui_helpers.dart';
+import '../../models/enum/player.dart';
+import '../../models/player_config.dart';
+import '../../utils/ui_helpers.dart';
 
 class WinnerIndicator extends StatefulWidget {
   const WinnerIndicator({
