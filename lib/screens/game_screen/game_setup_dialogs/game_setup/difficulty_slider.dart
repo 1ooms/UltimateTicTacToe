@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 
 import '../../../../extensions/string_extension.dart';
-import '../../../../models/enum/ai_difficulty.dart';
+import '../../../../models/enum/bot_difficulty.dart';
 
 class DifficultySlider extends StatelessWidget {
-  final AIDifficulty selectedDifficulty;
-  final ValueChanged<AIDifficulty> onChanged;
+  final BotDifficulty selectedDifficulty;
+  final ValueChanged<BotDifficulty> onChanged;
 
   const DifficultySlider({
     super.key,
@@ -18,20 +18,20 @@ class DifficultySlider extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('AI Difficulty', style: Theme.of(context).textTheme.titleSmall),
+        Text('Bot Difficulty', style: Theme.of(context).textTheme.titleSmall),
         Slider(
           value: selectedDifficulty.index.toDouble(),
           min: 0,
-          max: AIDifficulty.values.length - 1.0,
-          divisions: AIDifficulty.values.length - 1,
+          max: BotDifficulty.values.length - 1.0,
+          divisions: BotDifficulty.values.length - 1,
           onChanged: (value) {
-            onChanged(AIDifficulty.values[value.round()]);
+            onChanged(BotDifficulty.values[value.round()]);
           },
         ),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children:
-              AIDifficulty.values
+              BotDifficulty.values
                   .map(
                     (d) => Text(
                       d.name.capitalize(),

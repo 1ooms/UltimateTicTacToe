@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:ultimate_tic_tac_toe/screens/game_screen/board/ultimate_board.dart';
 
 import '../../../data/win_patterns.dart';
-import '../../../models/ai_player/ai_isolate.dart';
+import '../../../models/bot_player/bot_isolate.dart';
 import '../../../models/enum/player.dart';
 import '../../../models/game_setup.dart';
 import '../../../models/move.dart';
@@ -18,13 +18,13 @@ import '../end_dialogs/win_dialog.dart';
 class GameState extends StatefulWidget {
   const GameState({
     super.key,
-    required this.playingAgainstAI,
+    required this.playingAgainstBot,
     required this.layoutBuilder,
     required this.onPlayAgain,
     required this.gameSetup,
   });
 
-  final bool playingAgainstAI;
+  final bool playingAgainstBot;
   final VoidCallback onPlayAgain;
   final GameSetup gameSetup;
 
@@ -55,7 +55,7 @@ class GameStateState extends State<GameState> {
   bool gameFinished = false;
   Color _winnerColor = Colors.transparent;
   final _confettiController = ConfettiController();
-  late final AIIsolate _aiIsolate;
+  late final BotIsolate _aiIsolate;
 
   AudioController audioController = AudioController();
 
@@ -64,11 +64,11 @@ class GameStateState extends State<GameState> {
     super.initState();
     _initializeGame();
 
-    if (widget.playingAgainstAI) {
-      _aiIsolate = AIIsolate(widget.gameSetup.aiDifficulty!);
+    if (widget.playingAgainstBot) {
+      _aiIsolate = BotIsolate(widget.gameSetup.botDifficulty!);
 
       if (_currentPlayer == Player.two) {
-        _makeAIMove();
+        _makeBotMove();
       }
     }
   }
@@ -87,12 +87,12 @@ class GameStateState extends State<GameState> {
       widget.gameSetup.player1 = setup.player1;
       widget.gameSetup.player2 = setup.player2;
       widget.gameSetup.player1Starts = setup.player1Starts;
-      widget.gameSetup.aiDifficulty = setup.aiDifficulty;
+      widget.gameSetup.botDifficulty = setup.botDifficulty;
 
       _moveHistory.clear();
       _initializeGame();
-      if (widget.playingAgainstAI && _currentPlayer == Player.two) {
-        _makeAIMove();
+      if (widget.playingAgainstBot && _currentPlayer == Player.two) {
+        _makeBotMove();
       }
     });
   }
@@ -146,13 +146,13 @@ class GameStateState extends State<GameState> {
       // switch player turn
       _currentPlayer = _currentPlayer == Player.one ? Player.two : Player.one;
 
-      if (widget.playingAgainstAI && _currentPlayer == Player.two) {
-        _makeAIMove();
+      if (widget.playingAgainstBot && _currentPlayer == Player.two) {
+        _makeBotMove();
       }
     });
   }
 
-  Future<void> _makeAIMove() async {
+  Future<void> _makeBotMove() async {
     if (_aiThinking) return;
     _aiThinking = true;
 
@@ -163,7 +163,7 @@ class GameStateState extends State<GameState> {
       _subBoardWinners,
       Player.two,
       _activeSubBoardIndex,
-      widget.gameSetup.aiDifficulty!,
+      widget.gameSetup.botDifficulty!,
     );
 
     final move = await _aiIsolate.computeMove(moveParameters);
@@ -267,7 +267,7 @@ class GameStateState extends State<GameState> {
     Theme.of(context).colorScheme.onSurface;
 
     setState(() {
-      int movesToUndo = widget.playingAgainstAI ? 2 : 1;
+      int movesToUndo = widget.playingAgainstBot ? 2 : 1;
 
       for (int i = 0; i < movesToUndo && _moveHistory.isNotEmpty; i++) {
         final move = _moveHistory.removeLast();
@@ -280,8 +280,8 @@ class GameStateState extends State<GameState> {
       gameFinished = false;
     });
 
-    if (widget.playingAgainstAI && _currentPlayer == Player.two) {
-      _makeAIMove();
+    if (widget.playingAgainstBot && _currentPlayer == Player.two) {
+      _makeBotMove();
     }
   }
 

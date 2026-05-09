@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:ultimate_tic_tac_toe/models/enum/ai_difficulty.dart';
+import 'package:ultimate_tic_tac_toe/models/enum/bot_difficulty.dart';
 import 'package:ultimate_tic_tac_toe/models/enum/player_shape.dart';
 import 'package:ultimate_tic_tac_toe/screens/game_screen/game_setup_dialogs/game_setup/player_icon_preview.dart';
 
@@ -30,7 +30,7 @@ class _GameSetupDialogState extends State<GameSetupDialog> {
   late PlayerConfig player1Config;
   late PlayerConfig player2Config;
   bool isLoading = true;
-  AIDifficulty aiDifficulty = AIDifficulty.medium;
+  BotDifficulty botDifficulty = BotDifficulty.medium;
 
   @override
   void initState() {
@@ -50,9 +50,9 @@ class _GameSetupDialogState extends State<GameSetupDialog> {
     final int player2Color =
         prefs.getInt('player2Color') ?? Colors.blue.toARGB32();
     isPlayer1First = prefs.getBool('isPlayer1First') ?? true;
-    if (prefs.getString('aiDifficulty') != null) {
-      aiDifficulty = AIDifficulty.values.firstWhere(
-        (element) => element.name == prefs.getString('aiDifficulty'),
+    if (prefs.getString('botDifficulty') != null) {
+      botDifficulty = BotDifficulty.values.firstWhere(
+        (element) => element.name == prefs.getString('botDifficulty'),
       );
     }
 
@@ -87,7 +87,7 @@ class _GameSetupDialogState extends State<GameSetupDialog> {
     prefs.setInt('player1Color', player1Config.color.toARGB32());
     prefs.setInt('player2Color', player2Config.color.toARGB32());
     prefs.setBool('isPlayer1First', isPlayer1First);
-    prefs.setString('aiDifficulty', aiDifficulty.name);
+    prefs.setString('botDifficulty', botDifficulty.name);
   }
 
   @override
@@ -145,7 +145,7 @@ class _GameSetupDialogState extends State<GameSetupDialog> {
           children: [
             Row(
               children: [
-                widget.gameMode == GameMode.computer
+                widget.gameMode == GameMode.bot
                     ? Icon(Icons.smart_toy_outlined)
                     : widget.gameMode == GameMode.online
                     ? Icon(Icons.language)
@@ -177,12 +177,12 @@ class _GameSetupDialogState extends State<GameSetupDialog> {
     );
 
     final difficultyWidget =
-        widget.gameMode == GameMode.computer
+        widget.gameMode == GameMode.bot
             ? DifficultySlider(
-              selectedDifficulty: aiDifficulty,
+              selectedDifficulty: botDifficulty,
               onChanged: (difficulty) {
                 setState(() {
-                  aiDifficulty = difficulty;
+                  botDifficulty = difficulty;
                 });
               },
             )
@@ -245,7 +245,7 @@ class _GameSetupDialogState extends State<GameSetupDialog> {
                               player1: player1Config,
                               player2: player2Config,
                               player1Starts: isPlayer1First,
-                              aiDifficulty: aiDifficulty,
+                              botDifficulty: botDifficulty,
                             ),
                           );
                         },
@@ -259,7 +259,7 @@ class _GameSetupDialogState extends State<GameSetupDialog> {
                               player1: player1Config,
                               player2: player2Config,
                               player1Starts: isPlayer1First,
-                              aiDifficulty: aiDifficulty,
+                              botDifficulty: botDifficulty,
                             ),
                           );
                         },

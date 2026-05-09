@@ -10,13 +10,13 @@ class CurrentPlayerIndicator extends StatefulWidget {
     required this.currentPlayer,
     required this.player1,
     required this.player2,
-    required this.playingAgainstAI,
+    required this.playingAgainstBot,
   });
 
   final Player currentPlayer;
   final PlayerConfig player1;
   final PlayerConfig player2;
-  final bool playingAgainstAI;
+  final bool playingAgainstBot;
 
   @override
   State<CurrentPlayerIndicator> createState() => _CurrentPlayerIndicatorState();
@@ -35,9 +35,9 @@ class _CurrentPlayerIndicatorState extends State<CurrentPlayerIndicator> {
         widget.currentPlayer == Player.one
             ? buildIcon(widget.player1.shape, widget.player1.color, 28)
             : buildIcon(widget.player2.shape, widget.player2.color, 28),
-        widget.playingAgainstAI
+        widget.playingAgainstBot
             ? widget.currentPlayer == Player.two
-                ? const Text(' (AI)')
+                ? const Text(' (Bot)')
                 : const Text(' (You)')
             : const SizedBox(),
       ],

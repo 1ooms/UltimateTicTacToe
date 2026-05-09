@@ -81,13 +81,13 @@ class _TutorialWizardState extends State<TutorialWizard> {
                         overallWinner: Player.two,
                         player1: player1,
                         player2: player2,
-                        playingAgainstAI: false,
+                        playingAgainstBot: false,
                       )
                       : CurrentPlayerIndicator(
                         currentPlayer: boardState.currentPlayer,
                         player1: player1,
                         player2: player2,
-                        playingAgainstAI: false,
+                        playingAgainstBot: false,
                       );
 
               return Padding(

@@ -1,21 +1,21 @@
 import 'dart:async';
 import 'dart:isolate';
 
-import '../enum/ai_difficulty.dart';
+import '../enum/bot_difficulty.dart';
 import '../move.dart';
 import '../move_parameters.dart';
-import 'ai_isolate_message.dart';
-import 'ai_player.dart';
+import 'bot_isolate_message.dart';
+import 'bot_player.dart';
 
-void _aiIsolateEntryPoint(SendPort sendPort) {
+void _botIsolateEntryPoint(SendPort sendPort) {
   final ReceivePort isolateReceivePort = ReceivePort();
 
   // Send back the SendPort so the main isolate can communicate with this one
   sendPort.send(isolateReceivePort.sendPort);
 
   isolateReceivePort.listen((message) async {
-    if (message is AIIsolateMessage) {
-      final move = chooseAIMove(message.moveParametersJson);
+    if (message is BotIsolateMessage) {
+      final move = chooseBotMove(message.moveParametersJson);
       message.responsePort.send(
         move,
       ); // Already serialized (Map<String, dynamic>?)
@@ -23,20 +23,20 @@ void _aiIsolateEntryPoint(SendPort sendPort) {
   });
 }
 
-class AIIsolate {
+class BotIsolate {
   late Isolate _isolate;
   late SendPort _sendPort;
   final Completer<void> _ready = Completer();
-  final AIDifficulty aiDifficulty;
+  final BotDifficulty botDifficulty;
 
-  AIIsolate(this.aiDifficulty) {
+  BotIsolate(this.botDifficulty) {
     _initialize();
   }
 
   Future<void> _initialize() async {
     final receivePort = ReceivePort();
 
-    _isolate = await Isolate.spawn(_aiIsolateEntryPoint, receivePort.sendPort);
+    _isolate = await Isolate.spawn(_botIsolateEntryPoint, receivePort.sendPort);
 
     // Wait for the isolate to send back its SendPort
     _sendPort = await receivePort.first as SendPort;
@@ -50,7 +50,7 @@ class AIIsolate {
     final responsePort = ReceivePort();
 
     _sendPort.send(
-      AIIsolateMessage(parameters.toJson(), responsePort.sendPort),
+      BotIsolateMessage(parameters.toJson(), responsePort.sendPort),
     );
 
     final resultJson = await responsePort.first as Map<String, dynamic>?;

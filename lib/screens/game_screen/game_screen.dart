@@ -4,7 +4,7 @@ import 'package:ultimate_tic_tac_toe/models/enum/game_mode.dart';
 import 'package:ultimate_tic_tac_toe/screens/game_screen/play_again_button.dart';
 import 'package:ultimate_tic_tac_toe/screens/game_screen/winner_indicator.dart';
 
-import '../../models/enum/ai_difficulty.dart';
+import '../../models/enum/bot_difficulty.dart';
 import '../../models/enum/player.dart';
 import '../../models/game_setup.dart';
 import '../../models/online_setup.dart';
@@ -31,7 +31,7 @@ class _GameScreenState extends State<GameScreen> {
   late PlayerConfig player1;
   late PlayerConfig player2;
   late bool player1Starts;
-  AIDifficulty? aiDifficulty;
+  BotDifficulty? botDifficulty;
   bool gameStarted = false;
 
   final GlobalKey<GameStateState> _boardKey = GlobalKey();
@@ -67,7 +67,7 @@ class _GameScreenState extends State<GameScreen> {
         player1 = result.player1;
         player2 = result.player2;
         player1Starts = result.player1Starts;
-        aiDifficulty = result.aiDifficulty;
+        botDifficulty = result.botDifficulty;
       });
 
       if (!gameStarted) {
@@ -110,7 +110,7 @@ class _GameScreenState extends State<GameScreen> {
 
     final PlayerConfig p1 = player1;
     final PlayerConfig p2 = player2;
-    final bool playingAgainstAI = widget.gameMode == GameMode.computer;
+    final bool playingAgainstBot = widget.gameMode == GameMode.bot;
 
     Widget playerStatusIndicator =
     gameFinished
@@ -118,13 +118,13 @@ class _GameScreenState extends State<GameScreen> {
       overallWinner: overallWinner,
       player1: p1,
       player2: p2,
-      playingAgainstAI: playingAgainstAI,
+      playingAgainstBot: playingAgainstBot,
     )
         : CurrentPlayerIndicator(
       currentPlayer: currentPlayer,
       player1: p1,
       player2: p2,
-      playingAgainstAI: playingAgainstAI,
+      playingAgainstBot: playingAgainstBot,
     );
 
     final aiThinkingIndicator = BotThinkingIndicator(visible: aiThinking);
@@ -160,9 +160,9 @@ class _GameScreenState extends State<GameScreen> {
             player1: player1,
             player2: player2,
             player1Starts: player1Starts,
-            aiDifficulty: aiDifficulty,
+            botDifficulty: botDifficulty,
           ),
-          playingAgainstAI: widget.gameMode == GameMode.computer,
+          playingAgainstBot: widget.gameMode == GameMode.bot,
           onPlayAgain: _handlePlayAgain,
           layoutBuilder:
               ({

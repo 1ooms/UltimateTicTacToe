@@ -1,8 +1,8 @@
 import 'dart:isolate';
 
-class AIIsolateMessage {
+class BotIsolateMessage {
   final Map<String, dynamic> moveParametersJson;
   final SendPort responsePort;
 
-  AIIsolateMessage(this.moveParametersJson, this.responsePort);
+  BotIsolateMessage(this.moveParametersJson, this.responsePort);
 }

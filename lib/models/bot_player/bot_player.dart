@@ -2,26 +2,26 @@ import 'dart:math';
 
 import 'package:ultimate_tic_tac_toe/data/win_patterns.dart';
 
-import '../enum/ai_difficulty.dart';
+import '../enum/bot_difficulty.dart';
 import '../enum/player.dart';
 import '../move.dart';
 import '../move_parameters.dart';
 
-Map<String, dynamic>? chooseAIMove(Map<String, dynamic> moveParametersJson) {
+Map<String, dynamic>? chooseBotMove(Map<String, dynamic> moveParametersJson) {
   final moveParameters = MoveParameters.fromJson(moveParametersJson);
 
   final board = moveParameters.subBoards;
   final subBoardWinners = moveParameters.subBoardWinners;
-  final aiPlayerNumber = moveParameters.aiPlayer;
+  final botPlayerNumber = moveParameters.botPlayer;
   final activeSubBoardIndex = moveParameters.activeSubBoardIndex;
   final difficulty = moveParameters.difficulty;
 
-  final AIPlayer aiPlayer = AIPlayer(difficulty: difficulty);
+  final BotPlayer botPlayer = BotPlayer(difficulty: difficulty);
 
   if (subBoardWinners.every((value) => value == null) &&
       activeSubBoardIndex == null) {
-    // First AI move --> every move is optimal, so just perform a random one
-    Move? move = aiPlayer.randomMove(
+    // First Bot move --> every move is optimal, so just perform a random one
+    Move? move = botPlayer.randomMove(
       board,
       subBoardWinners,
       activeSubBoardIndex,
@@ -30,39 +30,39 @@ Map<String, dynamic>? chooseAIMove(Map<String, dynamic> moveParametersJson) {
   }
 
   switch (difficulty) {
-    case AIDifficulty.easy:
-      Move? move = aiPlayer.randomMove(
+    case BotDifficulty.easy:
+      Move? move = botPlayer.randomMove(
         board,
         subBoardWinners,
         activeSubBoardIndex,
       );
       return (move != null) ? move.toJson() : null;
 
-    case AIDifficulty.medium:
-      Move? move = aiPlayer.minimaxMove(
+    case BotDifficulty.medium:
+      Move? move = botPlayer.minimaxMove(
         board,
         subBoardWinners,
-        aiPlayerNumber,
+        botPlayerNumber,
         activeSubBoardIndex,
         maxDepth: 2,
       );
       return (move != null) ? move.toJson() : null;
 
-    case AIDifficulty.hard:
-      Move? move = aiPlayer.minimaxMove(
+    case BotDifficulty.hard:
+      Move? move = botPlayer.minimaxMove(
         board,
         subBoardWinners,
-        aiPlayerNumber,
+        botPlayerNumber,
         activeSubBoardIndex,
         maxDepth: 4,
       );
       return (move != null) ? move.toJson() : null;
 
-    case AIDifficulty.expert:
-      Move? move = aiPlayer.minimaxMove(
+    case BotDifficulty.expert:
+      Move? move = botPlayer.minimaxMove(
         board,
         subBoardWinners,
-        aiPlayerNumber,
+        botPlayerNumber,
         activeSubBoardIndex,
         maxDepth: 9,
       );
@@ -70,10 +70,10 @@ Map<String, dynamic>? chooseAIMove(Map<String, dynamic> moveParametersJson) {
   }
 }
 
-class AIPlayer {
-  final AIDifficulty difficulty;
+class BotPlayer {
+  final BotDifficulty difficulty;
 
-  AIPlayer({required this.difficulty});
+  BotPlayer({required this.difficulty});
 
   final Random _random = Random();
 
@@ -95,7 +95,7 @@ class AIPlayer {
   Move? minimaxMove(
       List<List<Player?>> board,
       List<Player?> subBoardWinners,
-      Player aiPlayer,
+      Player botPlayer,
       int? activeSubBoardIndex, {
         required int maxDepth,
       }) {
@@ -115,18 +115,18 @@ class AIPlayer {
       activeSubBoardIndex,
     )) {
       final prevWinner = subBoardWinners[move.boardIndex];
-      _applyMove(board, subBoardWinners, move, aiPlayer);
+      _applyMove(board, subBoardWinners, move, botPlayer);
 
       int score = _minimax(
         board,
         subBoardWinners,
-        _switchPlayer(aiPlayer),
+        _switchPlayer(botPlayer),
         move.cellIndex,
         1,
         maxDepth,
         -1000000,
         1000000,
-        aiPlayer,
+        botPlayer,
       );
 
       _undoMove(board, subBoardWinners, move, prevWinner);
@@ -161,7 +161,7 @@ class AIPlayer {
       int maxDepth,
       int alpha,
       int beta,
-      Player aiPlayer,
+      Player botPlayer,
       ) {
     // Fallback if sub-board is unplayable
     if (activeSubBoardIndex != null &&
@@ -172,7 +172,7 @@ class AIPlayer {
 
     Player? winner = checkOverallWinner(subBoardWinners);
     if (winner != null) {
-      if (winner == aiPlayer) {
+      if (winner == botPlayer) {
         return 1000 - depth;
       } else {
         return -1000 + depth;
@@ -181,10 +181,10 @@ class AIPlayer {
 
     if (checkDraw(board, subBoardWinners)) return 0;
     if (depth >= maxDepth) {
-      return _evaluateBoard(board, subBoardWinners, aiPlayer);
+      return _evaluateBoard(board, subBoardWinners, botPlayer);
     }
 
-    if (currentPlayer == aiPlayer) {
+    if (currentPlayer == botPlayer) {
       int maxEval = -1000000;
       for (final move in _getValidMoves(
         board,
@@ -202,7 +202,7 @@ class AIPlayer {
           maxDepth,
           alpha,
           beta,
-          aiPlayer,
+          botPlayer,
         );
         _undoMove(board, subBoardWinners, move, prevWinner);
         maxEval = max(maxEval, eval);
@@ -228,7 +228,7 @@ class AIPlayer {
           maxDepth,
           alpha,
           beta,
-          aiPlayer,
+          botPlayer,
         );
         _undoMove(board, subBoardWinners, move, prevWinner);
         minEval = min(minEval, eval);
@@ -320,21 +320,21 @@ class AIPlayer {
   int _evaluateBoard(
       List<List<Player?>> board,
       List<Player?> subBoardWinners,
-      Player aiPlayer,
+      Player botPlayer,
       ) {
     int score = 0;
 
     for (int i = 0; i < 9; i++) {
-      if (subBoardWinners[i] == aiPlayer) {
+      if (subBoardWinners[i] == botPlayer) {
         score += 10;
       } else if (subBoardWinners[i] != null) {
         score -= 10;
       }
 
       for (int cell = 0; cell < 9; cell++) {
-        if (board[i][cell] == aiPlayer) {
+        if (board[i][cell] == botPlayer) {
           score += 1;
-        } else if (board[i][cell] != null && board[i][cell] != aiPlayer) {
+        } else if (board[i][cell] != null && board[i][cell] != botPlayer) {
           score -= 1;
         }
       }

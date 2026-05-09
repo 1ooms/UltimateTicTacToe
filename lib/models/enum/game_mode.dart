@@ -1,1 +1,1 @@
-enum GameMode { local, online, computer }
+enum GameMode { local, online, bot }

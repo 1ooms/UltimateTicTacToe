@@ -13,7 +13,7 @@ class BotThinkingIndicator extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           Text(
-            "AI is thinking",
+            "Bot is thinking",
             style: Theme.of(context).textTheme.titleMedium,
           ),
           const SizedBox(width: 8),
