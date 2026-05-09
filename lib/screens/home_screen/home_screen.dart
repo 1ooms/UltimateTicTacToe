@@ -3,7 +3,6 @@ import 'package:ultimate_tic_tac_toe/models/enum/game_mode.dart';
 import 'package:ultimate_tic_tac_toe/screens/home_screen/app_drawer.dart';
 import 'package:ultimate_tic_tac_toe/screens/home_screen/game_mode_card.dart';
 
-import '../../utils/ui_helpers.dart';
 import '../../widgets/ads/banner_ad_widget.dart';
 import '../game_screen/game_screen.dart';
 
@@ -51,34 +50,34 @@ class HomeScreen extends StatelessWidget {
               title: 'Online',
               icon: Icons.public,
               onTap: () {
-                // Navigator.push(
-                //   context,
-                //   MaterialPageRoute(
-                //     builder: (ctx) => GameScreen(gameMode: GameMode.online),
-                //   ),
-                // );
-                showCustomSnackBar(
+                Navigator.push(
                   context,
-                  Text(
-                    'Coming soon!',
-                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                      color: Theme.of(context).colorScheme.onInverseSurface,
-                    ),
+                  MaterialPageRoute(
+                    builder: (ctx) => GameScreen(gameMode: GameMode.online),
                   ),
                 );
+                // showCustomSnackBar(
+                //   context,
+                //   Text(
+                //     'Coming soon!',
+                //     style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                //       color: Theme.of(context).colorScheme.onInverseSurface,
+                //     ),
+                //   ),
+                // );
               },
             ),
           ),
           SizedBox(
             width: isLandscape ? cardWidth : null,
             child: GameModeCard(
-              title: 'Computer',
+              title: 'Bot',
               icon: Icons.smart_toy,
               onTap: () {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (ctx) => GameScreen(gameMode: GameMode.computer),
+                    builder: (ctx) => GameScreen(gameMode: GameMode.bot),
                   ),
                 );
               },

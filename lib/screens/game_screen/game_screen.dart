@@ -7,7 +7,6 @@ import 'package:ultimate_tic_tac_toe/screens/game_screen/winner_indicator.dart';
 import '../../models/enum/bot_difficulty.dart';
 import '../../models/enum/player.dart';
 import '../../models/game_setup.dart';
-import '../../models/online_setup.dart';
 import '../../models/player_config.dart';
 import '../../widgets/ads/banner_ad_widget.dart';
 import 'board/game_state.dart';
@@ -81,11 +80,17 @@ class _GameScreenState extends State<GameScreen> {
   }
 
   Future<void> _showOnlineSetupDialog(BuildContext context) async {
-    await showDialog<OnlineSetup>(
+    final result = await showDialog<bool>(
       barrierDismissible: false,
       context: context,
       builder: (context) => const OnlineSetupDialog(),
     );
+
+    if (result == true) {
+      if (mounted) {
+        _showGameSetupDialog(context);
+      }
+    }
   }
 
   void _handlePlayAgain() {

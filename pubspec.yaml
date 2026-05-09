@@ -45,6 +45,8 @@ dependencies:
   flutter_launcher_icons: ^0.14.4
   flutter_native_splash: ^2.4.6
   flutter_soloud: ^3.3.8
+  firebase_auth: ^6.4.0
+  uuid: ^4.5.3
 
 dev_dependencies:
   flutter_test:

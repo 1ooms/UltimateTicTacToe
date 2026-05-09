@@ -1,9 +1,8 @@
-import 'dart:math';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
-import '../../../../multiplayer/firestore_controller.dart';
+import '../../../../utils/lobby_controller.dart';
 
 class OnlineSetupDialog extends StatefulWidget {
   const OnlineSetupDialog({super.key});
@@ -18,9 +17,11 @@ class _OnlineSetupDialogState extends State<OnlineSetupDialog>
   late TextEditingController textFieldController;
   bool joinButtonActive = false;
   bool waitingForGuest = false;
+  bool readyToStart = false;
   late String? passCode;
-  FirestoreController firestoreController = FirestoreController(
+  LobbyController lobbyController = LobbyController(
     instance: FirebaseFirestore.instance,
+    auth: FirebaseAuth.instance,
   );
 
   @override
@@ -58,7 +59,7 @@ class _OnlineSetupDialogState extends State<OnlineSetupDialog>
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       ElevatedButton(
-                        onPressed: _startHostingGame,
+                        onPressed: waitingForGuest ? null : _startHostingGame,
                         child: const Text("Host game"),
                       ),
                       SizedBox(width: 8),
@@ -82,6 +83,24 @@ class _OnlineSetupDialogState extends State<OnlineSetupDialog>
                           "Waiting for other player...",
                           textAlign: TextAlign.center,
                           style: Theme.of(context).textTheme.bodyLarge,
+                        ),
+                      ],
+                    )
+                    : const SizedBox(),
+                readyToStart
+                    ? Column(
+                      children: [
+                        Text(
+                          "Another player has joined!",
+                          textAlign: TextAlign.center,
+                          style: Theme.of(context).textTheme.bodyLarge,
+                        ),
+                        SizedBox(height: 8),
+                        ElevatedButton(
+                          onPressed: () {
+                            Navigator.of(context).pop(true);
+                          },
+                          child: const Text('Continue'),
                         ),
                       ],
                     )
@@ -131,41 +150,46 @@ class _OnlineSetupDialogState extends State<OnlineSetupDialog>
     );
   }
 
-  void _startHostingGame() {
-    passCode = _generatePassCode();
-    // firestoreController.createLobby(passCode);
+  Future<void> _startHostingGame() async {
+    final lobbyCode = await lobbyController.createLobby();
     setState(() {
+      passCode = lobbyCode;
       waitingForGuest = true;
+    });
+    final lobbyStream = lobbyController.getLobbyStream(lobbyCode);
+
+    lobbyStream.listen((event) {
+      if (!event.exists) return;
+      final data = event.data() as Map<String, dynamic>;
+      if (data['state'] == 'ready') {
+        setState(() {
+          waitingForGuest = false;
+          readyToStart = true;
+        });
+      }
     });
   }
 
-  void _stopHostingGame() {
-    passCode = null;
+  Future<void> _stopHostingGame() async {
+    if (passCode != null) {
+      await lobbyController.deleteLobby(passCode!);
+      passCode = null;
+    }
     setState(() {
       waitingForGuest = false;
     });
   }
 
-  void _joinGame() {
-    _stopHostingGame();
-    // firestoreController.joinLobby(textFieldController.text);
+  Future<void> _joinGame() async {
+    final success = await lobbyController.joinLobby(textFieldController.text);
+    if (success && mounted) {
+      Navigator.of(context).pop(true);
+    }
   }
 
   void _updateTextField() {
     setState(() {
       joinButtonActive = textFieldController.text.length == 4;
     });
-  }
-
-  String _generatePassCode() {
-    var random = Random();
-    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890';
-
-    return String.fromCharCodes(
-      Iterable.generate(
-        4,
-        (_) => chars.codeUnitAt(random.nextInt(chars.length)),
-      ),
-    );
   }
 }

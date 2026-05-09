@@ -46,7 +46,6 @@ void main() async {
   final audioController = AudioController();
   await audioController.initialize();
 
-  // runApp(Provider(value: FirebaseFirestore.instance, child: App(audioController: audioController)));
   runApp(ProviderScope(child: App(audioController: audioController)));
 }
 
