@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:ultimate_tic_tac_toe/models/enum/bot_difficulty.dart';
 import 'package:ultimate_tic_tac_toe/models/enum/player_shape.dart';
-import 'package:ultimate_tic_tac_toe/screens/game_screen/game_setup_dialogs/game_setup/player_icon_preview.dart';
+import 'package:ultimate_tic_tac_toe/screens/game_screen/game_setup_dialogs/game_setup/player_customizer.dart';
 
 import '../../../../models/enum/game_mode.dart';
 import '../../../../models/game_setup.dart';
@@ -106,17 +106,27 @@ class _GameSetupDialogState extends State<GameSetupDialog> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
-            Text('Players', style: theme.textTheme.titleSmall),
+            Text('Player', style: theme.textTheme.titleSmall),
+            Text('Icon', style: theme.textTheme.titleSmall,),
             Text('Who starts?', style: theme.textTheme.titleSmall),
           ],
         ),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Row(
+            Column(
               children: [
                 const Icon(Icons.person_outline),
-                const SizedBox(width: 10),
+                const SizedBox(height: 24.0),
+                widget.gameMode == GameMode.bot
+                    ? Icon(Icons.smart_toy_outlined)
+                    : widget.gameMode == GameMode.online
+                    ? Icon(Icons.language)
+                    : Icon(Icons.person_outline),
+              ],
+            ),
+            Column(
+              children: [
                 PlayerCustomizer(
                   config1: player1Config,
                   config2: player2Config,
@@ -126,30 +136,6 @@ class _GameSetupDialogState extends State<GameSetupDialog> {
                     });
                   },
                 ),
-              ],
-            ),
-
-            Radio<bool>(
-              value: true,
-              groupValue: isPlayer1First,
-              onChanged: (value) {
-                setState(() {
-                  isPlayer1First = true;
-                });
-              },
-            ),
-          ],
-        ),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Row(
-              children: [
-                widget.gameMode == GameMode.bot
-                    ? Icon(Icons.smart_toy_outlined)
-                    : widget.gameMode == GameMode.online
-                    ? Icon(Icons.language)
-                    : Icon(Icons.person_outline),
                 const SizedBox(width: 10),
                 PlayerCustomizer(
                   config1: player2Config,
@@ -162,31 +148,41 @@ class _GameSetupDialogState extends State<GameSetupDialog> {
                 ),
               ],
             ),
-            Radio<bool>(
-              value: false,
-              groupValue: isPlayer1First,
-              onChanged: (value) {
-                setState(() {
-                  isPlayer1First = false;
-                });
-              },
+            Column(
+              children: [
+                Radio<bool>(
+                  value: true,
+                  groupValue: isPlayer1First,
+                  onChanged: (value) {
+                    setState(() {
+                      isPlayer1First = true;
+                    });
+                  },
+                ),
+                Radio<bool>(
+                  value: false,
+                  groupValue: isPlayer1First,
+                  onChanged: (value) {
+                    setState(() {
+                      isPlayer1First = false;
+                    });
+                  },
+                ),
+              ],
             ),
           ],
         ),
       ],
     );
 
-    final difficultyWidget =
-        widget.gameMode == GameMode.bot
-            ? DifficultySlider(
-              selectedDifficulty: botDifficulty,
-              onChanged: (difficulty) {
-                setState(() {
-                  botDifficulty = difficulty;
-                });
-              },
-            )
-            : Container();
+    final difficultyWidget = DifficultySlider(
+      selectedDifficulty: botDifficulty,
+      onChanged: (difficulty) {
+        setState(() {
+          botDifficulty = difficulty;
+        });
+      },
+    );
 
     return StatefulBuilder(
       builder: (context, setState) {
@@ -216,12 +212,16 @@ class _GameSetupDialogState extends State<GameSetupDialog> {
                           ],
                         )
                         : Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Expanded(child: gameSetup),
-                            const SizedBox(width: 64),
-                            Expanded(child: difficultyWidget),
+                            widget.gameMode == GameMode.bot
+                                ? const SizedBox(width: 32)
+                                : const SizedBox(),
+                            widget.gameMode == GameMode.bot
+                                ? Expanded(child: difficultyWidget)
+                                : const SizedBox(),
                           ],
                         ),
                 actions: [

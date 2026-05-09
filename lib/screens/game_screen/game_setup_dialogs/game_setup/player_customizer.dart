@@ -18,7 +18,8 @@ class PlayerCustomizer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
 
     return Row(
       children: [
@@ -30,8 +31,11 @@ class PlayerCustomizer extends StatelessWidget {
           ),
           child: buildIcon(config1.shape, config1.color, 32),
         ),
-        IconButton(
-          icon: const Icon(Icons.edit),
+        ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            shape: CircleBorder(),
+          ),
+          child: const Icon(Icons.edit),
           onPressed: () {
             showDialog(
               barrierColor: Colors.transparent,

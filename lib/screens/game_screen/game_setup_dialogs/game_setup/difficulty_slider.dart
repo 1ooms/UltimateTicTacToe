@@ -16,7 +16,7 @@ class DifficultySlider extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         Text('Bot Difficulty', style: Theme.of(context).textTheme.titleSmall),
         Slider(
