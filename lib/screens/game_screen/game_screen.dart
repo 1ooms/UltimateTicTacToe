@@ -236,34 +236,42 @@ class _GameScreenState extends State<GameScreen> {
     final isLandscape =
         MediaQuery.of(context).orientation == Orientation.landscape;
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          '${widget.gameMode.name.capitalize()} Game',
-          style: Theme.of(context).textTheme.titleLarge,
-        ),
-        actions: [
-          IconButton(
-            onPressed: () => _showGameSetupDialog(context),
-            icon: const Icon(Icons.palette),
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) {
+        if (!didPop && gameStarted) {
+          showDialog(context: context, builder: (ctx) => LeaveGameDialog());
+        }
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text(
+            '${widget.gameMode.name.capitalize()} Game',
+            style: Theme.of(context).textTheme.titleLarge,
           ),
-          IconButton(
-            onPressed: () => _boardKey.currentState?.performUndo(),
-            icon: const Icon(Icons.undo),
-          ),
-        ],
-      ),
-      body: Padding(
-        padding: const EdgeInsets.only(
-          left: 16.0,
-          right: 16.0,
-          top: 8.0,
-          bottom: 16,
+          actions: [
+            IconButton(
+              onPressed: () => _showGameSetupDialog(context),
+              icon: const Icon(Icons.palette),
+            ),
+            IconButton(
+              onPressed: () => _boardKey.currentState?.performUndo(),
+              icon: const Icon(Icons.undo),
+            ),
+          ],
         ),
-        child: buildBodyContent(),
+        body: Padding(
+          padding: const EdgeInsets.only(
+            left: 16.0,
+            right: 16.0,
+            top: 8.0,
+            bottom: 16,
+          ),
+          child: buildBodyContent(),
+        ),
+        bottomNavigationBar:
+            isLandscape ? const SizedBox() : const BannerAdWidget(),
       ),
-      bottomNavigationBar:
-          isLandscape ? const SizedBox() : const BannerAdWidget(),
     );
   }
 }
