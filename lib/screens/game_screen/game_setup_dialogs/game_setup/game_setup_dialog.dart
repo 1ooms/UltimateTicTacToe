@@ -148,28 +148,18 @@ class _GameSetupDialogState extends State<GameSetupDialog> {
                 ),
               ],
             ),
-            Column(
-              children: [
-                Radio<bool>(
-                  value: true,
-                  groupValue: isPlayer1First,
-                  onChanged: (value) {
-                    setState(() {
-                      isPlayer1First = true;
-                    });
-                  },
-                ),
-                Radio<bool>(
-                  value: false,
-                  groupValue: isPlayer1First,
-                  onChanged: (value) {
-                    setState(() {
-                      isPlayer1First = false;
-                    });
-                  },
-                ),
-              ],
-            ),
+            RadioGroup<bool>(
+              groupValue: isPlayer1First,
+              onChanged: (bool? value) {
+                setState(() {
+                  isPlayer1First = value!;
+                });
+              },
+              child: Column(children: [
+                Radio<bool>(value: true,),
+                Radio<bool>(value: false,),
+              ],)
+            )
           ],
         ),
       ],
