@@ -1,11 +1,13 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
 import '../../../../utils/lobby_controller.dart';
 
 class OnlineSetupDialog extends StatefulWidget {
-  const OnlineSetupDialog({super.key});
+  final LobbyController lobbyController;
+
+  const OnlineSetupDialog({super.key, required this.lobbyController});
 
   @override
   State<OnlineSetupDialog> createState() => _OnlineSetupDialogState();
@@ -18,11 +20,9 @@ class _OnlineSetupDialogState extends State<OnlineSetupDialog>
   bool joinButtonActive = false;
   bool waitingForGuest = false;
   bool readyToStart = false;
-  late String? passCode;
-  LobbyController lobbyController = LobbyController(
-    instance: FirebaseFirestore.instance,
-    auth: FirebaseAuth.instance,
-  );
+  bool waitingForHostToStart = false;
+  String? passCode;
+  StreamSubscription? lobbySubscription;
 
   @override
   void initState() {
@@ -35,7 +35,17 @@ class _OnlineSetupDialogState extends State<OnlineSetupDialog>
   }
 
   @override
+  void dispose() {
+    tabController.dispose();
+    textFieldController.dispose();
+    lobbySubscription?.cancel();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
+
     final isLandscape =
         MediaQuery.of(context).orientation == Orientation.landscape;
 
@@ -53,36 +63,40 @@ class _OnlineSetupDialogState extends State<OnlineSetupDialog>
             Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      ElevatedButton(
-                        onPressed: waitingForGuest ? null : _startHostingGame,
-                        child: const Text("Host game"),
+                readyToStart
+                    ? SizedBox()
+                    : Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          ElevatedButton(
+                            onPressed:
+                                waitingForGuest ? null : _startHostingGame,
+                            child: const Text("Host game"),
+                          ),
+                          SizedBox(width: 8),
+                          ElevatedButton(
+                            onPressed:
+                                waitingForGuest ? _stopHostingGame : null,
+                            child: const Text("Cancel"),
+                          ),
+                        ],
                       ),
-                      SizedBox(width: 8),
-                      ElevatedButton(
-                        onPressed: waitingForGuest ? _stopHostingGame : null,
-                        child: const Text("Cancel"),
-                      ),
-                    ],
-                  ),
-                ),
+                    ),
                 waitingForGuest
                     ? Column(
                       children: [
                         Text(
                           "Join code: $passCode",
                           textAlign: TextAlign.center,
-                          style: Theme.of(context).textTheme.titleLarge,
+                          style: textTheme.titleLarge,
                         ),
                         SizedBox(height: 8),
                         Text(
                           "Waiting for other player...",
                           textAlign: TextAlign.center,
-                          style: Theme.of(context).textTheme.bodyLarge,
+                          style: textTheme.bodyLarge,
                         ),
                       ],
                     )
@@ -90,15 +104,18 @@ class _OnlineSetupDialogState extends State<OnlineSetupDialog>
                 readyToStart
                     ? Column(
                       children: [
+                        SizedBox(height: 32),
                         Text(
                           "Another player has joined!",
                           textAlign: TextAlign.center,
-                          style: Theme.of(context).textTheme.bodyLarge,
+                          style: textTheme.bodyLarge,
                         ),
                         SizedBox(height: 8),
                         ElevatedButton(
                           onPressed: () {
-                            Navigator.of(context).pop(true);
+                            Navigator.of(
+                              context,
+                            ).pop({'lobbyCode': passCode, 'isHost': true});
                           },
                           child: const Text('Continue'),
                         ),
@@ -107,23 +124,38 @@ class _OnlineSetupDialogState extends State<OnlineSetupDialog>
                     : const SizedBox(),
               ],
             ),
-            Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                TextField(
-                  controller: textFieldController,
-                  onChanged: (text) {
-                    _updateTextField();
-                  },
-                  decoration: InputDecoration(labelText: "Enter code"),
+            waitingForHostToStart
+                ? Column(
+                  mainAxisSize: MainAxisSize.min,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Text(
+                      "Waiting for host\nto start game.",
+                      style: textTheme.bodyLarge,
+                      textAlign: TextAlign.center,
+                    ),
+                    SizedBox(height: 16),
+                    CircularProgressIndicator(),
+                  ],
+                )
+                : Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    TextField(
+                      controller: textFieldController,
+                      onChanged: (text) {
+                        _updateTextField();
+                      },
+                      decoration: InputDecoration(labelText: "Enter code"),
+                    ),
+                    SizedBox(height: 8),
+                    ElevatedButton(
+                      onPressed: joinButtonActive ? _joinGame : null,
+                      child: const Text("Join game"),
+                    ),
+                  ],
                 ),
-                SizedBox(height: 8),
-                ElevatedButton(
-                  onPressed: joinButtonActive ? _joinGame : null,
-                  child: const Text("Join game"),
-                ),
-              ],
-            ),
           ],
         ),
       ),
@@ -135,6 +167,15 @@ class _OnlineSetupDialogState extends State<OnlineSetupDialog>
           canPop: false,
           onPopInvokedWithResult: (didPop, result) {
             if (!didPop) {
+              if (passCode != null) {
+                if (tabController.index == 0) {
+                  // Host tab
+                  _stopHostingGame();
+                } else if (waitingForHostToStart) {
+                  // Join tab and actually joined
+                  _leaveLobby();
+                }
+              }
               Navigator.of(context).pop(); // Pop the dialog
               Navigator.of(context).pop(); // Pop the screen
             }
@@ -151,39 +192,98 @@ class _OnlineSetupDialogState extends State<OnlineSetupDialog>
   }
 
   Future<void> _startHostingGame() async {
-    final lobbyCode = await lobbyController.createLobby();
+    final lobbyCode = await widget.lobbyController.createLobby();
     setState(() {
       passCode = lobbyCode;
       waitingForGuest = true;
     });
-    final lobbyStream = lobbyController.getLobbyStream(lobbyCode);
-
-    lobbyStream.listen((event) {
-      if (!event.exists) return;
-      final data = event.data() as Map<String, dynamic>;
-      if (data['state'] == 'ready') {
-        setState(() {
-          waitingForGuest = false;
-          readyToStart = true;
-        });
-      }
-    });
+    lobbySubscription = widget.lobbyController.getLobbyStream(lobbyCode).listen(
+      (event) {
+        if (!event.exists) return;
+        final data = event.data() as Map<String, dynamic>;
+        if (mounted) {
+          setState(() {
+            if (data['state'] == 'ready') {
+              waitingForGuest = false;
+              readyToStart = true;
+            } else if (data['state'] == 'waiting') {
+              waitingForGuest = true;
+              readyToStart = false;
+            }
+          });
+        }
+      },
+    );
   }
 
   Future<void> _stopHostingGame() async {
     if (passCode != null) {
-      await lobbyController.deleteLobby(passCode!);
+      await widget.lobbyController.deleteLobby(passCode!);
       passCode = null;
     }
-    setState(() {
-      waitingForGuest = false;
-    });
+    lobbySubscription?.cancel();
+    if (mounted) {
+      setState(() {
+        waitingForGuest = false;
+        readyToStart = false;
+      });
+    }
   }
 
   Future<void> _joinGame() async {
-    final success = await lobbyController.joinLobby(textFieldController.text);
-    if (success && mounted) {
-      Navigator.of(context).pop(true);
+    final code = textFieldController.text.toUpperCase();
+    final success = await widget.lobbyController.joinLobby(code);
+    if (success) {
+      setState(() {
+        waitingForHostToStart = true;
+        passCode = code;
+      });
+
+      lobbySubscription = widget.lobbyController.getLobbyStream(code).listen((
+        event,
+      ) {
+        if (!event.exists) {
+          if (mounted) {
+            setState(() {
+              waitingForHostToStart = false;
+              passCode = null;
+            });
+            lobbySubscription?.cancel();
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text("Host closed the lobby")),
+            );
+          }
+          return;
+        }
+        final data = event.data() as Map<String, dynamic>;
+        if (data['state'] == 'playing') {
+          if (mounted) {
+            Navigator.of(context).pop({
+              'lobbyCode': code,
+              'isHost': false,
+              'gameSetup': data['gameSetup'],
+            });
+          }
+        }
+      });
+    }
+    else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Lobby does not exist!")),
+      );
+    }
+  }
+
+  Future<void> _leaveLobby() async {
+    if (passCode != null) {
+      await widget.lobbyController.leaveLobby(passCode!);
+      passCode = null;
+    }
+    lobbySubscription?.cancel();
+    if (mounted) {
+      setState(() {
+        waitingForHostToStart = false;
+      });
     }
   }
 

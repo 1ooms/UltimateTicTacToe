@@ -14,4 +14,24 @@ class GameSetup {
     required this.player1Starts,
     this.botDifficulty,
   });
+
+  Map<String, dynamic> toJson() {
+    return {
+      'player1': player1.toJson(),
+      'player2': player2.toJson(),
+      'player1Starts': player1Starts,
+      'botDifficulty': botDifficulty?.name,
+    };
+  }
+
+  factory GameSetup.fromJson(Map<String, dynamic> json) {
+    return GameSetup(
+      player1: PlayerConfig.fromJson(json['player1']),
+      player2: PlayerConfig.fromJson(json['player2']),
+      player1Starts: json['player1Starts'],
+      botDifficulty: json['botDifficulty'] != null
+          ? BotDifficulty.values.byName(json['botDifficulty'])
+          : null,
+    );
+  }
 }

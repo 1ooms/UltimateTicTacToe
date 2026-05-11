@@ -1,8 +1,10 @@
+import 'dart:async';
 import 'dart:math';
 
 import 'package:confetti/confetti.dart';
 import 'package:flutter/material.dart';
 import 'package:ultimate_tic_tac_toe/screens/game_screen/board/ultimate_board.dart';
+import 'package:ultimate_tic_tac_toe/utils/lobby_controller.dart';
 
 import '../../../data/win_patterns.dart';
 import '../../../models/bot_player/bot_isolate.dart';
@@ -19,14 +21,20 @@ class GameState extends StatefulWidget {
   const GameState({
     super.key,
     required this.playingAgainstBot,
+    required this.playingOnline,
     required this.layoutBuilder,
     required this.onPlayAgain,
     required this.gameSetup,
+    required this.lobbyController,
+    required this.lobbyCode,
   });
 
   final bool playingAgainstBot;
+  final bool playingOnline;
   final VoidCallback onPlayAgain;
   final GameSetup gameSetup;
+  final LobbyController? lobbyController;
+  final String? lobbyCode;
 
   final Widget Function({
     required Widget boardWidget,
@@ -49,8 +57,9 @@ class GameStateState extends State<GameState> {
   int? _activeSubBoardIndex;
   late Player? overallWinner;
 
-  final List<Move> _moveHistory = [];
+  List<Move> _moveHistory = [];
   bool _aiThinking = false;
+  bool _onlineOtherPlayerTurn = false;
 
   bool gameFinished = false;
   Color _winnerColor = Colors.transparent;
@@ -58,6 +67,8 @@ class GameStateState extends State<GameState> {
   late final BotIsolate _aiIsolate;
 
   AudioController audioController = AudioController();
+
+  StreamSubscription? lobbySubscription;
 
   @override
   void initState() {
@@ -109,6 +120,7 @@ class GameStateState extends State<GameState> {
 
   void _handleTap(int boardIndex, int cellIndex) {
     if (_aiThinking) return;
+    if (_onlineOtherPlayerTurn) return;
 
     if (!_isValidMove(boardIndex, cellIndex)) return;
 
@@ -145,10 +157,15 @@ class GameStateState extends State<GameState> {
 
       // switch player turn
       _currentPlayer = _currentPlayer == Player.one ? Player.two : Player.one;
+      // _onlineOtherPlayerTurn = !_onlineOtherPlayerTurn;
 
       if (widget.playingAgainstBot && _currentPlayer == Player.two) {
         _makeBotMove();
       }
+
+      // if (widget.playingOnline {
+      //   // _submitTurnToServer(_subBoards, _moveHistory, _subBoardWinners, _activeSubBoardIndex);
+      // }
     });
   }
 
@@ -173,6 +190,24 @@ class GameStateState extends State<GameState> {
     if (move != null) {
       _handleTap(move.boardIndex, move.cellIndex);
     }
+  }
+
+  Future<void> _listenOtherPlayerTurn() async {
+    lobbySubscription = widget.lobbyController?.getLobbyStream(widget.lobbyCode!).listen(
+        (event) {
+        if (!event.exists) return;
+        final data = event.data() as Map<String, dynamic>;
+        if (mounted && data['current_player'] == _currentPlayer) {
+          setState(() {
+            _moveHistory = data['move_history'];
+            _subBoards = data['sub_boards'];
+            _subBoardWinners = data['sub_board_winners'];
+          });
+        }
+      },
+    );
+
+
   }
 
   bool _isValidMove(int boardIndex, int cellIndex) {
