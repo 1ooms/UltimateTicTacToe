@@ -1,0 +1,19 @@
+default_platform(:android)
+
+platform :android do
+  desc "Build and upload a new release to the Google Play Store"
+  lane :deploy do
+    flutter_build_appbundle(
+      build_number: ENV['FLUTTER_BUILD_NUMBER']
+    )
+
+    upload_to_play_store(
+      track: 'internal',
+      json_key: 'fastlane/api-key.json',
+      package_name: 'com.example.ultimate_tic_tac_toe',
+      aab: '../build/app/outputs/bundle/release/app-release.aab',
+      skip_upload_screenshots: true,
+      skip_upload_images: true
+    )
+  end
+end
