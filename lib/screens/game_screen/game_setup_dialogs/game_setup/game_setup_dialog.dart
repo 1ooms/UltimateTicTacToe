@@ -119,10 +119,10 @@ class _GameSetupDialogState extends State<GameSetupDialog> {
                 const Icon(Icons.person_outline),
                 const SizedBox(height: 24.0),
                 widget.gameMode == GameMode.bot
-                    ? Icon(Icons.smart_toy_outlined)
+                    ? const Icon(Icons.smart_toy_outlined)
                     : widget.gameMode == GameMode.online
-                    ? Icon(Icons.language)
-                    : Icon(Icons.person_outline),
+                        ? const Icon(Icons.language)
+                        : const Icon(Icons.person_outline),
               ],
             ),
             Column(
@@ -136,7 +136,7 @@ class _GameSetupDialogState extends State<GameSetupDialog> {
                     });
                   },
                 ),
-                const SizedBox(width: 10),
+                const SizedBox(height: 10),
                 PlayerCustomizer(
                   config1: player2Config,
                   config2: player1Config,
@@ -184,93 +184,67 @@ class _GameSetupDialogState extends State<GameSetupDialog> {
       },
     );
 
-    return StatefulBuilder(
-      builder: (context, setState) {
-        return Stack(
-          children: [
-            PopScope(
-              canPop: false,
-              onPopInvokedWithResult: (didPop, result) {
-                if (!didPop && !widget.gameStarted) {
-                  Navigator.of(context).pop(); // Pop the dialog
-                  Navigator.of(context).pop(); // Pop the screen
-                } else if (!didPop && widget.gameStarted) {
-                  Navigator.of(context).pop();
-                }
-              },
-              child: AlertDialog(
-                scrollable: true,
-                title: Text('Setup', style: theme.textTheme.titleLarge),
-                content:
-                    !isLandscape
-                        ? Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            gameSetup,
-                            const SizedBox(height: 32),
-                            difficultyWidget,
-                          ],
-                        )
-                        : Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Expanded(child: gameSetup),
-                            widget.gameMode == GameMode.bot
-                                ? const SizedBox(width: 32)
-                                : const SizedBox(),
-                            widget.gameMode == GameMode.bot
-                                ? Expanded(child: difficultyWidget)
-                                : const SizedBox(),
-                          ],
-                        ),
-                actions: [
-                  TextButton(
-                    onPressed: () {
-                      if (widget.gameStarted) {
-                        Navigator.of(context).pop();
-                      } else {
-                        Navigator.of(context).pop();
-                        Navigator.of(context).pop();
-                      }
-                    },
-                    child: const Text('Cancel'),
-                  ),
-                  widget.gameStarted
-                      ? ElevatedButton(
-                        onPressed: () {
-                          _savePrefs();
-                          Navigator.of(context).pop(
-                            GameSetup(
-                              player1: player1Config,
-                              player2: player2Config,
-                              player1Starts: isPlayer1First,
-                              botDifficulty: botDifficulty,
-                            ),
-                          );
-                        },
-                        child: const Text('Continue game'),
-                      )
-                      : ElevatedButton(
-                        onPressed: () {
-                          _savePrefs();
-                          Navigator.of(context).pop(
-                            GameSetup(
-                              player1: player1Config,
-                              player2: player2Config,
-                              player1Starts: isPlayer1First,
-                              botDifficulty: botDifficulty,
-                            ),
-                          );
-                        },
-                        child: const Text('Start Game'),
-                      ),
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) {
+        if (!didPop && !widget.gameStarted) {
+          Navigator.of(context).pop(); // Pop the dialog
+          Navigator.of(context).pop(); // Pop the screen
+        } else if (!didPop && widget.gameStarted) {
+          Navigator.of(context).pop();
+        }
+      },
+      child: AlertDialog(
+        scrollable: true,
+        title: Text('Setup', style: theme.textTheme.titleLarge),
+        content: !isLandscape
+            ? Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  gameSetup,
+                  const SizedBox(height: 32),
+                  if (widget.gameMode == GameMode.bot) difficultyWidget,
+                ],
+              )
+            : Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(child: gameSetup),
+                  if (widget.gameMode == GameMode.bot) ...[
+                    const SizedBox(width: 32),
+                    Expanded(child: difficultyWidget),
+                  ],
                 ],
               ),
-            ),
-          ],
-        );
-      },
+        actions: [
+          TextButton(
+            onPressed: () {
+              if (widget.gameStarted) {
+                Navigator.of(context).pop();
+              } else {
+                Navigator.of(context).pop();
+                Navigator.of(context).pop();
+              }
+            },
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              _savePrefs();
+              Navigator.of(context).pop(
+                GameSetup(
+                  player1: player1Config,
+                  player2: player2Config,
+                  player1Starts: isPlayer1First,
+                  botDifficulty: botDifficulty,
+                ),
+              );
+            },
+            child: Text(widget.gameStarted ? 'Continue game' : 'Start Game'),
+          ),
+        ],
+      ),
     );
   }
 }
