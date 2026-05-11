@@ -71,14 +71,12 @@ class _PlayerCustomizationDialogState extends State<PlayerCustomizationDialog> {
       selectedShape: selectedShape,
       otherShape: widget.otherConfig.shape,
       onShapeSelected: (shape) => setState(() => selectedShape = shape),
-      expand: isLandscape,
     );
 
     final colorSelector = ColorSelectorGrid(
       selectedColor: selectedColor,
       otherColor: widget.otherConfig.color,
       onColorSelected: (color) => setState(() => selectedColor = color),
-      expand: isLandscape,
     );
 
     final preview = buildPreview(colorScheme);
@@ -88,10 +86,10 @@ class _PlayerCustomizationDialogState extends State<PlayerCustomizationDialog> {
             ? Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                shapeSelector,
-                const SizedBox(width: 12),
-                colorSelector,
-                const SizedBox(width: 12),
+                SizedBox(width: 3*48+2*8, child: shapeSelector),
+                const SizedBox(width: 24),
+                SizedBox(width: 4*48+3*8, child: colorSelector),
+                const SizedBox(width: 24),
                 preview,
               ],
             )
@@ -107,8 +105,10 @@ class _PlayerCustomizationDialogState extends State<PlayerCustomizationDialog> {
             );
 
     return AlertDialog(
+      scrollable: true,
       title: const Text('Customize player'),
       content: layout,
+
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(context),
