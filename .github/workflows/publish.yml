@@ -40,14 +40,26 @@ jobs:
 
       - name: Create Google Play Service Account JSON
         run: |
-          echo "${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON }}" > fastlane/api-key.json
+          echo "${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON }}" > store_credentials.json 
 
-      - name: Install Fastlane
-        run: bundle install
+      - name: Install dependencies
+        run: flutter pub get
 
-      - name: Run Fastlane Deploy
-        run: bundle exec fastlane deploy
-        env:
-          # If you need version codes to increment automatically based on git commits
-          # ensure you have logic in Fastfile or pubspec.yaml to handle this.
-          FLUTTER_BUILD_NUMBER: ${{ github.run_number }}
+      - name: Build app bundle
+        run: |
+          flutter build appbundle 
+          --release
+
+      - name: Upload generated aab to the artifacts
+        uses: actions/upload-artifact@master
+        with:
+          name: aab-stores
+          path: build/app/outputs/bundle/release/app-release.aab
+
+      - name: Deploy to Play Store
+        uses: r0adkll/upload-google-play@v1
+        with:
+          serviceAccountJson: store_credentials.json
+          packageName: com.ohms.tictactoe
+          releaseFiles: build/app/outputs/bundle/release/app-release.aab
+          tracks: alpha,beta
