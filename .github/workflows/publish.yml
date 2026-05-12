@@ -21,17 +21,21 @@ jobs:
         with:
           distribution: 'zulu'
           java-version: '17'
+          cache: 'gradle'
 
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
           channel: 'stable'
+          cache: true
 
       - name: Decode Keystore
+        working-directory: ./android
         run: |
           echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 --decode > app/keystore.jks
 
       - name: Create key.properties
+        working-directory: ./android
         run: |
           echo "storePassword=${{ secrets.ANDROID_STORE_PASSWORD }}" > key.properties
           echo "keyPassword=${{ secrets.ANDROID_KEY_PASSWORD }}" >> key.properties
@@ -39,6 +43,7 @@ jobs:
           echo "storeFile=../app/keystore.jks" >> key.properties
 
       - name: Create Google Play Service Account JSON
+        working-directory: ./android
         run: |
           echo "${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON }}" > store_credentials.json 
 
