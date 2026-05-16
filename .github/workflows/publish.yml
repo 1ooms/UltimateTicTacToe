@@ -35,7 +35,7 @@ jobs:
           echo "storePassword=${{ secrets.ANDROID_STORE_PASSWORD }}" > android/key.properties
           echo "keyPassword=${{ secrets.ANDROID_KEY_PASSWORD }}" >> android/key.properties
           echo "keyAlias=${{ secrets.ANDROID_KEY_ALIAS }}" >> android/key.properties
-          echo "storeFile=app/keystore.jks" >> android/key.properties
+          echo "storeFile=keystore.jks" >> android/key.properties
 
       - name: Create Google Play Service Account JSON
         run: |
@@ -46,7 +46,7 @@ jobs:
 
       - name: Build app bundle
         run: |
-          flutter build appbundle --release
+          flutter build appbundle
 
       - name: Upload generated aab to the artifacts
         uses: actions/upload-artifact@master
