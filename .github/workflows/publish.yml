@@ -41,8 +41,7 @@ jobs:
         run: flutter pub get
 
       - name: Build app bundle
-        run: |
-          flutter build appbundle
+        run: flutter build appbundle --build-number=${{ github.run_number }}
 
       - name: Upload generated aab to the artifacts
         uses: actions/upload-artifact@master
