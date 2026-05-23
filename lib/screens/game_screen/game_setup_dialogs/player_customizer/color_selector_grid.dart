@@ -39,51 +39,51 @@ class ColorSelectorGrid extends StatelessWidget {
           spacing: 8,
           runSpacing: 8,
           children:
-          colors.map((color) {
-            final isTaken = color.toARGB32() == otherColor.toARGB32();
-            final isSelected = color.toARGB32() == selectedColor.toARGB32();
+              colors.map((color) {
+                final isTaken = color.toARGB32() == otherColor.toARGB32();
+                final isSelected = color.toARGB32() == selectedColor.toARGB32();
 
-            return GestureDetector(
-              onTap:
-              isTaken
-                  ? () => showCustomSnackBar(
-                context,
-                Text(
-                  'The other player is using this color.',
-                  style: Theme.of(
-                    context,
-                  ).textTheme.titleMedium?.copyWith(
-                    color: colorScheme.onInverseSurface,
-                  ),
-                ),
-              )
-                  : () => onColorSelected(color),
-              child: Stack(
-                children: [
-                  Container(
-                    width: 48,
-                    height: 48,
-                    decoration: BoxDecoration(
-                      color: color,
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(
-                        color:
-                        isSelected
-                            ? colorScheme.onSurface
-                            : Colors.transparent,
-                        width: 2,
+                return GestureDetector(
+                  onTap:
+                      isTaken
+                          ? () => showCustomSnackBar(
+                            context,
+                            Text(
+                              'The other player is using this color.',
+                              style: Theme.of(
+                                context,
+                              ).textTheme.titleMedium?.copyWith(
+                                color: colorScheme.onInverseSurface,
+                              ),
+                            ),
+                          )
+                          : () => onColorSelected(color),
+                  child: Stack(
+                    children: [
+                      Container(
+                        width: 48,
+                        height: 48,
+                        decoration: BoxDecoration(
+                          color: color,
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(
+                            color:
+                                isSelected
+                                    ? colorScheme.onSurface
+                                    : Colors.transparent,
+                            width: 2,
+                          ),
+                        ),
                       ),
-                    ),
+                      if (isTaken)
+                        CustomPaint(
+                          size: const Size(48, 48),
+                          painter: DiagonalLinePainter(colorScheme),
+                        ),
+                    ],
                   ),
-                  if (isTaken)
-                    CustomPaint(
-                      size: const Size(48, 48),
-                      painter: DiagonalLinePainter(colorScheme),
-                    ),
-                ],
-              ),
-            );
-          }).toList(),
+                );
+              }).toList(),
         ),
       ],
     );
@@ -100,20 +100,20 @@ class DiagonalLinePainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final path =
-    Path()..addRRect(
-      RRect.fromRectAndRadius(
-        Rect.fromLTWH(0, 0, size.width, size.height),
-        const Radius.circular(8),
-      ),
-    );
+        Path()..addRRect(
+          RRect.fromRectAndRadius(
+            Rect.fromLTWH(0, 0, size.width, size.height),
+            const Radius.circular(8),
+          ),
+        );
 
     canvas.clipPath(path);
 
     final paint =
-    Paint()
-      ..color = Colors.grey.shade500
-      ..strokeWidth = 3
-      ..strokeCap = StrokeCap.round;
+        Paint()
+          ..color = Colors.grey.shade500
+          ..strokeWidth = 3
+          ..strokeCap = StrokeCap.round;
 
     canvas.drawLine(Offset(0, size.height), Offset(size.width, 0), paint);
     canvas.drawLine(Offset(0, 0), Offset(size.width, size.height), paint);

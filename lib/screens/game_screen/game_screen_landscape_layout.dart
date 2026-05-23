@@ -8,7 +8,8 @@ class GameScreenLandscapeLayout extends StatelessWidget {
   final Widget playAgainButton;
   final Widget aiThinkingIndicator;
 
-  const GameScreenLandscapeLayout({super.key,
+  const GameScreenLandscapeLayout({
+    super.key,
     required this.boardWidget,
     required this.playerStatusIndicator,
     required this.playAgainButton,
@@ -17,7 +18,6 @@ class GameScreenLandscapeLayout extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0),
       child: Row(
@@ -39,7 +39,7 @@ class GameScreenLandscapeLayout extends StatelessWidget {
               ),
               BannerAdWidget(),
             ],
-          )
+          ),
         ],
       ),
     );

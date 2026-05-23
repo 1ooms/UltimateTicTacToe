@@ -59,18 +59,18 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 children: [
                   ListTile(
                     title: const Text('Light theme'),
-                    leading: Radio<ThemeMode>(value: ThemeMode.light)
+                    leading: Radio<ThemeMode>(value: ThemeMode.light),
                   ),
                   ListTile(
                     title: const Text('Dark theme'),
-                    leading: Radio<ThemeMode>(value: ThemeMode.dark)
+                    leading: Radio<ThemeMode>(value: ThemeMode.dark),
                   ),
                   ListTile(
                     title: const Text('Use device theme'),
-                    leading: Radio<ThemeMode>(value: ThemeMode.system)
+                    leading: Radio<ThemeMode>(value: ThemeMode.system),
                   ),
                 ],
-              )
+              ),
             ),
             const SizedBox(height: 24),
             Text('Sound', style: Theme.of(context).textTheme.titleLarge),
@@ -86,17 +86,17 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 children: [
                   ListTile(
                     title: const Text('On'),
-                    leading: Radio<bool>(value: true)
+                    leading: Radio<bool>(value: true),
                   ),
                   ListTile(
                     title: const Text('Off'),
-                    leading: Radio<bool>(value: false)
+                    leading: Radio<bool>(value: false),
                   ),
                 ],
               ),
             ),
           ],
-        )
+        ),
         // child: Column(
         //   crossAxisAlignment: CrossAxisAlignment.start,
         //   children: [

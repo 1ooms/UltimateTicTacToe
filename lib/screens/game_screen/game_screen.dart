@@ -100,7 +100,8 @@ class _GameScreenState extends State<GameScreen> {
     final result = await showDialog<Map<String, dynamic>>(
       barrierDismissible: false,
       context: context,
-      builder: (context) => OnlineSetupDialog(lobbyController: lobbyController!),
+      builder:
+          (context) => OnlineSetupDialog(lobbyController: lobbyController!),
     );
 
     // if (!mounted) return;

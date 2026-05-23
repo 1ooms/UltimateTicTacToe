@@ -17,10 +17,9 @@ mixin OnlineHandler on State<GameState> {
 
   Future<void> _listenOtherPlayerTurn() async {
     final state = this as GameStateState;
-    lobbySubscription =
-        widget.lobbyController?.getLobbyStream(widget.lobbyCode!).listen((
-          event,
-        ) {
+    lobbySubscription = widget.lobbyController
+        ?.getLobbyStream(widget.lobbyCode!)
+        .listen((event) {
           if (!event.exists) return;
           final data = event.data() as Map<String, dynamic>;
           final gameData = data['gameData'] as Map<String, dynamic>?;

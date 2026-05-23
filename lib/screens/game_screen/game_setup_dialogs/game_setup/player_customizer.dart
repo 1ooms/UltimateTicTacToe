@@ -32,9 +32,7 @@ class PlayerCustomizer extends StatelessWidget {
           child: buildIcon(config1.shape, config1.color, 32),
         ),
         ElevatedButton(
-          style: ElevatedButton.styleFrom(
-            shape: CircleBorder(),
-          ),
+          style: ElevatedButton.styleFrom(shape: CircleBorder()),
           child: const Icon(Icons.edit),
           onPressed: () {
             showDialog(

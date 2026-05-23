@@ -78,10 +78,10 @@ class BotPlayer {
   final Random _random = Random();
 
   Move? randomMove(
-      List<List<Player?>> board,
-      List<Player?> subBoardWinners,
-      int? activeSubBoardIndex,
-      ) {
+    List<List<Player?>> board,
+    List<Player?> subBoardWinners,
+    int? activeSubBoardIndex,
+  ) {
     final validMoves = _getValidMoves(
       board,
       subBoardWinners,
@@ -93,12 +93,12 @@ class BotPlayer {
   }
 
   Move? minimaxMove(
-      List<List<Player?>> board,
-      List<Player?> subBoardWinners,
-      Player botPlayer,
-      int? activeSubBoardIndex, {
-        required int maxDepth,
-      }) {
+    List<List<Player?>> board,
+    List<Player?> subBoardWinners,
+    Player botPlayer,
+    int? activeSubBoardIndex, {
+    required int maxDepth,
+  }) {
     int bestScore = -1000000;
     List<Move> bestMoves = List<Move>.empty(growable: true);
 
@@ -153,16 +153,16 @@ class BotPlayer {
   }
 
   int _minimax(
-      List<List<Player?>> board,
-      List<Player?> subBoardWinners,
-      Player currentPlayer,
-      int? activeSubBoardIndex,
-      int depth,
-      int maxDepth,
-      int alpha,
-      int beta,
-      Player botPlayer,
-      ) {
+    List<List<Player?>> board,
+    List<Player?> subBoardWinners,
+    Player currentPlayer,
+    int? activeSubBoardIndex,
+    int depth,
+    int maxDepth,
+    int alpha,
+    int beta,
+    Player botPlayer,
+  ) {
     // Fallback if sub-board is unplayable
     if (activeSubBoardIndex != null &&
         (subBoardWinners[activeSubBoardIndex] != null ||
@@ -240,10 +240,10 @@ class BotPlayer {
   }
 
   List<Move> _getValidMoves(
-      List<List<Player?>> board,
-      List<Player?> subBoardWinners,
-      int? activeSubBoardIndex,
-      ) {
+    List<List<Player?>> board,
+    List<Player?> subBoardWinners,
+    int? activeSubBoardIndex,
+  ) {
     final moves = <Move>[];
 
     // Fallback if target board is not playable
@@ -276,11 +276,11 @@ class BotPlayer {
 
   bool checkDraw(subBoards, subBoardWinners) =>
       subBoardWinners.every(
-            (winner) =>
-        winner != null ||
+        (winner) =>
+            winner != null ||
             !subBoards[subBoardWinners.indexOf(winner)].contains(null),
       ) &&
-          checkOverallWinner(subBoardWinners) == null;
+      checkOverallWinner(subBoardWinners) == null;
 
   Player? checkOverallWinner(subBoardWinners) {
     for (final player in [Player.one, Player.two]) {
@@ -292,11 +292,11 @@ class BotPlayer {
   }
 
   void _applyMove(
-      List<List<Player?>> board,
-      List<Player?> subBoardWinners,
-      Move move,
-      Player player,
-      ) {
+    List<List<Player?>> board,
+    List<Player?> subBoardWinners,
+    Move move,
+    Player player,
+  ) {
     board[move.boardIndex][move.cellIndex] = player;
     if (checkWin(board[move.boardIndex], player)) {
       subBoardWinners[move.boardIndex] = player;
@@ -304,11 +304,11 @@ class BotPlayer {
   }
 
   void _undoMove(
-      List<List<Player?>> board,
-      List<Player?> subBoardWinners,
-      Move move,
-      Player? previousWinner,
-      ) {
+    List<List<Player?>> board,
+    List<Player?> subBoardWinners,
+    Move move,
+    Player? previousWinner,
+  ) {
     board[move.boardIndex][move.cellIndex] = null;
     subBoardWinners[move.boardIndex] = previousWinner;
   }
@@ -318,10 +318,10 @@ class BotPlayer {
   }
 
   int _evaluateBoard(
-      List<List<Player?>> board,
-      List<Player?> subBoardWinners,
-      Player botPlayer,
-      ) {
+    List<List<Player?>> board,
+    List<Player?> subBoardWinners,
+    Player botPlayer,
+  ) {
     int score = 0;
 
     for (int i = 0; i < 9; i++) {

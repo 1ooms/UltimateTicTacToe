@@ -180,7 +180,10 @@ class GameStateState extends State<GameState> with BotHandler, OnlineHandler {
       }
 
       if (widget.playingOnline) {
-        widget.lobbyController?.updateGameData(widget.lobbyCode!, _getGameData());
+        widget.lobbyController?.updateGameData(
+          widget.lobbyCode!,
+          _getGameData(),
+        );
       }
     });
   }

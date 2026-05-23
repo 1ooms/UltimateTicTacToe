@@ -86,9 +86,9 @@ class _PlayerCustomizationDialogState extends State<PlayerCustomizationDialog> {
             ? Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                SizedBox(width: 3*48+2*8, child: shapeSelector),
+                SizedBox(width: 3 * 48 + 2 * 8, child: shapeSelector),
                 const SizedBox(width: 24),
-                SizedBox(width: 4*48+3*8, child: colorSelector),
+                SizedBox(width: 4 * 48 + 3 * 8, child: colorSelector),
                 const SizedBox(width: 24),
                 preview,
               ],
