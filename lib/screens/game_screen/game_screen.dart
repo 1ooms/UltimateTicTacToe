@@ -211,6 +211,7 @@ class _GameScreenState extends State<GameScreen> {
           onPlayAgain: _handlePlayAgain,
           lobbyController: lobbyController,
           lobbyCode: lobbyCode,
+          isHost: isHost,
           layoutBuilder:
               ({
                 required Widget boardWidget,
@@ -254,10 +255,11 @@ class _GameScreenState extends State<GameScreen> {
               onPressed: () => _showGameSetupDialog(context),
               icon: const Icon(Icons.palette),
             ),
-            IconButton(
-              onPressed: () => _boardKey.currentState?.performUndo(),
-              icon: const Icon(Icons.undo),
-            ),
+            if (widget.gameMode != GameMode.online)
+              IconButton(
+                onPressed: () => _boardKey.currentState?.performUndo(),
+                icon: const Icon(Icons.undo),
+              ),
           ],
         ),
         body: Padding(

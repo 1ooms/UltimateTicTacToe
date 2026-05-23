@@ -2,10 +2,10 @@ import 'dart:math';
 
 import 'package:ultimate_tic_tac_toe/data/win_patterns.dart';
 
-import '../enum/bot_difficulty.dart';
-import '../enum/player.dart';
-import '../move.dart';
-import '../move_parameters.dart';
+import '../../models/enum/bot_difficulty.dart';
+import '../../models/enum/player.dart';
+import '../../models/move.dart';
+import '../../models/move_parameters.dart';
 
 Map<String, dynamic>? chooseBotMove(Map<String, dynamic> moveParametersJson) {
   final moveParameters = MoveParameters.fromJson(moveParametersJson);

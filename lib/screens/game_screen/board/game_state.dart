@@ -7,15 +7,18 @@ import 'package:ultimate_tic_tac_toe/screens/game_screen/board/ultimate_board.da
 import 'package:ultimate_tic_tac_toe/utils/lobby_controller.dart';
 
 import '../../../data/win_patterns.dart';
-import '../../../models/bot_player/bot_isolate.dart';
 import '../../../models/enum/player.dart';
 import '../../../models/game_setup.dart';
 import '../../../models/move.dart';
 import '../../../models/move_parameters.dart';
 import '../../../utils/audio_controller.dart';
+import '../../../utils/bot_player/bot_isolate.dart';
 import '../../../utils/ui_helpers.dart';
 import '../end_dialogs/draw_dialog.dart';
 import '../end_dialogs/win_dialog.dart';
+
+part '../../../utils/bot_game_handler.dart';
+part '../../../utils/online_game_handler.dart';
 
 class GameState extends StatefulWidget {
   const GameState({
@@ -27,6 +30,7 @@ class GameState extends StatefulWidget {
     required this.gameSetup,
     required this.lobbyController,
     required this.lobbyCode,
+    required this.isHost,
   });
 
   final bool playingAgainstBot;
@@ -35,6 +39,7 @@ class GameState extends StatefulWidget {
   final GameSetup gameSetup;
   final LobbyController? lobbyController;
   final String? lobbyCode;
+  final bool isHost;
 
   final Widget Function({
     required Widget boardWidget,
@@ -50,7 +55,7 @@ class GameState extends StatefulWidget {
   State<GameState> createState() => GameStateState();
 }
 
-class GameStateState extends State<GameState> {
+class GameStateState extends State<GameState> with BotHandler, OnlineHandler {
   late List<List<Player?>> _subBoards;
   late List<Player?> _subBoardWinners;
   late Player _currentPlayer;
@@ -58,30 +63,30 @@ class GameStateState extends State<GameState> {
   late Player? overallWinner;
 
   List<Move> _moveHistory = [];
-  bool _aiThinking = false;
-  bool _onlineOtherPlayerTurn = false;
 
   bool gameFinished = false;
   Color _winnerColor = Colors.transparent;
   final _confettiController = ConfettiController();
-  late final BotIsolate _aiIsolate;
 
   AudioController audioController = AudioController();
-
-  StreamSubscription? lobbySubscription;
 
   @override
   void initState() {
     super.initState();
     _initializeGame();
+    _initBot();
+    _initOnline();
 
-    if (widget.playingAgainstBot) {
-      _aiIsolate = BotIsolate(widget.gameSetup.botDifficulty!);
-
-      if (_currentPlayer == Player.two) {
-        _makeBotMove();
-      }
+    if (widget.playingAgainstBot && _currentPlayer == Player.two) {
+      _makeBotMove();
     }
+  }
+
+  @override
+  void dispose() {
+    _disposeOnline();
+    _confettiController.dispose();
+    super.dispose();
   }
 
   void _initializeGame() {
@@ -120,7 +125,7 @@ class GameStateState extends State<GameState> {
 
   void _handleTap(int boardIndex, int cellIndex) {
     if (_aiThinking) return;
-    if (_onlineOtherPlayerTurn) return;
+    if (widget.playingOnline && _currentPlayer != _localPlayer) return;
 
     if (!_isValidMove(boardIndex, cellIndex)) return;
 
@@ -136,13 +141,25 @@ class GameStateState extends State<GameState> {
         _subBoardWinners[boardIndex] = _currentPlayer;
 
         if (checkOverallWinner() != null) {
-          _showWinDialog(_currentPlayer);
           overallWinner = _currentPlayer;
           gameFinished = true;
+          _showWinDialog(_currentPlayer);
+          if (widget.playingOnline) {
+            widget.lobbyController?.updateGameData(
+              widget.lobbyCode!,
+              _getGameData(),
+            );
+          }
           return;
         } else if (checkDraw()) {
-          _showDrawDialog();
           gameFinished = true;
+          _showDrawDialog();
+          if (widget.playingOnline) {
+            widget.lobbyController?.updateGameData(
+              widget.lobbyCode!,
+              _getGameData(),
+            );
+          }
           return;
         }
       }
@@ -157,60 +174,19 @@ class GameStateState extends State<GameState> {
 
       // switch player turn
       _currentPlayer = _currentPlayer == Player.one ? Player.two : Player.one;
-      // _onlineOtherPlayerTurn = !_onlineOtherPlayerTurn;
 
       if (widget.playingAgainstBot && _currentPlayer == Player.two) {
         _makeBotMove();
       }
 
-      // if (widget.playingOnline {
-      //   // _submitTurnToServer(_subBoards, _moveHistory, _subBoardWinners, _activeSubBoardIndex);
-      // }
+      if (widget.playingOnline) {
+        widget.lobbyController?.updateGameData(widget.lobbyCode!, _getGameData());
+      }
     });
   }
 
-  Future<void> _makeBotMove() async {
-    if (_aiThinking) return;
-    _aiThinking = true;
-
-    await Future.delayed(const Duration(milliseconds: 500));
-
-    final moveParameters = MoveParameters(
-      _subBoards,
-      _subBoardWinners,
-      Player.two,
-      _activeSubBoardIndex,
-      widget.gameSetup.botDifficulty!,
-    );
-
-    final move = await _aiIsolate.computeMove(moveParameters);
-
-    _aiThinking = false;
-
-    if (move != null) {
-      _handleTap(move.boardIndex, move.cellIndex);
-    }
-  }
-
-  Future<void> _listenOtherPlayerTurn() async {
-    lobbySubscription = widget.lobbyController?.getLobbyStream(widget.lobbyCode!).listen(
-        (event) {
-        if (!event.exists) return;
-        final data = event.data() as Map<String, dynamic>;
-        if (mounted && data['current_player'] == _currentPlayer) {
-          setState(() {
-            _moveHistory = data['move_history'];
-            _subBoards = data['sub_boards'];
-            _subBoardWinners = data['sub_board_winners'];
-          });
-        }
-      },
-    );
-
-
-  }
-
   bool _isValidMove(int boardIndex, int cellIndex) {
+    if (gameFinished) return false;
     final boardPlayable =
         _subBoardWinners[boardIndex] == null &&
         (_activeSubBoardIndex == null || boardIndex == _activeSubBoardIndex);
@@ -298,8 +274,6 @@ class GameStateState extends State<GameState> {
     if (_moveHistory.isEmpty || _aiThinking) return;
 
     audioController.playSound("assets/sounds/tap.wav");
-
-    Theme.of(context).colorScheme.onSurface;
 
     setState(() {
       int movesToUndo = widget.playingAgainstBot ? 2 : 1;

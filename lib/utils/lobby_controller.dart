@@ -88,6 +88,13 @@ class LobbyController {
     await instance.collection('lobbies').doc(lobbyCode).update({
       'state': 'playing',
       'gameSetup': setup.toJson(),
+      'gameData': null,
+    });
+  }
+
+  Future<void> updateGameData(String lobbyCode, Map<String, dynamic> gameData) async {
+    await instance.collection('lobbies').doc(lobbyCode).update({
+      'gameData': gameData,
     });
   }
 
