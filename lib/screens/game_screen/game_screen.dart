@@ -253,10 +253,11 @@ class _GameScreenState extends State<GameScreen> {
             style: Theme.of(context).textTheme.titleLarge,
           ),
           actions: [
-            IconButton(
-              onPressed: () => _showGameSetupDialog(),
-              icon: const Icon(Icons.palette),
-            ),
+            if (widget.gameMode != GameMode.online)
+              IconButton(
+                onPressed: () => _showGameSetupDialog(),
+                icon: const Icon(Icons.palette),
+              ),
             if (widget.gameMode != GameMode.online)
               IconButton(
                 onPressed: () => _boardKey.currentState?.performUndo(),
