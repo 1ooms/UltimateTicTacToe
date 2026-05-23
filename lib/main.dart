@@ -77,7 +77,7 @@ class _AppState extends State<App> {
         themeMode = ThemeMode.system;
         break;
       default:
-        themeMode = ThemeMode.system;
+        themeMode = ThemeMode.light;
         break;
     }
 
