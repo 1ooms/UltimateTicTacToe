@@ -137,6 +137,7 @@ class GameStateState extends State<GameState> with BotHandler, OnlineHandler {
         Move(boardIndex, cellIndex, _currentPlayer, _activeSubBoardIndex),
       );
 
+      // check for winner
       if (checkWin(_subBoards[boardIndex], _currentPlayer)) {
         _subBoardWinners[boardIndex] = _currentPlayer;
 
@@ -151,17 +152,20 @@ class GameStateState extends State<GameState> with BotHandler, OnlineHandler {
             );
           }
           return;
-        } else if (checkDraw()) {
-          gameFinished = true;
-          _showDrawDialog();
-          if (widget.playingOnline) {
-            widget.lobbyController?.updateGameData(
-              widget.lobbyCode!,
-              _getGameData(),
-            );
-          }
-          return;
         }
+      }
+
+      // check for draw
+      if (checkDraw()) {
+        gameFinished = true;
+        _showDrawDialog();
+        if (widget.playingOnline) {
+          widget.lobbyController?.updateGameData(
+            widget.lobbyCode!,
+            _getGameData(),
+          );
+        }
+        return;
       }
 
       _activeSubBoardIndex = cellIndex;
@@ -200,13 +204,16 @@ class GameStateState extends State<GameState> with BotHandler, OnlineHandler {
   bool checkWin(List<Player?> board, Player player) =>
       winPatterns.any((pattern) => pattern.every((i) => board[i] == player));
 
-  bool checkDraw() =>
-      _subBoardWinners.every(
-        (winner) =>
-            winner != null ||
-            !_subBoards[_subBoardWinners.indexOf(winner)].contains(null),
-      ) &&
-      checkOverallWinner() == null;
+  bool checkDraw() {
+    if (checkOverallWinner() != null) return false;
+
+    for (int i = 0; i < 9; i++) {
+      if (_subBoardWinners[i] == null && _subBoards[i].contains(null)) {
+        return false;
+      }
+    }
+    return true;
+  }
 
   Player? checkOverallWinner() {
     for (final player in [Player.one, Player.two]) {
