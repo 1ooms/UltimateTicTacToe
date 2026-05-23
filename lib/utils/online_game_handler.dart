@@ -51,14 +51,24 @@ mixin OnlineHandler on State<GameState> {
 
   Map<String, dynamic> _getGameData() {
     final state = this as GameStateState;
+    print(state._subBoardWinners.map((p) => p?.name).toList());
+    print("");
+    print(state._subBoards[0].map((p) => p?.name).toList());
+    print("");
+    print(state._moveHistory.map((m) => m.toJson()).toList());
     return {
       'currentPlayer': state._currentPlayer.name,
       'activeSubBoardIndex': state._activeSubBoardIndex,
       'subBoardWinners': state._subBoardWinners.map((p) => p?.name).toList(),
-      'subBoards':
-          state._subBoards
-              .map((board) => board.map((p) => p?.name).toList())
-              .toList(),
+      'subBoard1': state._subBoards[0].map((p) => p?.name).toList(),
+      'subBoard2': state._subBoards[1].map((p) => p?.name).toList(),
+      'subBoard3': state._subBoards[2].map((p) => p?.name).toList(),
+      'subBoard4': state._subBoards[3].map((p) => p?.name).toList(),
+      'subBoard5': state._subBoards[4].map((p) => p?.name).toList(),
+      'subBoard6': state._subBoards[5].map((p) => p?.name).toList(),
+      'subBoard7': state._subBoards[6].map((p) => p?.name).toList(),
+      'subBoard8': state._subBoards[7].map((p) => p?.name).toList(),
+      'subBoard9': state._subBoards[8].map((p) => p?.name).toList(),
       'moveHistory': state._moveHistory.map((m) => m.toJson()).toList(),
       'gameFinished': state.gameFinished,
       'overallWinner': state.overallWinner?.name,
@@ -77,15 +87,11 @@ mixin OnlineHandler on State<GameState> {
           (data['subBoardWinners'] as List)
               .map((p) => p != null ? Player.values.byName(p) : null)
               .toList();
-      state._subBoards =
-          (data['subBoards'] as List)
-              .map(
-                (board) =>
-                    (board as List)
-                        .map((p) => p != null ? Player.values.byName(p) : null)
-                        .toList(),
-              )
-              .toList();
+      for (int i = 1; i < 9; i++) {
+        state._subBoards[i-1] = (data['subBoard$i'] as List)
+            .map((p) => p != null ? Player.values.byName(p) : null)
+            .toList();
+      }
       state._moveHistory =
           (data['moveHistory'] as List).map((m) => Move.fromJson(m)).toList();
       state.gameFinished = data['gameFinished'];
