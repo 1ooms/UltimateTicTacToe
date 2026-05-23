@@ -169,6 +169,8 @@ class _GameScreenState extends State<GameScreen> {
               player1: p1,
               player2: p2,
               playingAgainstBot: playingAgainstBot,
+              playingOnline: widget.gameMode == GameMode.online,
+              isHost: isHost,
             );
 
     final aiThinkingIndicator = BotThinkingIndicator(visible: aiThinking);

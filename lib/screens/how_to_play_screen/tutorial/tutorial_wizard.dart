@@ -88,6 +88,8 @@ class _TutorialWizardState extends State<TutorialWizard> {
                         player1: player1,
                         player2: player2,
                         playingAgainstBot: false,
+                        playingOnline: false,
+                        isHost: false,
                       );
 
               return Padding(
