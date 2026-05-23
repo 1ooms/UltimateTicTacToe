@@ -48,7 +48,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
             const SizedBox(height: 24),
             Text('Appearance', style: Theme.of(context).textTheme.titleLarge),
             const SizedBox(height: 16),
-            RadioGroup(
+            RadioGroup<ThemeMode>(
+              groupValue: themeMode,
               onChanged: (ThemeMode? value) {
                 widget.onChangeThemeMode(value!);
                 setState(() {
@@ -75,7 +76,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
             const SizedBox(height: 24),
             Text('Sound', style: Theme.of(context).textTheme.titleLarge),
             const SizedBox(height: 16),
-            RadioGroup(
+            RadioGroup<bool>(
+              groupValue: soundSetting,
               onChanged: (bool? value) {
                 setState(() {
                   soundSetting = value!;
