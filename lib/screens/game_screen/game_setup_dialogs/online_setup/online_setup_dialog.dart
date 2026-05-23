@@ -268,9 +268,11 @@ class _OnlineSetupDialogState extends State<OnlineSetupDialog>
       });
     }
     else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Lobby does not exist!")),
-      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Lobby does not exist!")),
+        );
+      }
     }
   }
 

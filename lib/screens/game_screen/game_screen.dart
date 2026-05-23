@@ -48,16 +48,16 @@ class _GameScreenState extends State<GameScreen> {
     if (widget.gameMode == GameMode.online) {
       lobbyController = LobbyController(instance: FirebaseFirestore.instance);
       WidgetsBinding.instance.addPostFrameCallback((ctx) {
-        _showOnlineSetupDialog(context);
+        _showOnlineSetupDialog();
       });
     } else {
       WidgetsBinding.instance.addPostFrameCallback((ctx) {
-        _showGameSetupDialog(context);
+        _showGameSetupDialog();
       });
     }
   }
 
-  Future<void> _showGameSetupDialog(BuildContext context) async {
+  Future<void> _showGameSetupDialog() async {
     final result = await showDialog<GameSetup>(
       barrierDismissible: false,
       context: context,
@@ -90,19 +90,20 @@ class _GameScreenState extends State<GameScreen> {
     } else {
       if (widget.gameMode == GameMode.online && isHost && lobbyCode != null) {
         await lobbyController?.deleteLobby(lobbyCode!);
-        if (mounted) {
-          Navigator.of(context).pop();
-        }
+        if (!mounted) return;
+        Navigator.of(context).pop();
       }
     }
   }
 
-  Future<void> _showOnlineSetupDialog(BuildContext context) async {
+  Future<void> _showOnlineSetupDialog() async {
     final result = await showDialog<Map<String, dynamic>>(
       barrierDismissible: false,
       context: context,
       builder: (context) => OnlineSetupDialog(lobbyController: lobbyController!),
     );
+
+    // if (!mounted) return;
 
     if (result != null) {
       setState(() {
@@ -111,9 +112,7 @@ class _GameScreenState extends State<GameScreen> {
       });
 
       if (isHost) {
-        if (mounted) {
-          _showGameSetupDialog(context);
-        }
+        _showGameSetupDialog();
       } else {
         final setupData = result['gameSetup'];
         if (setupData != null) {
@@ -138,7 +137,7 @@ class _GameScreenState extends State<GameScreen> {
     setState(() {
       gameStarted = false;
     });
-    _showGameSetupDialog(context);
+    _showGameSetupDialog();
   }
 
   Widget _buildGameLayout({
@@ -252,7 +251,7 @@ class _GameScreenState extends State<GameScreen> {
           ),
           actions: [
             IconButton(
-              onPressed: () => _showGameSetupDialog(context),
+              onPressed: () => _showGameSetupDialog(),
               icon: const Icon(Icons.palette),
             ),
             if (widget.gameMode != GameMode.online)

@@ -48,76 +48,131 @@ class _SettingsScreenState extends State<SettingsScreen> {
             const SizedBox(height: 24),
             Text('Appearance', style: Theme.of(context).textTheme.titleLarge),
             const SizedBox(height: 16),
-            ListTile(
-              title: const Text('Light theme'),
-              leading: Radio<ThemeMode>(
-                value: ThemeMode.light,
-                groupValue: themeMode,
-                onChanged: (ThemeMode? value) {
-                  widget.onChangeThemeMode(value!);
-                  setState(() {
-                    themeMode = value;
-                  });
-                },
-              ),
-            ),
-            ListTile(
-              title: const Text('Dark theme'),
-              leading: Radio<ThemeMode>(
-                value: ThemeMode.dark,
-                groupValue: themeMode,
-                onChanged: (ThemeMode? value) {
-                  widget.onChangeThemeMode(value!);
-                  setState(() {
-                    themeMode = value;
-                  });
-                },
-              ),
-            ),
-            ListTile(
-              title: const Text('Use device theme'),
-              leading: Radio<ThemeMode>(
-                value: ThemeMode.system,
-                groupValue: themeMode,
-                onChanged: (ThemeMode? value) {
-                  widget.onChangeThemeMode(value!);
-                  setState(() {
-                    themeMode = value;
-                  });
-                },
-              ),
+            RadioGroup(
+              onChanged: (ThemeMode? value) {
+                widget.onChangeThemeMode(value!);
+                setState(() {
+                  themeMode = value;
+                });
+              },
+              child: Column(
+                children: [
+                  ListTile(
+                    title: const Text('Light theme'),
+                    leading: Radio<ThemeMode>(value: ThemeMode.light)
+                  ),
+                  ListTile(
+                    title: const Text('Dark theme'),
+                    leading: Radio<ThemeMode>(value: ThemeMode.dark)
+                  ),
+                  ListTile(
+                    title: const Text('Use device theme'),
+                    leading: Radio<ThemeMode>(value: ThemeMode.system)
+                  ),
+                ],
+              )
             ),
             const SizedBox(height: 24),
             Text('Sound', style: Theme.of(context).textTheme.titleLarge),
             const SizedBox(height: 16),
-            ListTile(
-              title: const Text('On'),
-              leading: Radio<bool>(
-                value: true,
-                groupValue: soundSetting,
-                onChanged: (bool? value) {
-                  setState(() {
-                    soundSetting = value!;
-                    saveSoundSettings();
-                  });
-                },
-              ),
-            ),
-            ListTile(
-              title: const Text('Off'),
-              leading: Radio<bool>(
-                value: false,
-                groupValue: soundSetting,
-                onChanged: (bool? value) {
-                  setState(() {
-                    soundSetting = value!;
-                    saveSoundSettings();
-                  });
-                },
+            RadioGroup(
+              onChanged: (bool? value) {
+                setState(() {
+                  soundSetting = value!;
+                  saveSoundSettings();
+                });
+              },
+              child: Column(
+                children: [
+                  ListTile(
+                    title: const Text('On'),
+                    leading: Radio<bool>(value: true)
+                  ),
+                  ListTile(
+                    title: const Text('Off'),
+                    leading: Radio<bool>(value: false)
+                  ),
+                ],
               ),
             ),
           ],
-        ),
+        )
+        // child: Column(
+        //   crossAxisAlignment: CrossAxisAlignment.start,
+        //   children: [
+        //     const SizedBox(height: 24),
+        //     Text('Appearance', style: Theme.of(context).textTheme.titleLarge),
+        //     const SizedBox(height: 16),
+        //     ListTile(
+        //       title: const Text('Light theme'),
+        //       leading: Radio<ThemeMode>(
+        //         value: ThemeMode.light,
+        //         groupValue: themeMode,
+        //         onChanged: (ThemeMode? value) {
+        //           widget.onChangeThemeMode(value!);
+        //           setState(() {
+        //             themeMode = value;
+        //           });
+        //         },
+        //       ),
+        //     ),
+        //     ListTile(
+        //       title: const Text('Dark theme'),
+        //       leading: Radio<ThemeMode>(
+        //         value: ThemeMode.dark,
+        //         groupValue: themeMode,
+        //         onChanged: (ThemeMode? value) {
+        //           widget.onChangeThemeMode(value!);
+        //           setState(() {
+        //             themeMode = value;
+        //           });
+        //         },
+        //       ),
+        //     ),
+        //     ListTile(
+        //       title: const Text('Use device theme'),
+        //       leading: Radio<ThemeMode>(
+        //         value: ThemeMode.system,
+        //         groupValue: themeMode,
+        //         onChanged: (ThemeMode? value) {
+        //           widget.onChangeThemeMode(value!);
+        //           setState(() {
+        //             themeMode = value;
+        //           });
+        //         },
+        //       ),
+        //     ),
+        //     const SizedBox(height: 24),
+        //     Text('Sound', style: Theme.of(context).textTheme.titleLarge),
+        //     const SizedBox(height: 16),
+        //     ListTile(
+        //       title: const Text('On'),
+        //       leading: Radio<bool>(
+        //         value: true,
+        //         groupValue: soundSetting,
+        //         onChanged: (bool? value) {
+        //           setState(() {
+        //             soundSetting = value!;
+        //             saveSoundSettings();
+        //           });
+        //         },
+        //       ),
+        //     ),
+        //     ListTile(
+        //       title: const Text('Off'),
+        //       leading: Radio<bool>(
+        //         value: false,
+        //         groupValue: soundSetting,
+        //         onChanged: (bool? value) {
+        //           setState(() {
+        //             soundSetting = value!;
+        //             saveSoundSettings();
+        //           });
+        //         },
+        //       ),
+        //     ),
+        //   ],
+        // ),
       ),
     );
   }

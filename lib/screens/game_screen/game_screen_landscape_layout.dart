@@ -43,44 +43,5 @@ class GameScreenLandscapeLayout extends StatelessWidget {
         ],
       ),
     );
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final totalHeight = constraints.maxHeight;
-        final totalWidth = constraints.maxWidth;
-        final sidePanelWidth = (totalWidth - totalHeight) / 2;
-
-        return Row(
-          children: [
-            SizedBox(
-              width: sidePanelWidth,
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  children: [
-                    playerStatusIndicator,
-                    const SizedBox(height: 16),
-                    playAgainButton,
-                    aiThinkingIndicator,
-                  ],
-                ),
-              ),
-            ),
-            AspectRatio(aspectRatio: 1, child: boardWidget),
-            SizedBox(
-              width: sidePanelWidth,
-              child: const Padding(
-                padding: EdgeInsets.all(16.0),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    BannerAdWidget(),
-                  ],
-                ),
-              ),
-            ),
-          ],
-        );
-      },
-    );
   }
 }
