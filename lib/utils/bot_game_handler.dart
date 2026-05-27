@@ -5,7 +5,7 @@ mixin BotHandler on State<GameState> {
   bool _aiThinking = false;
 
   void _initBot() {
-    if (widget.playingAgainstBot) {
+    if (widget.gameMode == GameMode.bot) {
       _aiIsolate = BotIsolate(widget.gameSetup.botDifficulty!);
     }
   }

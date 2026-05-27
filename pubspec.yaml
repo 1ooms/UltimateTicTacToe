@@ -39,6 +39,7 @@ dependencies:
   confetti: ^0.8.0
   shared_preferences: ^2.5.3
   cloud_firestore: ^6.0.3
+  firebase_database: ^12.4.1
   firebase_core: ^4.2.0
   provider: ^6.1.5
   google_mobile_ads: ^6.0.0

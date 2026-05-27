@@ -1,31 +1,26 @@
 import 'dart:math';
 
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:uuid/uuid.dart';
-
+import 'package:firebase_database/firebase_database.dart';
 import '../models/game_setup.dart';
 
 class LobbyController {
-  final FirebaseFirestore instance;
+  final FirebaseDatabase instance;
 
   LobbyController({required this.instance});
 
   void dispose() {}
 
   Future<String> createLobby() async {
-    final String hostId = Uuid().v4();
     final lobbyCode = generatePassCode();
-    final lobbyRef = instance.collection('lobbies').doc(lobbyCode);
+    final lobbyRef = instance.ref('lobbies/$lobbyCode');
 
-    await lobbyRef.set({'hostId': hostId, 'guestId': null, 'state': 'waiting'});
+    await lobbyRef.set({'state': 'waiting'});
 
     return lobbyCode;
   }
 
   Future<bool> joinLobby(String lobbyCode) async {
-    final String guestId = Uuid().v4();
-
-    final lobbyRef = instance.collection('lobbies').doc(lobbyCode);
+    final lobbyRef = instance.ref('lobbies/$lobbyCode');
 
     final doc = await lobbyRef.get();
 
@@ -33,30 +28,31 @@ class LobbyController {
       return false;
     }
 
-    await instance.runTransaction((transaction) async {
-      final snapShot = await transaction.get(lobbyRef);
-
-      if (!snapShot.exists) return false;
-
-      final data = snapShot.data() as Map<String, dynamic>;
-
-      if (data['guestId'] != null) {
-        return false;
+    final TransactionResult result = await lobbyRef.runTransaction((Object? lobby) {
+      if (lobby == null) {
+        return Transaction.abort();
       }
 
-      transaction.update(lobbyRef, {'guestId': guestId, 'state': 'ready'});
+      Map<String, dynamic> data = Map<String, dynamic>.from(lobby as Map);
+
+      if (data['state'] != 'waiting') {
+        return Transaction.abort();
+      }
+
+      data['state'] = 'ready';
+      return Transaction.success(data);
     });
 
-    return true;
+    return result.committed;
   }
 
   Future<void> deleteLobby(String lobbyCode) async {
-    await instance.collection('lobbies').doc(lobbyCode).delete();
+    await instance.ref('lobbies/$lobbyCode').remove();
   }
 
   Future<void> leaveLobby(String lobbyCode) async {
-    final lobbyRef = instance.collection('lobbies').doc(lobbyCode);
-    await lobbyRef.update({'guestId': null, 'state': 'waiting'});
+    final lobbyRef = instance.ref('lobbies/$lobbyCode');
+    await lobbyRef.update({'state': 'waiting'});
   }
 
   String generatePassCode() {
@@ -71,21 +67,18 @@ class LobbyController {
     );
   }
 
-  Stream<DocumentSnapshot> getLobbyStream(String lobbyCode) {
-    return FirebaseFirestore.instance
-        .collection('lobbies')
-        .doc(lobbyCode)
-        .snapshots();
+  Stream<DatabaseEvent> getLobbyStream(String lobbyCode) {
+    return instance.ref('lobbies/$lobbyCode').onValue;
   }
 
   Future<void> setGameState(String lobbyCode, String state) async {
-    await instance.collection('lobbies').doc(lobbyCode).update({
+    await instance.ref('lobbies/$lobbyCode').update({
       'state': state,
     });
   }
 
   Future<void> startGame(String lobbyCode, GameSetup setup) async {
-    await instance.collection('lobbies').doc(lobbyCode).update({
+    await instance.ref('lobbies/$lobbyCode').update({
       'state': 'playing',
       'gameSetup': setup.toJson(),
       'gameData': null,
@@ -96,15 +89,18 @@ class LobbyController {
     String lobbyCode,
     Map<String, dynamic> gameData,
   ) async {
-    await instance.collection('lobbies').doc(lobbyCode).update({
+    await instance.ref('lobbies/$lobbyCode').update({
       'gameData': gameData,
     });
   }
 
   Future<GameSetup?> getGameSetup(String lobbyCode) async {
-    final doc = await instance.collection('lobbies').doc(lobbyCode).get();
-    if (doc.exists && doc.data()?['gameSetup'] != null) {
-      return GameSetup.fromJson(doc.data()?['gameSetup']);
+    final doc = await instance.ref('lobbies/$lobbyCode').get();
+    if (doc.exists) {
+      final data = doc.value as Map?;
+      if (data != null && data['gameSetup'] != null) {
+        return GameSetup.fromJson(Map<String, dynamic>.from(data['gameSetup'] as Map));
+      }
     }
     return null;
   }

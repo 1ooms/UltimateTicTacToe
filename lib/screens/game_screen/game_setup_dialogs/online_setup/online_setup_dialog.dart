@@ -199,8 +199,10 @@ class _OnlineSetupDialogState extends State<OnlineSetupDialog>
     });
     lobbySubscription = widget.lobbyController.getLobbyStream(lobbyCode).listen(
       (event) {
-        if (!event.exists) return;
-        final data = event.data() as Map<String, dynamic>;
+        if (!event.snapshot.exists) return;
+        final value = event.snapshot.value;
+        if (value == null) return;
+        final data = Map<String, dynamic>.from(value as Map);
         if (mounted) {
           setState(() {
             if (data['state'] == 'ready') {
@@ -242,7 +244,7 @@ class _OnlineSetupDialogState extends State<OnlineSetupDialog>
       lobbySubscription = widget.lobbyController.getLobbyStream(code).listen((
         event,
       ) {
-        if (!event.exists) {
+        if (!event.snapshot.exists) {
           if (mounted) {
             setState(() {
               waitingForHostToStart = false;
@@ -255,7 +257,9 @@ class _OnlineSetupDialogState extends State<OnlineSetupDialog>
           }
           return;
         }
-        final data = event.data() as Map<String, dynamic>;
+        final value = event.snapshot.value;
+        if (value == null) return;
+        final data = Map<String, dynamic>.from(value as Map);
         if (data['state'] == 'playing') {
           if (mounted) {
             Navigator.of(context).pop({
@@ -270,7 +274,7 @@ class _OnlineSetupDialogState extends State<OnlineSetupDialog>
       if (mounted) {
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(const SnackBar(content: Text("Lobby does not exist!")));
+        ).showSnackBar(const SnackBar(content: Text("Lobby does not exist or is already playing!")));
       }
     }
   }

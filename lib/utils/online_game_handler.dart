@@ -5,8 +5,8 @@ mixin OnlineHandler on State<GameState> {
   late Player _localPlayer;
 
   void _initOnline() {
-    _localPlayer = widget.isHost ? Player.one : Player.two;
-    if (widget.playingOnline) {
+    _localPlayer = widget.isHost! ? Player.one : Player.two;
+    if (widget.gameMode == GameMode.online) {
       _listenOtherPlayerTurn();
     }
   }
@@ -20,12 +20,27 @@ mixin OnlineHandler on State<GameState> {
     lobbySubscription = widget.lobbyController
         ?.getLobbyStream(widget.lobbyCode!)
         .listen((event) {
-          if (!event.exists) return;
-          final data = event.data() as Map<String, dynamic>;
-          final gameData = data['gameData'] as Map<String, dynamic>?;
+          if (!event.snapshot.exists) return;
+          
+          final Object? value = event.snapshot.value;
+          if (value == null) return;
+          
+          final data = Map<String, dynamic>.from(value as Map);
 
-          if (!widget.isHost && data['gameSetup'] != null) {
-            final newSetup = GameSetup.fromJson(data['gameSetup']);
+          if (data['state'] == 'other_player_left') {
+            _showSessionEndedDialog(widget.lobbyCode!);
+            return;
+          }
+
+          final gameDataRaw = data['gameData'];
+          final Map<String, dynamic>? gameData = gameDataRaw != null 
+              ? Map<String, dynamic>.from(gameDataRaw as Map) 
+              : null;
+
+          if (!widget.isHost! && data['gameSetup'] != null) {
+            final newSetup = GameSetup.fromJson(
+              Map<String, dynamic>.from(data['gameSetup'] as Map),
+            );
             setState(() {
               widget.gameSetup.player1 = newSetup.player1;
               widget.gameSetup.player2 = newSetup.player2;
@@ -35,6 +50,10 @@ mixin OnlineHandler on State<GameState> {
 
           if (gameData == null) {
             if (state._moveHistory.isNotEmpty) {
+              state._confettiController.stop();
+              if (widget.isHost == false && state._isEndDialogOpen) {
+                Navigator.of(context).pop();
+              }
               setState(() {
                 state._initializeGame();
                 state._moveHistory.clear();
@@ -51,11 +70,6 @@ mixin OnlineHandler on State<GameState> {
 
   Map<String, dynamic> _getGameData() {
     final state = this as GameStateState;
-    print(state._subBoardWinners.map((p) => p?.name).toList());
-    print("");
-    print(state._subBoards[0].map((p) => p?.name).toList());
-    print("");
-    print(state._moveHistory.map((m) => m.toJson()).toList());
     return {
       'currentPlayer': state._currentPlayer.name,
       'activeSubBoardIndex': state._activeSubBoardIndex,
@@ -80,6 +94,10 @@ mixin OnlineHandler on State<GameState> {
     final state = this as GameStateState;
     final bool wasFinished = state.gameFinished;
 
+    if (data['state'] == 'other_player_left') {
+      _showSessionEndedDialog(widget.lobbyCode!);
+    }
+
     setState(() {
       state._currentPlayer = Player.values.byName(data['currentPlayer']);
       state._activeSubBoardIndex = data['activeSubBoardIndex'];
@@ -87,13 +105,16 @@ mixin OnlineHandler on State<GameState> {
           (data['subBoardWinners'] as List)
               .map((p) => p != null ? Player.values.byName(p) : null)
               .toList();
-      for (int i = 1; i < 9; i++) {
-        state._subBoards[i-1] = (data['subBoard$i'] as List)
-            .map((p) => p != null ? Player.values.byName(p) : null)
-            .toList();
+      for (int i = 1; i <= 9; i++) {
+        state._subBoards[i - 1] =
+            (data['subBoard$i'] as List)
+                .map((p) => p != null ? Player.values.byName(p) : null)
+                .toList();
       }
       state._moveHistory =
-          (data['moveHistory'] as List).map((m) => Move.fromJson(m)).toList();
+          (data['moveHistory'] as List).map((m) {
+            return Move.fromJson(Map<String, dynamic>.from(m as Map));
+          }).toList();
       state.gameFinished = data['gameFinished'];
       state.overallWinner =
           data['overallWinner'] != null
@@ -108,5 +129,17 @@ mixin OnlineHandler on State<GameState> {
         state._showDrawDialog();
       }
     }
+  }
+
+  Future<void> _showSessionEndedDialog(String lobbyCode) async {
+    await showDialog(
+      barrierDismissible: false,
+      context: context,
+      builder:
+          (context) => SessionEndedDialog(
+            lobbyController: widget.lobbyController,
+            lobbyCode: widget.lobbyCode,
+          ),
+    );
   }
 }

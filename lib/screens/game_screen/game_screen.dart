@@ -1,4 +1,4 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:ultimate_tic_tac_toe/extensions/string_extension.dart';
 import 'package:ultimate_tic_tac_toe/models/enum/game_mode.dart';
@@ -37,7 +37,7 @@ class _GameScreenState extends State<GameScreen> {
   bool gameStarted = false;
   LobbyController? lobbyController;
   String? lobbyCode;
-  bool isHost = false;
+  bool? isHost;
 
   final GlobalKey<GameStateState> _boardKey = GlobalKey();
 
@@ -46,7 +46,7 @@ class _GameScreenState extends State<GameScreen> {
     super.initState();
 
     if (widget.gameMode == GameMode.online) {
-      lobbyController = LobbyController(instance: FirebaseFirestore.instance);
+      lobbyController = LobbyController(instance: FirebaseDatabase.instance);
       WidgetsBinding.instance.addPostFrameCallback((ctx) {
         _showOnlineSetupDialog();
       });
@@ -76,7 +76,7 @@ class _GameScreenState extends State<GameScreen> {
         botDifficulty = result.botDifficulty;
       });
 
-      if (widget.gameMode == GameMode.online && isHost && lobbyCode != null) {
+      if (widget.gameMode == GameMode.online && isHost != null && lobbyCode != null) {
         await lobbyController?.startGame(lobbyCode!, result);
       }
 
@@ -88,7 +88,7 @@ class _GameScreenState extends State<GameScreen> {
         gameStarted = true;
       });
     } else {
-      if (widget.gameMode == GameMode.online && isHost && lobbyCode != null) {
+      if (widget.gameMode == GameMode.online && isHost != null && lobbyCode != null) {
         await lobbyController?.deleteLobby(lobbyCode!);
         if (!mounted) return;
         Navigator.of(context).pop();
@@ -112,7 +112,7 @@ class _GameScreenState extends State<GameScreen> {
         isHost = result['isHost'];
       });
 
-      if (isHost) {
+      if (isHost ?? false) {
         _showGameSetupDialog();
       } else {
         final setupData = result['gameSetup'];
@@ -208,8 +208,7 @@ class _GameScreenState extends State<GameScreen> {
             player1Starts: player1Starts,
             botDifficulty: botDifficulty,
           ),
-          playingAgainstBot: widget.gameMode == GameMode.bot,
-          playingOnline: widget.gameMode == GameMode.online,
+          gameMode: widget.gameMode,
           onPlayAgain: _handlePlayAgain,
           lobbyController: lobbyController,
           lobbyCode: lobbyCode,
@@ -243,7 +242,15 @@ class _GameScreenState extends State<GameScreen> {
       canPop: false,
       onPopInvokedWithResult: (didPop, result) {
         if (!didPop && gameStarted) {
-          showDialog(context: context, builder: (ctx) => LeaveGameDialog());
+          showDialog(
+            context: context,
+            builder:
+                (ctx) => LeaveGameDialog(
+                  gameMode: widget.gameMode,
+                  lobbyController: lobbyController,
+                  lobbyCode: lobbyCode,
+                ),
+          );
         }
       },
       child: Scaffold(

@@ -20,7 +20,7 @@ class CurrentPlayerIndicator extends StatefulWidget {
   final PlayerConfig player2;
   final bool playingAgainstBot;
   final bool playingOnline;
-  final bool isHost;
+  final bool? isHost;
 
   @override
   State<CurrentPlayerIndicator> createState() => _CurrentPlayerIndicatorState();
@@ -45,7 +45,7 @@ class _CurrentPlayerIndicatorState extends State<CurrentPlayerIndicator> {
                 : const Text(' (You)')
             : const SizedBox(),
         widget.playingOnline
-            ? widget.isHost
+            ? widget.isHost ?? false
               ? widget.currentPlayer == Player.one
                   ? const Text(' (You)')
                   : const Text(' (Opponent)')

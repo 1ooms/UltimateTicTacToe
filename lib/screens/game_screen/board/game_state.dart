@@ -4,9 +4,11 @@ import 'dart:math';
 import 'package:confetti/confetti.dart';
 import 'package:flutter/material.dart';
 import 'package:ultimate_tic_tac_toe/screens/game_screen/board/ultimate_board.dart';
+import 'package:ultimate_tic_tac_toe/screens/game_screen/session_ended_dialog.dart';
 import 'package:ultimate_tic_tac_toe/utils/lobby_controller.dart';
 
 import '../../../data/win_patterns.dart';
+import '../../../models/enum/game_mode.dart';
 import '../../../models/enum/player.dart';
 import '../../../models/game_setup.dart';
 import '../../../models/move.dart';
@@ -23,8 +25,7 @@ part '../../../utils/online_game_handler.dart';
 class GameState extends StatefulWidget {
   const GameState({
     super.key,
-    required this.playingAgainstBot,
-    required this.playingOnline,
+    required this.gameMode,
     required this.layoutBuilder,
     required this.onPlayAgain,
     required this.gameSetup,
@@ -33,13 +34,12 @@ class GameState extends StatefulWidget {
     required this.isHost,
   });
 
-  final bool playingAgainstBot;
-  final bool playingOnline;
+  final GameMode gameMode;
   final VoidCallback onPlayAgain;
   final GameSetup gameSetup;
   final LobbyController? lobbyController;
   final String? lobbyCode;
-  final bool isHost;
+  final bool? isHost;
 
   final Widget Function({
     required Widget boardWidget,
@@ -65,6 +65,7 @@ class GameStateState extends State<GameState> with BotHandler, OnlineHandler {
   List<Move> _moveHistory = [];
 
   bool gameFinished = false;
+  bool _isEndDialogOpen = false;
   Color _winnerColor = Colors.transparent;
   final _confettiController = ConfettiController();
 
@@ -77,7 +78,7 @@ class GameStateState extends State<GameState> with BotHandler, OnlineHandler {
     _initBot();
     _initOnline();
 
-    if (widget.playingAgainstBot && _currentPlayer == Player.two) {
+    if (widget.gameMode == GameMode.bot && _currentPlayer == Player.two) {
       _makeBotMove();
     }
   }
@@ -107,7 +108,7 @@ class GameStateState extends State<GameState> with BotHandler, OnlineHandler {
 
       _moveHistory.clear();
       _initializeGame();
-      if (widget.playingAgainstBot && _currentPlayer == Player.two) {
+      if (widget.gameMode == GameMode.bot && _currentPlayer == Player.two) {
         _makeBotMove();
       }
     });
@@ -125,7 +126,7 @@ class GameStateState extends State<GameState> with BotHandler, OnlineHandler {
 
   void _handleTap(int boardIndex, int cellIndex) {
     if (_aiThinking) return;
-    if (widget.playingOnline && _currentPlayer != _localPlayer) return;
+    if (widget.gameMode == GameMode.online && _currentPlayer != _localPlayer) return;
 
     if (!_isValidMove(boardIndex, cellIndex)) return;
 
@@ -145,7 +146,7 @@ class GameStateState extends State<GameState> with BotHandler, OnlineHandler {
           overallWinner = _currentPlayer;
           gameFinished = true;
           _showWinDialog(_currentPlayer);
-          if (widget.playingOnline) {
+          if (widget.gameMode == GameMode.online) {
             widget.lobbyController?.updateGameData(
               widget.lobbyCode!,
               _getGameData(),
@@ -159,7 +160,7 @@ class GameStateState extends State<GameState> with BotHandler, OnlineHandler {
       if (checkDraw()) {
         gameFinished = true;
         _showDrawDialog();
-        if (widget.playingOnline) {
+        if (widget.gameMode == GameMode.online) {
           widget.lobbyController?.updateGameData(
             widget.lobbyCode!,
             _getGameData(),
@@ -179,11 +180,11 @@ class GameStateState extends State<GameState> with BotHandler, OnlineHandler {
       // switch player turn
       _currentPlayer = _currentPlayer == Player.one ? Player.two : Player.one;
 
-      if (widget.playingAgainstBot && _currentPlayer == Player.two) {
+      if (widget.gameMode == GameMode.bot && _currentPlayer == Player.two) {
         _makeBotMove();
       }
 
-      if (widget.playingOnline) {
+      if (widget.gameMode == GameMode.online) {
         widget.lobbyController?.updateGameData(
           widget.lobbyCode!,
           _getGameData(),
@@ -230,6 +231,7 @@ class GameStateState extends State<GameState> with BotHandler, OnlineHandler {
             ? widget.gameSetup.player1.color
             : widget.gameSetup.player2.color;
 
+    _isEndDialogOpen = true;
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -238,6 +240,8 @@ class GameStateState extends State<GameState> with BotHandler, OnlineHandler {
             alignment: Alignment.topCenter,
             children: [
               WinDialog(
+                gameMode: widget.gameMode,
+                isHost: widget.isHost,
                 winningPlayer: winner,
                 winnerConfig:
                     winner == Player.one
@@ -257,7 +261,9 @@ class GameStateState extends State<GameState> with BotHandler, OnlineHandler {
               ),
             ],
           ),
-    );
+    ).then((_) {
+      _isEndDialogOpen = false;
+    });
 
     _playConfetti();
   }
@@ -269,15 +275,20 @@ class GameStateState extends State<GameState> with BotHandler, OnlineHandler {
   }
 
   void _showDrawDialog() {
+    _isEndDialogOpen = true;
     showDialog(
       context: context,
       barrierDismissible: false,
       builder:
           (ctx) => DrawDialog(
+            gameMode: widget.gameMode,
+            isHost: widget.isHost,
             onPlayAgain: widget.onPlayAgain,
             onViewBoard: _showPlayAgainButton,
           ),
-    );
+    ).then((_) {
+      _isEndDialogOpen = false;
+    });
   }
 
   void undoMove() {
@@ -286,7 +297,7 @@ class GameStateState extends State<GameState> with BotHandler, OnlineHandler {
     audioController.playSound("assets/sounds/tap.wav");
 
     setState(() {
-      int movesToUndo = widget.playingAgainstBot ? 2 : 1;
+      int movesToUndo = widget.gameMode == GameMode.bot ? 2 : 1;
 
       for (int i = 0; i < movesToUndo && _moveHistory.isNotEmpty; i++) {
         final move = _moveHistory.removeLast();
@@ -299,7 +310,7 @@ class GameStateState extends State<GameState> with BotHandler, OnlineHandler {
       gameFinished = false;
     });
 
-    if (widget.playingAgainstBot && _currentPlayer == Player.two) {
+    if (widget.gameMode == GameMode.bot && _currentPlayer == Player.two) {
       _makeBotMove();
     }
   }
@@ -324,7 +335,9 @@ class GameStateState extends State<GameState> with BotHandler, OnlineHandler {
       gameFinished: gameFinished,
       overallWinner: overallWinner,
       aiThinking: _aiThinking,
-      showPlayAgainButton: gameFinished,
+      showPlayAgainButton:
+          gameFinished &&
+          !(widget.gameMode == GameMode.online && widget.isHost != true),
     );
   }
 }
