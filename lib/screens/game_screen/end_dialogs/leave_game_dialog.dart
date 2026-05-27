@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import '../../models/enum/game_mode.dart';
-import '../../utils/lobby_controller.dart';
+import '../../../models/enum/game_mode.dart';
+import '../../../utils/lobby_controller.dart';
 
 class LeaveGameDialog extends StatefulWidget {
   const LeaveGameDialog({

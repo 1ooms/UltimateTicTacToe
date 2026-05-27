@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../utils/lobby_controller.dart';
+import '../../../utils/lobby_controller.dart';
 
 class SessionEndedDialog extends StatefulWidget {
   const SessionEndedDialog({

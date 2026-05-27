@@ -4,7 +4,7 @@ import 'dart:math';
 import 'package:confetti/confetti.dart';
 import 'package:flutter/material.dart';
 import 'package:ultimate_tic_tac_toe/screens/game_screen/board/ultimate_board.dart';
-import 'package:ultimate_tic_tac_toe/screens/game_screen/session_ended_dialog.dart';
+import 'package:ultimate_tic_tac_toe/screens/game_screen/end_dialogs/session_ended_dialog.dart';
 import 'package:ultimate_tic_tac_toe/utils/lobby_controller.dart';
 
 import '../../../data/win_patterns.dart';
