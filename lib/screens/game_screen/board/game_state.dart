@@ -126,8 +126,9 @@ class GameStateState extends State<GameState> with BotHandler, OnlineHandler {
 
   void _handleTap(int boardIndex, int cellIndex) {
     if (_aiThinking) return;
-    if (widget.gameMode == GameMode.online && _currentPlayer != _localPlayer)
+    if (widget.gameMode == GameMode.online && _currentPlayer != _localPlayer) {
       return;
+    }
 
     if (!_isValidMove(boardIndex, cellIndex)) return;
 
