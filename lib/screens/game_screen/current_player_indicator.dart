@@ -46,12 +46,12 @@ class _CurrentPlayerIndicatorState extends State<CurrentPlayerIndicator> {
             : const SizedBox(),
         widget.playingOnline
             ? widget.isHost ?? false
-              ? widget.currentPlayer == Player.one
-                  ? const Text(' (You)')
-                  : const Text(' (Opponent)')
-              : widget.currentPlayer == Player.one
-                  ? const Text(' (Opponent)')
-                  : const Text(' (You)')
+                ? widget.currentPlayer == Player.one
+                    ? const Text(' (You)')
+                    : const Text(' (Opponent)')
+                : widget.currentPlayer == Player.one
+                ? const Text(' (Opponent)')
+                : const Text(' (You)')
             : const SizedBox(),
       ],
     );

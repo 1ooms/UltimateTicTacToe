@@ -11,7 +11,6 @@ import 'package:ultimate_tic_tac_toe/screens/home_screen/home_screen.dart';
 import 'package:ultimate_tic_tac_toe/utils/audio_controller.dart';
 
 import 'firebase_options.dart';
-// import 'package:provider/provider.dart';
 
 final lightTheme = ThemeData(
   brightness: Brightness.light,

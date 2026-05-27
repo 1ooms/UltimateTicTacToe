@@ -14,7 +14,10 @@ class PlayAgainButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return Visibility(
       visible: visible,
-      child: ElevatedButton(onPressed: onPressed, child: const Text("Play again")),
+      child: ElevatedButton(
+        onPressed: onPressed,
+        child: const Text("Play again"),
+      ),
     );
   }
 }

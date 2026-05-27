@@ -28,7 +28,9 @@ class LobbyController {
       return false;
     }
 
-    final TransactionResult result = await lobbyRef.runTransaction((Object? lobby) {
+    final TransactionResult result = await lobbyRef.runTransaction((
+      Object? lobby,
+    ) {
       if (lobby == null) {
         return Transaction.abort();
       }
@@ -72,9 +74,7 @@ class LobbyController {
   }
 
   Future<void> setGameState(String lobbyCode, String state) async {
-    await instance.ref('lobbies/$lobbyCode').update({
-      'state': state,
-    });
+    await instance.ref('lobbies/$lobbyCode').update({'state': state});
   }
 
   Future<void> startGame(String lobbyCode, GameSetup setup) async {
@@ -89,9 +89,7 @@ class LobbyController {
     String lobbyCode,
     Map<String, dynamic> gameData,
   ) async {
-    await instance.ref('lobbies/$lobbyCode').update({
-      'gameData': gameData,
-    });
+    await instance.ref('lobbies/$lobbyCode').update({'gameData': gameData});
   }
 
   Future<GameSetup?> getGameSetup(String lobbyCode) async {
@@ -99,7 +97,9 @@ class LobbyController {
     if (doc.exists) {
       final data = doc.value as Map?;
       if (data != null && data['gameSetup'] != null) {
-        return GameSetup.fromJson(Map<String, dynamic>.from(data['gameSetup'] as Map));
+        return GameSetup.fromJson(
+          Map<String, dynamic>.from(data['gameSetup'] as Map),
+        );
       }
     }
     return null;

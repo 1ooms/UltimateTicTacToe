@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-import '../../models/enum/game_mode.dart';
 import '../../utils/lobby_controller.dart';
 
 class SessionEndedDialog extends StatefulWidget {
@@ -30,7 +29,7 @@ class _SessionEndedDialogState extends State<SessionEndedDialog> {
       actions: [
         TextButton(
           onPressed: () {
-            widget.lobbyController?.deleteLobby(widget.lobbyCode!,);
+            widget.lobbyController?.deleteLobby(widget.lobbyCode!);
             Navigator.of(context).pop(); // Pop the dialog
             Navigator.of(context).pop(); // Pop the screen
           },

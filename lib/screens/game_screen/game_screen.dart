@@ -76,7 +76,9 @@ class _GameScreenState extends State<GameScreen> {
         botDifficulty = result.botDifficulty;
       });
 
-      if (widget.gameMode == GameMode.online && isHost != null && lobbyCode != null) {
+      if (widget.gameMode == GameMode.online &&
+          isHost != null &&
+          lobbyCode != null) {
         await lobbyController?.startGame(lobbyCode!, result);
       }
 
@@ -88,7 +90,9 @@ class _GameScreenState extends State<GameScreen> {
         gameStarted = true;
       });
     } else {
-      if (widget.gameMode == GameMode.online && isHost != null && lobbyCode != null) {
+      if (widget.gameMode == GameMode.online &&
+          isHost != null &&
+          lobbyCode != null) {
         await lobbyController?.deleteLobby(lobbyCode!);
         if (!mounted) return;
         Navigator.of(context).pop();

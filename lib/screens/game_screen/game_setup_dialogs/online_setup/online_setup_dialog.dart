@@ -272,9 +272,11 @@ class _OnlineSetupDialogState extends State<OnlineSetupDialog>
       });
     } else {
       if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(const SnackBar(content: Text("Lobby does not exist or is already playing!")));
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text("Lobby does not exist or is already playing!"),
+          ),
+        );
       }
     }
   }

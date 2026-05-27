@@ -21,10 +21,10 @@ mixin OnlineHandler on State<GameState> {
         ?.getLobbyStream(widget.lobbyCode!)
         .listen((event) {
           if (!event.snapshot.exists) return;
-          
+
           final Object? value = event.snapshot.value;
           if (value == null) return;
-          
+
           final data = Map<String, dynamic>.from(value as Map);
 
           if (data['state'] == 'other_player_left') {
@@ -33,9 +33,10 @@ mixin OnlineHandler on State<GameState> {
           }
 
           final gameDataRaw = data['gameData'];
-          final Map<String, dynamic>? gameData = gameDataRaw != null 
-              ? Map<String, dynamic>.from(gameDataRaw as Map) 
-              : null;
+          final Map<String, dynamic>? gameData =
+              gameDataRaw != null
+                  ? Map<String, dynamic>.from(gameDataRaw as Map)
+                  : null;
 
           if (!widget.isHost! && data['gameSetup'] != null) {
             final newSetup = GameSetup.fromJson(
@@ -52,7 +53,9 @@ mixin OnlineHandler on State<GameState> {
             if (state._moveHistory.isNotEmpty) {
               state._confettiController.stop();
               if (widget.isHost == false && state._isEndDialogOpen) {
-                Navigator.of(context).pop();
+                if (mounted) {
+                  Navigator.of(context).pop();
+                }
               }
               setState(() {
                 state._initializeGame();
