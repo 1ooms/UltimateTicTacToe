@@ -1,13 +1,14 @@
 {
   "project_info": {
     "project_number": "161833593264",
+    "firebase_url": "https://ultimate-tic-tac-toe-7439e-default-rtdb.europe-west1.firebasedatabase.app",
     "project_id": "ultimate-tic-tac-toe-7439e",
     "storage_bucket": "ultimate-tic-tac-toe-7439e.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:161833593264:android:ec3494088a187e3c7f0e75",
+        "mobilesdk_app_id": "1:161833593264:android:10eab8d2daa44aaf7f0e75",
         "android_client_info": {
           "package_name": "com.ohms.tictactoe"
         }
