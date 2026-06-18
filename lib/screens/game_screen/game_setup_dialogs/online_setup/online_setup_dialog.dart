@@ -63,6 +63,7 @@ class _OnlineSetupDialogState extends State<OnlineSetupDialog>
             Column(
               mainAxisSize: MainAxisSize.min,
               children: [
+                lobbyLoading ? CircularProgressIndicator() : SizedBox(),
                 readyToStart
                     ? SizedBox()
                     : Padding(
@@ -191,7 +192,10 @@ class _OnlineSetupDialogState extends State<OnlineSetupDialog>
     );
   }
 
+  bool lobbyLoading = false;
+
   Future<void> _startHostingGame() async {
+    lobbyLoading = true;
     final lobbyCode = await widget.lobbyController.createLobby();
     setState(() {
       passCode = lobbyCode;
@@ -214,6 +218,7 @@ class _OnlineSetupDialogState extends State<OnlineSetupDialog>
         }
       },
     );
+    lobbyLoading = false;
   }
 
   Future<void> _stopHostingGame() async {
