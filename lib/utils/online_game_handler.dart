@@ -5,8 +5,8 @@ mixin OnlineHandler on State<GameState> {
   late Player _localPlayer;
 
   void _initOnline() {
-    _localPlayer = widget.isHost! ? Player.one : Player.two;
     if (widget.gameMode == GameMode.online) {
+      _localPlayer = widget.isHost! ? Player.one : Player.two;
       _listenOtherPlayerTurn();
     }
   }
