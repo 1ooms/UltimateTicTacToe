@@ -32,14 +32,14 @@ class LobbyController {
       return false;
     }
 
-    await instance.runTransaction((transaction) async {
+    final result = await instance.runTransaction<bool>((transaction) async {
       final snapShot = await transaction.get(lobbyRef);
 
       if (!snapShot.exists) return false;
 
       final data = snapShot.data() as Map<String, dynamic>;
 
-      if (data['guestId'] != null) {
+      if (data['guestId'] != null || data['state'] != 'waiting') {
         return false;
       }
 
@@ -47,9 +47,11 @@ class LobbyController {
         'guestId': FirebaseAuth.instance.currentUser?.uid,
         'state': 'ready'
       });
+
+      return true;
     });
 
-    return true;
+    return result;
   }
 
   Future<void> deleteLobby(String lobbyCode) async {
