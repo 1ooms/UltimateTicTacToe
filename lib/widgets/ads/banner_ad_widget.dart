@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'package:ultimate_tic_tac_toe/utils/ad_controller.dart';
 
 class BannerAdWidget extends StatefulWidget {
   const BannerAdWidget({super.key, this.adSize = AdSize.banner});
@@ -13,11 +14,28 @@ class BannerAdWidget extends StatefulWidget {
 
 class _BannerAdWidgetState extends State<BannerAdWidget> {
   BannerAd? _bannerAd;
+  final adController = AdController();
 
   @override
   void initState() {
     super.initState();
-    _loadAd();
+    adController.adSettingNotifier.addListener(_adSettingChanged);
+    if (adController.adSettingNotifier.value) {
+      _loadAd();
+    }
+  }
+
+  @override
+  void dispose() {
+    adController.adSettingNotifier.removeListener(_adSettingChanged);
+    _bannerAd?.dispose();
+    super.dispose();
+  }
+
+  void _adSettingChanged() {
+    if (adController.adSettingNotifier.value && _bannerAd == null) {
+      _loadAd();
+    }
   }
 
   void _loadAd() {
@@ -48,17 +66,21 @@ class _BannerAdWidgetState extends State<BannerAdWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: SizedBox(
-        width: widget.adSize.width.toDouble(),
-        height: widget.adSize.height.toDouble(),
-        child:
-            _bannerAd == null
-                // Nothing to render yet.
-                ? const SizedBox()
-                // The actual ad.
-                : AdWidget(ad: _bannerAd!),
-      ),
+    return ValueListenableBuilder<bool>(
+      valueListenable: adController.adSettingNotifier,
+      builder: (context, showAd, child) {
+        if (!showAd || _bannerAd == null) {
+          return const SizedBox();
+        }
+
+        return SafeArea(
+          child: SizedBox(
+            width: widget.adSize.width.toDouble(),
+            height: widget.adSize.height.toDouble(),
+            child: AdWidget(ad: _bannerAd!),
+          ),
+        );
+      },
     );
   }
 }
