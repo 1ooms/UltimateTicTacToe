@@ -1,4 +1,5 @@
-import 'package:firebase_database/firebase_database.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:ultimate_tic_tac_toe/extensions/string_extension.dart';
 import 'package:ultimate_tic_tac_toe/models/enum/game_mode.dart';
@@ -45,15 +46,38 @@ class _GameScreenState extends State<GameScreen> {
   void initState() {
     super.initState();
 
-    if (widget.gameMode == GameMode.online) {
-      lobbyController = LobbyController(instance: FirebaseDatabase.instance);
-      WidgetsBinding.instance.addPostFrameCallback((ctx) {
-        _showOnlineSetupDialog();
-      });
-    } else {
-      WidgetsBinding.instance.addPostFrameCallback((ctx) {
+    WidgetsBinding.instance.addPostFrameCallback((ctx) {
+      if (widget.gameMode == GameMode.online) {
+        _initializeOnlineGame();
+      } else {
         _showGameSetupDialog();
-      });
+      }
+    });
+  }
+
+  Future<void> _initializeOnlineGame() async {
+    try {
+      User? user = FirebaseAuth.instance.currentUser;
+
+      if (user == null) {
+        UserCredential userCredential =
+        await FirebaseAuth.instance.signInAnonymously();
+        user = userCredential.user;
+      }
+
+      if (user != null) {
+        setState(() {
+          lobbyController =
+              LobbyController(instance: FirebaseFirestore.instance);
+        });
+        if (!mounted) return;
+        _showOnlineSetupDialog();
+      }
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Failed to connect to the server.")),
+      );
     }
   }
 
@@ -244,17 +268,23 @@ class _GameScreenState extends State<GameScreen> {
 
     return PopScope(
       canPop: false,
-      onPopInvokedWithResult: (didPop, result) {
+      onPopInvokedWithResult: (didPop, result) async {
         if (!didPop && gameStarted) {
-          showDialog(
+          final shouldLeave = await showDialog<bool>(
             context: context,
             builder:
                 (ctx) => LeaveGameDialog(
                   gameMode: widget.gameMode,
-                  lobbyController: lobbyController,
-                  lobbyCode: lobbyCode,
                 ),
           );
+
+          if (shouldLeave == true && mounted) {
+            _boardKey.currentState?.cancelOnlineSubscription();
+            if (widget.gameMode == GameMode.online) {
+              lobbyController?.setGameState(lobbyCode!, 'other_player_left');
+            }
+            Navigator.of(context).pop();
+          }
         }
       },
       child: Scaffold(

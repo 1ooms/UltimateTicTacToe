@@ -12,6 +12,10 @@ mixin OnlineHandler on State<GameState> {
   }
 
   void _disposeOnline() {
+    cancelOnlineSubscription();
+  }
+
+  void cancelOnlineSubscription() {
     lobbySubscription?.cancel();
   }
 
@@ -20,29 +24,19 @@ mixin OnlineHandler on State<GameState> {
     lobbySubscription = widget.lobbyController
         ?.getLobbyStream(widget.lobbyCode!)
         .listen((event) {
-          if (!event.snapshot.exists) return;
+      if (!event.exists) return;
+      final data = event.data() as Map<String, dynamic>;
 
-          final Object? value = event.snapshot.value;
-          if (value == null) return;
+      if (data['state'] == 'other_player_left') {
+        _showSessionEndedDialog(widget.lobbyCode!);
+        return;
+      }
 
-          final data = Map<String, dynamic>.from(value as Map);
+      final gameData = data['gameData'] as Map<String, dynamic>?;
 
-          if (data['state'] == 'other_player_left') {
-            _showSessionEndedDialog(widget.lobbyCode!);
-            return;
-          }
-
-          final gameDataRaw = data['gameData'];
-          final Map<String, dynamic>? gameData =
-              gameDataRaw != null
-                  ? Map<String, dynamic>.from(gameDataRaw as Map)
-                  : null;
-
-          if (!widget.isHost! && data['gameSetup'] != null) {
-            final newSetup = GameSetup.fromJson(
-              Map<String, dynamic>.from(data['gameSetup'] as Map),
-            );
-            setState(() {
+      if (widget.isHost != false && data['gameSetup'] != null) {
+        final newSetup = GameSetup.fromJson(data['gameSetup']);
+        setState(() {
               widget.gameSetup.player1 = newSetup.player1;
               widget.gameSetup.player2 = newSetup.player2;
               widget.gameSetup.player1Starts = newSetup.player1Starts;
@@ -96,10 +90,6 @@ mixin OnlineHandler on State<GameState> {
     if (!mounted) return;
     final state = this as GameStateState;
     final bool wasFinished = state.gameFinished;
-
-    if (data['state'] == 'other_player_left') {
-      _showSessionEndedDialog(widget.lobbyCode!);
-    }
 
     setState(() {
       state._currentPlayer = Player.values.byName(data['currentPlayer']);

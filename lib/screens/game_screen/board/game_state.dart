@@ -75,8 +75,15 @@ class GameStateState extends State<GameState> with BotHandler, OnlineHandler {
   void initState() {
     super.initState();
     _initializeGame();
-    _initBot();
-    _initOnline();
+
+
+    if (widget.gameMode == GameMode.bot) {
+      _initBot();
+    }
+
+    if (widget.gameMode == GameMode.online) {
+      _initOnline();
+    }
 
     if (widget.gameMode == GameMode.bot && _currentPlayer == Player.two) {
       _makeBotMove();
