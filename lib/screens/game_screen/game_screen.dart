@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -88,7 +89,7 @@ class _GameScreenState extends State<GameScreen> {
       builder:
           (context) => GameSetupDialog(
             gameMode: widget.gameMode,
-            gameStarted: gameStarted,
+            gameStarted: false,
           ),
     );
 
@@ -106,13 +107,7 @@ class _GameScreenState extends State<GameScreen> {
         await lobbyController?.startGame(lobbyCode!, result);
       }
 
-      if (!gameStarted) {
-        _boardKey.currentState?.resetAndStartNewGame(result);
-      }
-
-      setState(() {
-        gameStarted = true;
-      });
+      _boardKey.currentState?.resetAndStartNewGame(result);
     } else {
       if (widget.gameMode == GameMode.online &&
           isHost != null &&
@@ -138,6 +133,10 @@ class _GameScreenState extends State<GameScreen> {
       setState(() {
         lobbyCode = result['lobbyCode'];
         isHost = result['isHost'];
+
+        if (isHost ?? false) {
+          gameStarted = true;
+        }
       });
 
       if (isHost ?? false) {

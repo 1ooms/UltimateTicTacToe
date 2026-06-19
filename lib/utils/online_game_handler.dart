@@ -27,7 +27,8 @@ mixin OnlineHandler on State<GameState> {
       if (!event.exists) return;
       final data = event.data() as Map<String, dynamic>;
 
-      if (data['state'] == 'other_player_left') {
+      if (data['state'] == 'other_player_left' ||
+          (widget.isHost == true && data['state'] == 'waiting')) {
         _showSessionEndedDialog(widget.lobbyCode!);
         return;
       }
