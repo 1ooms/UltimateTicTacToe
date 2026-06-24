@@ -1,20 +1,25 @@
 import 'dart:async';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'dart:math';
+import 'package:confetti/confetti.dart';
 import 'package:flutter/material.dart';
 import 'package:ultimate_tic_tac_toe/extensions/string_extension.dart';
 import 'package:ultimate_tic_tac_toe/models/enum/game_mode.dart';
+import 'package:ultimate_tic_tac_toe/screens/game_screen/board/ultimate_board.dart';
+import 'package:ultimate_tic_tac_toe/screens/game_screen/end_dialogs/draw_dialog.dart';
+import 'package:ultimate_tic_tac_toe/screens/game_screen/end_dialogs/session_ended_dialog.dart';
+import 'package:ultimate_tic_tac_toe/screens/game_screen/end_dialogs/win_dialog.dart';
 import 'package:ultimate_tic_tac_toe/screens/game_screen/game_info/play_again_button.dart';
 import 'package:ultimate_tic_tac_toe/screens/game_screen/game_info/winner_indicator.dart';
-import 'package:ultimate_tic_tac_toe/utils/lobby_controller.dart';
+import 'package:ultimate_tic_tac_toe/utils/game_controller.dart';
+import 'package:ultimate_tic_tac_toe/utils/ui_helpers.dart';
 
 import '../../models/enum/bot_difficulty.dart';
 import '../../models/enum/player.dart';
 import '../../models/game_setup.dart';
 import '../../models/player_config.dart';
+import '../../utils/online_game_controller.dart';
 import '../../widgets/ads/banner_ad_widget.dart';
 import 'end_dialogs/leave_game_dialog.dart';
-import 'board/game_state.dart';
 import 'game_info/bot_thinking_indicator.dart';
 import 'game_info/current_player_indicator.dart';
 import 'game_screen_landscape_layout.dart';
@@ -32,16 +37,21 @@ class GameScreen extends StatefulWidget {
 }
 
 class _GameScreenState extends State<GameScreen> {
+  // game setup args
   late PlayerConfig player1;
   late PlayerConfig player2;
   late bool player1Starts;
   BotDifficulty? botDifficulty;
+
+  GameController? _gameController;
+  final ConfettiController _confettiController = ConfettiController();
   bool gameStarted = false;
-  LobbyController? lobbyController;
+  bool _isEndDialogOpen = false;
+
+  // online game args
+  OnlineGameController? onlineGameController;
   String? lobbyCode;
   bool? isHost;
-
-  final GlobalKey<GameStateState> _boardKey = GlobalKey();
 
   @override
   void initState() {
@@ -56,68 +66,74 @@ class _GameScreenState extends State<GameScreen> {
     });
   }
 
+  @override
+  void dispose() {
+    _gameController?.dispose();
+    _confettiController.dispose();
+    super.dispose();
+  }
+
   Future<void> _initializeOnlineGame() async {
-    try {
-      User? user = FirebaseAuth.instance.currentUser;
-
-      if (user == null) {
-        UserCredential userCredential =
-        await FirebaseAuth.instance.signInAnonymously();
-        user = userCredential.user;
-      }
-
-      if (user != null) {
-        setState(() {
-          lobbyController =
-              LobbyController(instance: FirebaseFirestore.instance);
-        });
-        if (!mounted) return;
-        _showOnlineSetupDialog();
-      }
-    } catch (e) {
+    onlineGameController = OnlineGameController();
+    bool connected = await onlineGameController!.initialize();
+    if (!connected) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Failed to connect to the server.")),
       );
+      return;
     }
+    _showOnlineSetupDialog();
   }
 
   Future<void> _showGameSetupDialog() async {
-    final result = await showDialog<GameSetup>(
+    final gameSetup = await showDialog<GameSetup>(
       barrierDismissible: false,
       context: context,
       builder:
-          (context) => GameSetupDialog(
-            gameMode: widget.gameMode,
-            gameStarted: false,
-          ),
+          (context) =>
+              GameSetupDialog(gameMode: widget.gameMode, gameStarted: false),
     );
 
-    if (result != null) {
+    if (gameSetup != null) {
       setState(() {
-        player1 = result.player1;
-        player2 = result.player2;
-        player1Starts = result.player1Starts;
-        botDifficulty = result.botDifficulty;
+        player1 = gameSetup.player1;
+        player2 = gameSetup.player2;
+        player1Starts = gameSetup.player1Starts;
+        botDifficulty = gameSetup.botDifficulty;
       });
 
       if (widget.gameMode == GameMode.online &&
           isHost != null &&
           lobbyCode != null) {
-        await lobbyController?.startGame(lobbyCode!, result);
+        await onlineGameController?.startGame(gameSetup);
       }
 
-      gameStarted = true;
+      setState(() {
+        gameStarted = true;
+      });
 
-      _boardKey.currentState?.resetAndStartNewGame(result);
-    } else {
-      if (widget.gameMode == GameMode.online &&
-          isHost != null &&
-          lobbyCode != null) {
-        await lobbyController?.deleteLobby(lobbyCode!);
-        if (!mounted) return;
-        Navigator.of(context).pop();
+      if (_gameController == null) {
+        _gameController = GameController(
+          gameMode: widget.gameMode,
+          gameSetup: gameSetup,
+          onlineGameController: onlineGameController,
+          lobbyCode: lobbyCode,
+          isHost: isHost,
+          onWin: _showWinDialog,
+          onDraw: _showDrawDialog,
+          onOnlineSessionEnded: _showSessionEndedDialog,
+          onGameRestarted: _handleGameRestarted,
+        );
+      } else {
+        _gameController!.resetAndStartNewGame(gameSetup);
       }
+    } else if (widget.gameMode == GameMode.online &&
+        isHost != null &&
+        lobbyCode != null) {
+      await onlineGameController?.stopHosting();
+      if (!mounted) return;
+      Navigator.of(context).pop();
     }
   }
 
@@ -126,16 +142,16 @@ class _GameScreenState extends State<GameScreen> {
       barrierDismissible: false,
       context: context,
       builder:
-          (context) => OnlineSetupDialog(lobbyController: lobbyController!),
+          (context) =>
+              OnlineSetupDialog(onlineGameController: onlineGameController!),
     );
-
-    // if (!mounted) return;
 
     if (result != null) {
       setState(() {
         lobbyCode = result['lobbyCode'];
         isHost = result['isHost'];
 
+        // why is this here?
         if (isHost ?? false) {
           gameStarted = true;
         }
@@ -145,20 +161,112 @@ class _GameScreenState extends State<GameScreen> {
         _showGameSetupDialog();
       } else {
         final setupData = result['gameSetup'];
-        if (setupData != null) {
-          final setup = GameSetup.fromJson(setupData);
-          setState(() {
-            player1 = setup.player1;
-            player2 = setup.player2;
-            player1Starts = setup.player1Starts;
-            botDifficulty = setup.botDifficulty;
-            gameStarted = true;
-          });
 
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            _boardKey.currentState?.resetAndStartNewGame(setup);
-          });
+        if (setupData == null) return;
+
+        final setup = GameSetup.fromJson(setupData);
+        setState(() {
+          player1 = setup.player1;
+          player2 = setup.player2;
+          player1Starts = setup.player1Starts;
+          botDifficulty = setup.botDifficulty;
+          gameStarted = true;
+        });
+
+        if (_gameController == null) {
+          _gameController = GameController(
+            gameMode: widget.gameMode,
+            gameSetup: setup,
+            onlineGameController: onlineGameController,
+            lobbyCode: lobbyCode,
+            isHost: isHost,
+            onWin: _showWinDialog,
+            onDraw: _showDrawDialog,
+            onOnlineSessionEnded: _showSessionEndedDialog,
+            onGameRestarted: _handleGameRestarted,
+          );
+        } else {
+          _gameController!.resetAndStartNewGame(setup);
         }
+      }
+    }
+  }
+
+  void _showWinDialog(Player winner) {
+    Color winnerColor = winner == Player.one ? player1.color : player2.color;
+
+    _isEndDialogOpen = true;
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder:
+          (ctx) => Stack(
+            alignment: Alignment.topCenter,
+            children: [
+              WinDialog(
+                gameMode: widget.gameMode,
+                isHost: isHost,
+                winningPlayer: winner,
+                winnerConfig: winner == Player.one ? player1 : player2,
+                viewingBoard: _gameController?.gameFinished ?? true,
+                confettiController: _confettiController,
+                onPlayAgain: _handlePlayAgain,
+                onViewBoard: () {
+                  // Ensure UI rebuilds if they dismiss the dialog to view board.
+                },
+                buildIcon: buildIcon,
+              ),
+              ConfettiWidget(
+                key: ValueKey(winnerColor),
+                confettiController: _confettiController,
+                blastDirection: pi / 2,
+                colors: [winnerColor],
+              ),
+            ],
+          ),
+    ).then((_) {
+      _isEndDialogOpen = false;
+    });
+
+    Future.delayed(const Duration(milliseconds: 50), () {
+      _confettiController.play();
+    });
+  }
+
+  void _showDrawDialog() {
+    _isEndDialogOpen = true;
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder:
+          (ctx) => DrawDialog(
+            gameMode: widget.gameMode,
+            isHost: isHost,
+            onPlayAgain: _handlePlayAgain,
+            onViewBoard: () {},
+          ),
+    ).then((_) {
+      _isEndDialogOpen = false;
+    });
+  }
+
+  void _showSessionEndedDialog(String lobbyCode) {
+    showDialog(
+      barrierDismissible: false,
+      context: context,
+      builder:
+          (context) => SessionEndedDialog(
+            onlineGameController: onlineGameController,
+            lobbyCode: lobbyCode,
+          ),
+    );
+  }
+
+  void _handleGameRestarted() {
+    _confettiController.stop();
+    if (isHost == false && _isEndDialogOpen) {
+      if (mounted) {
+        Navigator.of(context).pop();
       }
     }
   }
@@ -228,36 +336,34 @@ class _GameScreenState extends State<GameScreen> {
   @override
   Widget build(BuildContext context) {
     Widget buildBodyContent() {
-      if (gameStarted) {
-        return GameState(
-          key: _boardKey,
-          gameSetup: GameSetup(
-            player1: player1,
-            player2: player2,
-            player1Starts: player1Starts,
-            botDifficulty: botDifficulty,
-          ),
-          gameMode: widget.gameMode,
-          onPlayAgain: _handlePlayAgain,
-          lobbyController: lobbyController,
-          lobbyCode: lobbyCode,
-          isHost: isHost,
-          layoutBuilder:
-              ({
-                required Widget boardWidget,
-                required Player currentPlayer,
-                required bool gameFinished,
-                required Player? overallWinner,
-                required bool aiThinking,
-                required bool showPlayAgainButton,
-              }) => _buildGameLayout(
-                boardWidget: boardWidget,
-                currentPlayer: currentPlayer,
-                gameFinished: gameFinished,
-                overallWinner: overallWinner,
-                aiThinking: aiThinking,
-                showPlayAgainButton: showPlayAgainButton,
-              ),
+      if (gameStarted && _gameController != null) {
+        return ListenableBuilder(
+          listenable: _gameController!,
+          builder: (context, child) {
+            final controller = _gameController!;
+            final boardWidget = UltimateBoard(
+              subBoards: controller.subBoards,
+              subBoardWinners: controller.subBoardWinners,
+              player1: player1,
+              player2: player2,
+              currentPlayer: controller.currentPlayer,
+              isValidMove: controller.isValidMove,
+              onCellTap: controller.handleTap,
+              previousMove: controller.moveHistory.lastOrNull,
+              gameFinished: controller.gameFinished,
+            );
+
+            return _buildGameLayout(
+              boardWidget: boardWidget,
+              currentPlayer: controller.currentPlayer,
+              gameFinished: controller.gameFinished,
+              overallWinner: controller.overallWinner,
+              aiThinking: controller.aiThinking,
+              showPlayAgainButton:
+                  controller.gameFinished &&
+                  !(widget.gameMode == GameMode.online && isHost != true),
+            );
+          },
         );
       }
 
@@ -273,16 +379,13 @@ class _GameScreenState extends State<GameScreen> {
         if (!didPop && gameStarted) {
           final shouldLeave = await showDialog<bool>(
             context: context,
-            builder:
-                (ctx) => LeaveGameDialog(
-                  gameMode: widget.gameMode,
-                ),
+            builder: (ctx) => LeaveGameDialog(gameMode: widget.gameMode),
           );
 
           if (shouldLeave == true && mounted) {
-            _boardKey.currentState?.cancelOnlineSubscription();
+            _gameController?.cancelOnlineSubscription();
             if (widget.gameMode == GameMode.online) {
-              lobbyController?.setGameState(lobbyCode!, 'other_player_left');
+              onlineGameController?.setOtherPlayerLeft();
             }
             Navigator.of(context).pop();
           }
@@ -302,7 +405,7 @@ class _GameScreenState extends State<GameScreen> {
               ),
             if (widget.gameMode != GameMode.online)
               IconButton(
-                onPressed: () => _boardKey.currentState?.performUndo(),
+                onPressed: () => _gameController?.undoMove(),
                 icon: const Icon(Icons.undo),
               ),
           ],

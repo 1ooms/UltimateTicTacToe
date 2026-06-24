@@ -1,37 +1,41 @@
-part of '../screens/game_screen/board/game_state.dart';
+part of 'game_controller.dart';
 
-mixin BotHandler on State<GameState> {
+mixin BotHandler on ChangeNotifier {
   late final BotIsolate _aiIsolate;
-  bool _aiThinking = false;
+  bool aiThinking = false;
 
-  void _initBot() {
-    if (widget.gameMode == GameMode.bot) {
-      _aiIsolate = BotIsolate(widget.gameSetup.botDifficulty!);
+  void initBot() {
+    final controller = this as GameController;
+    if (controller.gameMode == GameMode.bot) {
+      _aiIsolate = BotIsolate(controller.gameSetup.botDifficulty!);
     }
   }
 
-  Future<void> _makeBotMove() async {
-    if (_aiThinking) return;
-    _aiThinking = true;
+  Future<void> makeBotMove() async {
+    if (aiThinking) return;
+    aiThinking = true;
+    notifyListeners();
 
-    final state = this as GameStateState;
+    final controller = this as GameController;
 
     await Future.delayed(const Duration(milliseconds: 500));
 
     final moveParameters = MoveParameters(
-      state._subBoards,
-      state._subBoardWinners,
+      controller.subBoards,
+      controller.subBoardWinners,
       Player.two,
-      state._activeSubBoardIndex,
-      widget.gameSetup.botDifficulty!,
+      controller.activeSubBoardIndex,
+      controller.gameSetup.botDifficulty!,
     );
 
     final move = await _aiIsolate.computeMove(moveParameters);
 
-    _aiThinking = false;
+    aiThinking = false;
 
     if (move != null) {
-      state._handleTap(move.boardIndex, move.cellIndex);
+      controller.handleTap(move.boardIndex, move.cellIndex);
+    } else {
+      notifyListeners();
     }
   }
 }

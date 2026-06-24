@@ -1,15 +1,14 @@
 import 'package:flutter/material.dart';
-
-import '../../../utils/lobby_controller.dart';
+import 'package:ultimate_tic_tac_toe/utils/online_game_controller.dart';
 
 class SessionEndedDialog extends StatefulWidget {
   const SessionEndedDialog({
     super.key,
-    required this.lobbyController,
+    required this.onlineGameController,
     required this.lobbyCode,
   });
 
-  final LobbyController? lobbyController;
+  final OnlineGameController? onlineGameController;
   final String? lobbyCode;
 
   @override
@@ -29,7 +28,7 @@ class _SessionEndedDialogState extends State<SessionEndedDialog> {
       actions: [
         TextButton(
           onPressed: () {
-            widget.lobbyController?.deleteLobby(widget.lobbyCode!);
+            widget.onlineGameController?.stopHosting();
             Navigator.of(context).pop(); // Pop the dialog
             Navigator.of(context).pop(); // Pop the screen
           },
