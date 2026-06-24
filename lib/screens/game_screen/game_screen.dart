@@ -107,6 +107,8 @@ class _GameScreenState extends State<GameScreen> {
         await lobbyController?.startGame(lobbyCode!, result);
       }
 
+      gameStarted = true;
+
       _boardKey.currentState?.resetAndStartNewGame(result);
     } else {
       if (widget.gameMode == GameMode.online &&
