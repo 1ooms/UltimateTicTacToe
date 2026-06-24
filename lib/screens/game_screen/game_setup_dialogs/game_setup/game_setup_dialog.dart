@@ -178,6 +178,7 @@ class _GameSetupDialogState extends State<GameSetupDialog> {
       onPopInvokedWithResult: (didPop, result) {
         if (!didPop && !widget.gameStarted) {
           Navigator.of(context).pop(); // Pop the dialog
+          Navigator.of(context).pop(); // Pop the screen
         } else if (!didPop && widget.gameStarted) {
           Navigator.of(context).pop();
         }
