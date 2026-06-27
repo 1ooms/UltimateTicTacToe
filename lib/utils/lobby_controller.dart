@@ -2,11 +2,14 @@ import 'dart:math';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import '../models/enum/lobby_state.dart';
 import '../models/game_setup.dart';
 import '../models/game_data.dart';
+import '../models/lobby_data.dart';
 
 class LobbyController {
   final FirebaseFirestore instance;
+  final String lobbies = 'lobbies';
 
   LobbyController({required this.instance});
 
@@ -14,18 +17,20 @@ class LobbyController {
 
   Future<String> createLobby() async {
     final lobbyCode = generatePassCode();
-    final lobbyRef = instance.collection('lobbies').doc(lobbyCode);
+    final lobbyRef = instance.collection(lobbies).doc(lobbyCode);
 
-    await lobbyRef.set({
-      'state': 'waiting',
-      'hostId': FirebaseAuth.instance.currentUser?.uid,
-    });
+    await lobbyRef.set(
+      LobbyData(
+        state: LobbyState.waiting.toString(),
+        hostId: FirebaseAuth.instance.currentUser?.uid,
+      ).toJson(),
+    );
 
     return lobbyCode;
   }
 
   Future<bool> joinLobby(String lobbyCode) async {
-    final lobbyRef = instance.collection('lobbies').doc(lobbyCode);
+    final lobbyRef = instance.collection(lobbies).doc(lobbyCode);
 
     final doc = await lobbyRef.get();
 
@@ -38,16 +43,22 @@ class LobbyController {
 
       if (!snapShot.exists) return false;
 
-      final data = snapShot.data() as Map<String, dynamic>;
+      final lobbyData = LobbyData.fromJson(
+        snapShot.data() as Map<String, dynamic>,
+      );
 
-      if (data['guestId'] != null || data['state'] != 'waiting') {
+      if (lobbyData.guestId != null ||
+          lobbyData.state != LobbyState.waiting.toString()) {
         return false;
       }
 
-      transaction.update(lobbyRef, {
-        'guestId': FirebaseAuth.instance.currentUser?.uid,
-        'state': 'ready'
-      });
+      transaction.update(
+        lobbyRef,
+        LobbyData(
+          guestId: FirebaseAuth.instance.currentUser?.uid,
+          state: LobbyState.ready.toString(),
+        ).toJson(),
+      );
 
       return true;
     });
@@ -56,15 +67,14 @@ class LobbyController {
   }
 
   Future<void> deleteLobby(String lobbyCode) async {
-    await instance.collection('lobbies').doc(lobbyCode).delete();
+    await instance.collection(lobbies).doc(lobbyCode).delete();
   }
 
   Future<void> leaveLobby(String lobbyCode) async {
-    final lobbyRef = instance.collection('lobbies').doc(lobbyCode);
-    await lobbyRef.update({
-      'guestId': null,
-      'state': 'waiting'
-    });
+    final lobbyRef = instance.collection(lobbies).doc(lobbyCode);
+    await lobbyRef.update(
+      LobbyData(guestId: null, state: LobbyState.waiting.toString()).toJson(),
+    );
   }
 
   String generatePassCode() {
@@ -81,38 +91,43 @@ class LobbyController {
 
   Stream<DocumentSnapshot> getLobbyStream(String lobbyCode) {
     return FirebaseFirestore.instance
-        .collection('lobbies')
+        .collection(lobbies)
         .doc(lobbyCode)
         .snapshots();
   }
 
   Future<void> setGameState(String lobbyCode, String state) async {
-    await instance.collection('lobbies').doc(lobbyCode).update({
-      'state': state,
-    });
+    await instance
+        .collection(lobbies)
+        .doc(lobbyCode)
+        .update(LobbyData(state: state).toJson());
   }
 
   Future<void> startGame(String lobbyCode, GameSetup setup) async {
-    await instance.collection('lobbies').doc(lobbyCode).update({
-      'state': 'playing',
-      'gameSetup': setup.toJson(),
-      'gameData': null,
-    });
+    await instance
+        .collection(lobbies)
+        .doc(lobbyCode)
+        .update(
+          LobbyData(
+            state: LobbyState.playing.toString(),
+            gameSetup: setup,
+            gameData: null,
+          ).toJson(),
+        );
   }
 
-  Future<void> updateGameData(
-      String lobbyCode,
-      GameData gameData,
-      ) async {
-    await instance.collection('lobbies').doc(lobbyCode).update({
-      'gameData': gameData.toJson(),
-    });
+  Future<void> updateGameData(String lobbyCode, GameData gameData) async {
+    await instance
+        .collection(lobbies)
+        .doc(lobbyCode)
+        .update(LobbyData(gameData: gameData).toJson());
   }
 
   Future<GameSetup?> getGameSetup(String lobbyCode) async {
-    final doc = await instance.collection('lobbies').doc(lobbyCode).get();
-    if (doc.exists && doc.data()?['gameSetup'] != null) {
-      return GameSetup.fromJson(doc.data()?['gameSetup']);
+    final doc = await instance.collection(lobbies).doc(lobbyCode).get();
+    final data = LobbyData.fromJson(doc.data() as Map<String, dynamic>);
+    if (data.gameSetup != null) {
+      return data.gameSetup;
     }
     return null;
   }

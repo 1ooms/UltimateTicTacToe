@@ -2,8 +2,10 @@ import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:ultimate_tic_tac_toe/models/enum/lobby_state.dart';
 import '../models/game_setup.dart';
 import '../models/game_data.dart';
+import '../models/lobby_data.dart';
 import 'game_controller.dart';
 import 'lobby_controller.dart';
 
@@ -77,7 +79,10 @@ class OnlineGameController {
 
   Future<void> sendGameData() async {
     if (currentLobbyCode != null && _gameController != null) {
-      await lobbyController.updateGameData(currentLobbyCode!, extractGameData());
+      await lobbyController.updateGameData(
+        currentLobbyCode!,
+        extractGameData(),
+      );
     }
   }
 
@@ -90,7 +95,7 @@ class OnlineGameController {
     if (currentLobbyCode != null) {
       await lobbyController.setGameState(
         currentLobbyCode!,
-        'other_player_left',
+        LobbyState.otherPlayerLeft.toString(),
       );
     }
   }
@@ -116,33 +121,35 @@ class OnlineGameController {
     _lobbySubscription?.cancel();
     _lobbySubscription = getLobbyStream()?.listen((event) {
       if (!event.exists) return;
-      final data = event.data() as Map<String, dynamic>;
+      final data = LobbyData.fromJson(event.data() as Map<String, dynamic>);
 
-      if (data['state'] == 'other_player_left' ||
-          (isHost == true && data['state'] == 'waiting')) {
+      if (data.state == LobbyState.otherPlayerLeft.toString() ||
+          (isHost == true && data.state == LobbyState.waiting.toString())) {
         onOnlineSessionEnded?.call(currentLobbyCode!);
         return;
       }
 
-      final gameData = data['gameData'] as Map<String, dynamic>?;
-
-      if (isHost != false && data['gameSetup'] != null && _gameController != null) {
-        final newSetup = GameSetup.fromJson(data['gameSetup']);
+      if (isHost != false &&
+          data.gameSetup != null &&
+          _gameController != null) {
+        final newSetup = data.gameSetup!;
         _gameController!.gameSetup.player1 = newSetup.player1;
         _gameController!.gameSetup.player2 = newSetup.player2;
         _gameController!.gameSetup.player1Starts = newSetup.player1Starts;
         _gameController!.notifyUI();
       }
 
-      if (gameData == null) {
-        if (_gameController != null && _gameController!.moveHistory.isNotEmpty) {
+      if (data.gameData == null) {
+        if (_gameController != null &&
+            _gameController!.moveHistory.isNotEmpty) {
           onGameRestarted?.call();
           _gameController!.resetAndStartNewGame(_gameController!.gameSetup);
         }
       } else {
         if (_gameController != null) {
-          final parsedGameData = GameData.fromJson(gameData);
-          if (parsedGameData.moveHistory.length != _gameController!.moveHistory.length) {
+          final parsedGameData = data.gameData!;
+          if (parsedGameData.moveHistory.length !=
+              _gameController!.moveHistory.length) {
             _applyGameData(parsedGameData);
           }
         }
@@ -164,7 +171,7 @@ class OnlineGameController {
 
   void _applyGameData(GameData data) {
     if (_gameController == null) return;
-    
+
     final bool wasFinished = _gameController!.gameFinished;
 
     _gameController!.currentPlayer = data.currentPlayer;

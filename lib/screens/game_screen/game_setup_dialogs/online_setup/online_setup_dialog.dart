@@ -1,9 +1,11 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:ultimate_tic_tac_toe/models/enum/lobby_state.dart';
 import 'package:ultimate_tic_tac_toe/utils/online_game_controller.dart';
 
 import '../../../../models/game_setup.dart';
+import '../../../../models/lobby_data.dart';
 import '../../../../models/online_setup.dart';
 
 class OnlineSetupDialog extends StatefulWidget {
@@ -116,9 +118,13 @@ class _OnlineSetupDialogState extends State<OnlineSetupDialog>
                         SizedBox(height: 8),
                         ElevatedButton(
                           onPressed: () {
-                            Navigator.of(
-                              context,
-                            ).pop(OnlineSetup(lobbyCode: passCode!, isHost: true, gameSetup: null));
+                            Navigator.of(context).pop(
+                              OnlineSetup(
+                                lobbyCode: passCode!,
+                                isHost: true,
+                                gameSetup: null,
+                              ),
+                            );
                           },
                           child: const Text('Continue'),
                         ),
@@ -156,9 +162,9 @@ class _OnlineSetupDialogState extends State<OnlineSetupDialog>
                     joinLoading
                         ? CircularProgressIndicator()
                         : ElevatedButton(
-                            onPressed: joinButtonActive ? _joinGame : null,
-                            child: const Text("Join game"),
-                    ),
+                          onPressed: joinButtonActive ? _joinGame : null,
+                          child: const Text("Join game"),
+                        ),
                   ],
                 ),
           ],
@@ -213,13 +219,13 @@ class _OnlineSetupDialogState extends State<OnlineSetupDialog>
       event,
     ) {
       if (!event.exists) return;
-      final data = event.data() as Map<String, dynamic>;
+      final data = LobbyData.fromJson(event.data() as Map<String, dynamic>);
       if (mounted) {
         setState(() {
-          if (data['state'] == 'ready') {
+          if (data.state == LobbyState.ready.toString()) {
             waitingForGuest = false;
             readyToStart = true;
-          } else if (data['state'] == 'waiting') {
+          } else if (data.state == LobbyState.waiting.toString()) {
             waitingForGuest = true;
             readyToStart = false;
           }
@@ -275,15 +281,15 @@ class _OnlineSetupDialogState extends State<OnlineSetupDialog>
           }
           return;
         }
-        final data = event.data() as Map<String, dynamic>;
-        if (data['state'] == 'playing') {
+        final data = LobbyData.fromJson(event.data() as Map<String, dynamic>);
+        if (data.state == LobbyState.playing.toString()) {
           if (mounted) {
             Navigator.of(context).pop(
-                OnlineSetup(
-                  lobbyCode: code,
-                  isHost: false,
-                  gameSetup: GameSetup.fromJson(data['gameSetup']),
-                )
+              OnlineSetup(
+                lobbyCode: code,
+                isHost: false,
+                gameSetup: data.gameSetup,
+              ),
             );
           }
         }
