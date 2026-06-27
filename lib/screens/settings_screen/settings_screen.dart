@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:ultimate_tic_tac_toe/utils/ad_controller.dart';
-import 'package:ultimate_tic_tac_toe/utils/audio_controller.dart';
+import 'package:ultimate_tic_tac_toe/controllers/ad_controller.dart';
+import 'package:ultimate_tic_tac_toe/controllers/audio_controller.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({

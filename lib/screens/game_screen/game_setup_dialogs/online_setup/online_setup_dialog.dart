@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:ultimate_tic_tac_toe/models/enum/lobby_state.dart';
-import 'package:ultimate_tic_tac_toe/utils/online_game_controller.dart';
+import 'package:ultimate_tic_tac_toe/controllers/online_game_controller.dart';
 
 import '../../../../models/lobby_data.dart';
 import '../../../../models/online_setup.dart';

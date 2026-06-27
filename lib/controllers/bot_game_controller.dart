@@ -2,7 +2,7 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import '../models/enum/player.dart';
 import '../models/move_parameters.dart';
-import 'bot_player/bot_isolate.dart';
+import '../utils/bot_player/bot_isolate.dart';
 import 'game_controller.dart';
 
 class BotGameController extends ChangeNotifier {

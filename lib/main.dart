@@ -9,8 +9,8 @@ import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:ultimate_tic_tac_toe/screens/home_screen/home_screen.dart';
 import 'package:ultimate_tic_tac_toe/data/pref_keys.dart';
-import 'package:ultimate_tic_tac_toe/utils/ad_controller.dart';
-import 'package:ultimate_tic_tac_toe/utils/audio_controller.dart';
+import 'package:ultimate_tic_tac_toe/controllers/ad_controller.dart';
+import 'package:ultimate_tic_tac_toe/controllers/audio_controller.dart';
 
 import 'firebase_options.dart';
 

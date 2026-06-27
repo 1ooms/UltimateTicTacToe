@@ -6,7 +6,7 @@ import 'package:ultimate_tic_tac_toe/models/enum/lobby_state.dart';
 import '../models/game_setup.dart';
 import '../models/game_data.dart';
 import '../models/lobby_data.dart';
-import 'game_controller.dart';
+import '../controllers/game_controller.dart';
 import 'lobby_controller.dart';
 
 class OnlineGameController {

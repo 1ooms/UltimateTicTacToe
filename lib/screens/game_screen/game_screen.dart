@@ -11,14 +11,14 @@ import 'package:ultimate_tic_tac_toe/screens/game_screen/end_dialogs/session_end
 import 'package:ultimate_tic_tac_toe/screens/game_screen/end_dialogs/win_dialog.dart';
 import 'package:ultimate_tic_tac_toe/screens/game_screen/game_info/play_again_button.dart';
 import 'package:ultimate_tic_tac_toe/screens/game_screen/game_info/winner_indicator.dart';
-import 'package:ultimate_tic_tac_toe/utils/game_controller.dart';
+import 'package:ultimate_tic_tac_toe/controllers/game_controller.dart';
 import 'package:ultimate_tic_tac_toe/utils/ui_helpers.dart';
 
 import '../../models/enum/player.dart';
 import '../../models/game_setup.dart';
 import '../../models/player_config.dart';
-import '../../utils/bot_game_controller.dart';
-import '../../utils/online_game_controller.dart';
+import '../../controllers/bot_game_controller.dart';
+import '../../controllers/online_game_controller.dart';
 import '../../widgets/ads/banner_ad_widget.dart';
 import 'end_dialogs/leave_game_dialog.dart';
 import 'game_info/bot_thinking_indicator.dart';

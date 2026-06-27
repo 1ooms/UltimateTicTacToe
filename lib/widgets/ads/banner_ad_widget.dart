@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
-import 'package:ultimate_tic_tac_toe/utils/ad_controller.dart';
+import 'package:ultimate_tic_tac_toe/controllers/ad_controller.dart';
 
 class BannerAdWidget extends StatefulWidget {
   const BannerAdWidget({super.key, this.adSize = AdSize.banner});
