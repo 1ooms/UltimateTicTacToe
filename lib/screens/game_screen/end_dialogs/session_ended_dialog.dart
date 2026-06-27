@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:ultimate_tic_tac_toe/utils/online_game_controller.dart';
+import 'package:ultimate_tic_tac_toe/controllers/online_game_controller.dart';
 
 class SessionEndedDialog extends StatefulWidget {
   const SessionEndedDialog({

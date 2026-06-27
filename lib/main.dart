@@ -8,8 +8,9 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:ultimate_tic_tac_toe/screens/home_screen/home_screen.dart';
-import 'package:ultimate_tic_tac_toe/utils/ad_controller.dart';
-import 'package:ultimate_tic_tac_toe/utils/audio_controller.dart';
+import 'package:ultimate_tic_tac_toe/data/pref_keys.dart';
+import 'package:ultimate_tic_tac_toe/controllers/ad_controller.dart';
+import 'package:ultimate_tic_tac_toe/controllers/audio_controller.dart';
 
 import 'firebase_options.dart';
 
@@ -24,7 +25,7 @@ final darkTheme = ThemeData(
   brightness: Brightness.dark,
   useMaterial3: true,
   textTheme: GoogleFonts.latoTextTheme(ThemeData.dark().textTheme),
-  colorScheme: ColorScheme.dark(),
+  colorSchemeSeed: Colors.teal,
 );
 
 class AppScrollBehavior extends MaterialScrollBehavior {
@@ -68,7 +69,7 @@ class _AppState extends State<App> {
 
   Future<void> _loadPrefs() async {
     prefs = await SharedPreferences.getInstance();
-    final themeModeIndex = prefs.getInt("themeMode");
+    final themeModeIndex = prefs.getInt(PrefKeys.themeMode);
     switch (themeModeIndex) {
       case 0:
         themeMode = ThemeMode.light;
@@ -94,13 +95,13 @@ class _AppState extends State<App> {
 
     switch (themeMode) {
       case ThemeMode.light:
-        prefs.setInt("themeMode", 0);
+        prefs.setInt(PrefKeys.themeMode, 0);
         break;
       case ThemeMode.dark:
-        prefs.setInt("themeMode", 1);
+        prefs.setInt(PrefKeys.themeMode, 1);
         break;
       case ThemeMode.system:
-        prefs.setInt("themeMode", 2);
+        prefs.setInt(PrefKeys.themeMode, 2);
         break;
     }
   }

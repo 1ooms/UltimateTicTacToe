@@ -1,8 +1,10 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:ultimate_tic_tac_toe/utils/online_game_controller.dart';
+import 'package:ultimate_tic_tac_toe/models/enum/lobby_state.dart';
+import 'package:ultimate_tic_tac_toe/controllers/online_game_controller.dart';
 
+import '../../../../models/lobby_data.dart';
 import '../../../../models/online_setup.dart';
 
 class OnlineSetupDialog extends StatefulWidget {
@@ -64,7 +66,6 @@ class _OnlineSetupDialogState extends State<OnlineSetupDialog>
             Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                lobbyLoading ? CircularProgressIndicator() : SizedBox(),
                 readyToStart
                     ? SizedBox()
                     : Padding(
@@ -86,6 +87,7 @@ class _OnlineSetupDialogState extends State<OnlineSetupDialog>
                         ],
                       ),
                     ),
+                hostLoading ? CircularProgressIndicator() : SizedBox(),
                 waitingForGuest
                     ? Column(
                       children: [
@@ -115,9 +117,13 @@ class _OnlineSetupDialogState extends State<OnlineSetupDialog>
                         SizedBox(height: 8),
                         ElevatedButton(
                           onPressed: () {
-                            Navigator.of(
-                              context,
-                            ).pop({'lobbyCode': passCode, 'isHost': true});
+                            Navigator.of(context).pop(
+                              OnlineSetup(
+                                lobbyCode: passCode!,
+                                isHost: true,
+                                gameSetup: null,
+                              ),
+                            );
                           },
                           child: const Text('Continue'),
                         ),
@@ -151,11 +157,13 @@ class _OnlineSetupDialogState extends State<OnlineSetupDialog>
                       },
                       decoration: InputDecoration(labelText: "Enter code"),
                     ),
-                    SizedBox(height: 8),
-                    ElevatedButton(
-                      onPressed: joinButtonActive ? _joinGame : null,
-                      child: const Text("Join game"),
-                    ),
+                    SizedBox(height: 16),
+                    joinLoading
+                        ? CircularProgressIndicator()
+                        : ElevatedButton(
+                          onPressed: joinButtonActive ? _joinGame : null,
+                          child: const Text("Join game"),
+                        ),
                   ],
                 ),
           ],
@@ -193,10 +201,14 @@ class _OnlineSetupDialogState extends State<OnlineSetupDialog>
     );
   }
 
-  bool lobbyLoading = false;
+  bool hostLoading = false;
+  bool joinLoading = false;
 
   Future<void> _startHostingGame() async {
-    lobbyLoading = true;
+    setState(() {
+      hostLoading = true;
+    });
+
     final lobbyCode = await widget.onlineGameController.hostGame();
     setState(() {
       passCode = lobbyCode;
@@ -206,20 +218,23 @@ class _OnlineSetupDialogState extends State<OnlineSetupDialog>
       event,
     ) {
       if (!event.exists) return;
-      final data = event.data() as Map<String, dynamic>;
+      final data = LobbyData.fromJson(event.data() as Map<String, dynamic>);
       if (mounted) {
         setState(() {
-          if (data['state'] == 'ready') {
+          if (data.state == LobbyState.ready.toString()) {
             waitingForGuest = false;
             readyToStart = true;
-          } else if (data['state'] == 'waiting') {
+          } else if (data.state == LobbyState.waiting.toString()) {
             waitingForGuest = true;
             readyToStart = false;
           }
         });
       }
     });
-    lobbyLoading = false;
+
+    setState(() {
+      hostLoading = false;
+    });
   }
 
   Future<void> _stopHostingGame() async {
@@ -237,6 +252,10 @@ class _OnlineSetupDialogState extends State<OnlineSetupDialog>
   }
 
   Future<void> _joinGame() async {
+    setState(() {
+      joinLoading = true;
+    });
+
     final code = textFieldController.text.toUpperCase();
     final success = await widget.onlineGameController.joinGame(code);
     if (success) {
@@ -261,15 +280,15 @@ class _OnlineSetupDialogState extends State<OnlineSetupDialog>
           }
           return;
         }
-        final data = event.data() as Map<String, dynamic>;
-        if (data['state'] == 'playing') {
+        final data = LobbyData.fromJson(event.data() as Map<String, dynamic>);
+        if (data.state == LobbyState.playing.toString()) {
           if (mounted) {
             Navigator.of(context).pop(
-                OnlineSetup(
-                  lobbyCode: code,
-                  isHost: false,
-                  gameSetup: data['gameSetup'],
-                )
+              OnlineSetup(
+                lobbyCode: code,
+                isHost: false,
+                gameSetup: data.gameSetup,
+              ),
             );
           }
         }
@@ -283,6 +302,10 @@ class _OnlineSetupDialogState extends State<OnlineSetupDialog>
         );
       }
     }
+
+    setState(() {
+      joinLoading = false;
+    });
   }
 
   Future<void> _leaveLobby() async {

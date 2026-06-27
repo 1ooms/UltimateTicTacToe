@@ -31,13 +31,27 @@ class WinDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    var title = '';
+
+    if (gameMode == GameMode.online) {
+      if (isHost == true && winningPlayer == Player.one ||
+          isHost == false && winningPlayer == Player.two) {
+        title = 'You have won!';
+      } else {
+        title = 'You have lost!';
+      }
+    } else if (gameMode == GameMode.bot) {
+      if (winningPlayer == Player.one) {
+        title = 'You have won!';
+      } else {
+        title = 'The bot has won!';
+      }
+    } else {
+      title = 'We have a winner!';
+    }
+
     return AlertDialog(
-      title:
-          gameMode == GameMode.online
-              ? isHost == true
-                  ? const Text('You have won!')
-                  : const Text('You have lost!')
-              : const Text('We have a winner!'),
+      title: Text(title),
       content: Row(
         children: [
           const Text('Winner: '),

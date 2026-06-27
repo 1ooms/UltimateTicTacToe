@@ -11,14 +11,14 @@ import 'package:ultimate_tic_tac_toe/screens/game_screen/end_dialogs/session_end
 import 'package:ultimate_tic_tac_toe/screens/game_screen/end_dialogs/win_dialog.dart';
 import 'package:ultimate_tic_tac_toe/screens/game_screen/game_info/play_again_button.dart';
 import 'package:ultimate_tic_tac_toe/screens/game_screen/game_info/winner_indicator.dart';
-import 'package:ultimate_tic_tac_toe/utils/game_controller.dart';
+import 'package:ultimate_tic_tac_toe/controllers/game_controller.dart';
 import 'package:ultimate_tic_tac_toe/utils/ui_helpers.dart';
 
 import '../../models/enum/player.dart';
 import '../../models/game_setup.dart';
 import '../../models/player_config.dart';
-import '../../utils/bot_game_controller.dart';
-import '../../utils/online_game_controller.dart';
+import '../../controllers/bot_game_controller.dart';
+import '../../controllers/online_game_controller.dart';
 import '../../widgets/ads/banner_ad_widget.dart';
 import 'end_dialogs/leave_game_dialog.dart';
 import 'game_info/bot_thinking_indicator.dart';
@@ -50,6 +50,8 @@ class _GameScreenState extends State<GameScreen> {
   OnlineGameController? onlineGameController;
   String? lobbyCode;
   bool? isHost;
+
+  late Player? localPlayer;
 
   @override
   void initState() {
@@ -90,8 +92,10 @@ class _GameScreenState extends State<GameScreen> {
       barrierDismissible: false,
       context: context,
       builder:
-          (context) =>
-              GameSetupDialog(gameMode: widget.gameMode, gameStarted: gameStarted),
+          (context) => GameSetupDialog(
+            gameMode: widget.gameMode,
+            gameStarted: gameStarted,
+          ),
     );
 
     if (gameSetupResult != null) {
@@ -112,7 +116,6 @@ class _GameScreenState extends State<GameScreen> {
       setState(() {
         gameStarted = true;
       });
-
     } else if (widget.gameMode == GameMode.online &&
         isHost != null &&
         lobbyCode != null) {
@@ -135,11 +138,6 @@ class _GameScreenState extends State<GameScreen> {
       setState(() {
         lobbyCode = onlineSetup.lobbyCode;
         isHost = onlineSetup.isHost;
-
-        // why is this here?
-        if (isHost ?? false) {
-          gameStarted = true;
-        }
       });
 
       if (isHost ?? false) {
@@ -148,7 +146,7 @@ class _GameScreenState extends State<GameScreen> {
         final gameSetupResult = onlineSetup.gameSetup;
 
         setState(() {
-          gameSetup = gameSetupResult;
+          gameSetup = gameSetupResult!;
           gameStarted = true;
         });
 
@@ -157,17 +155,25 @@ class _GameScreenState extends State<GameScreen> {
     }
   }
 
+  void _setLocalPlayer() {
+    if (widget.gameMode == GameMode.online) {
+      if (isHost != null && isHost!) {
+        localPlayer = Player.one;
+      } else if (isHost != null && !isHost!) {
+        localPlayer = Player.two;
+      }
+    } else if (widget.gameMode == GameMode.bot) {
+      localPlayer = Player.one;
+    }
+  }
+
   void _initializeOrResetGameController(GameSetup setup) {
+    _setLocalPlayer();
     if (_gameController == null) {
       _gameController = GameController(
         gameMode: widget.gameMode,
         gameSetup: setup,
-        localPlayer:
-            widget.gameMode == GameMode.bot
-                ? Player.one
-                : widget.gameMode == GameMode.online
-                ? (isHost != null ? (isHost! ? Player.one : Player.two) : null)
-                : null,
+        localPlayer: localPlayer,
         onWin: _showWinDialog,
         onDraw: _showDrawDialog,
         onGameStateChanged: () {
@@ -232,9 +238,11 @@ class _GameScreenState extends State<GameScreen> {
       _isEndDialogOpen = false;
     });
 
-    Future.delayed(const Duration(milliseconds: 50), () {
-      _confettiController.play();
-    });
+    if (localPlayer == null || winner == localPlayer) {
+      Future.delayed(const Duration(milliseconds: 50), () {
+        _confettiController.play();
+      });
+    }
   }
 
   void _showDrawDialog() {

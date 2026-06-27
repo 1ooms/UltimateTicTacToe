@@ -3,10 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../models/enum/game_mode.dart';
 
 class LeaveGameDialog extends StatelessWidget {
-  const LeaveGameDialog({
-    super.key,
-    required this.gameMode,
-  });
+  const LeaveGameDialog({super.key, required this.gameMode});
 
   final GameMode gameMode;
 
