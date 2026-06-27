@@ -1,4 +1,3 @@
-
 import 'package:flutter/foundation.dart';
 import 'package:ultimate_tic_tac_toe/data/win_patterns.dart';
 import 'package:ultimate_tic_tac_toe/models/enum/game_mode.dart';
@@ -147,7 +146,9 @@ class GameController extends ChangeNotifier {
   }
 
   void undoMove() {
-    if (moveHistory.isEmpty || (localPlayer != null && currentPlayer != localPlayer)) return;
+    if (moveHistory.isEmpty ||
+        (localPlayer != null && currentPlayer != localPlayer))
+      return;
 
     audioController.playSound("assets/sounds/tap.wav");
 

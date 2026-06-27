@@ -19,12 +19,14 @@ class LobbyData {
   factory LobbyData.fromJson(Map<String, dynamic> json) {
     return LobbyData(
       state: json['state'] as String,
-      gameData: json['gameData'] != null
-          ? GameData.fromJson(json['gameData'] as Map<String, dynamic>)
-          : null,
-      gameSetup: json['gameSetup'] != null
-          ? GameSetup.fromJson(json['gameSetup'] as Map<String, dynamic>)
-          : null,
+      gameData:
+          json['gameData'] != null
+              ? GameData.fromJson(json['gameData'] as Map<String, dynamic>)
+              : null,
+      gameSetup:
+          json['gameSetup'] != null
+              ? GameSetup.fromJson(json['gameSetup'] as Map<String, dynamic>)
+              : null,
       hostId: json['hostId'] as String?,
       guestId: json['guestId'] as String?,
     );

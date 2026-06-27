@@ -52,17 +52,20 @@ class GameData {
     return GameData(
       currentPlayer: Player.values.byName(json['currentPlayer']),
       activeSubBoardIndex: json['activeSubBoardIndex'],
-      subBoardWinners: (json['subBoardWinners'] as List)
-          .map((p) => p != null ? Player.values.byName(p) : null)
-          .toList(),
+      subBoardWinners:
+          (json['subBoardWinners'] as List)
+              .map((p) => p != null ? Player.values.byName(p) : null)
+              .toList(),
       subBoards: subBoards,
-      moveHistory: (json['moveHistory'] as List).map((m) {
-        return Move.fromJson(Map<String, dynamic>.from(m as Map));
-      }).toList(),
+      moveHistory:
+          (json['moveHistory'] as List).map((m) {
+            return Move.fromJson(Map<String, dynamic>.from(m as Map));
+          }).toList(),
       gameFinished: json['gameFinished'],
-      overallWinner: json['overallWinner'] != null
-          ? Player.values.byName(json['overallWinner'])
-          : null,
+      overallWinner:
+          json['overallWinner'] != null
+              ? Player.values.byName(json['overallWinner'])
+              : null,
     );
   }
 }

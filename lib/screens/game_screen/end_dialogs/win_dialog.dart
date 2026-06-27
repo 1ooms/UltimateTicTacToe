@@ -34,7 +34,8 @@ class WinDialog extends StatelessWidget {
     var title = '';
 
     if (gameMode == GameMode.online) {
-      if (isHost == true && winningPlayer == Player.one || isHost == false && winningPlayer == Player.two) {
+      if (isHost == true && winningPlayer == Player.one ||
+          isHost == false && winningPlayer == Player.two) {
         title = 'You have won!';
       } else {
         title = 'You have lost!';

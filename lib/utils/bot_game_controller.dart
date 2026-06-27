@@ -12,7 +12,7 @@ class BotGameController extends ChangeNotifier {
   final GameController _gameController;
 
   BotGameController({required GameController gameController})
-      : _gameController = gameController {
+    : _gameController = gameController {
     _aiIsolate = BotIsolate(_gameController.gameSetup.botDifficulty!);
     _gameController.addListener(_handleGameStateChanged);
 

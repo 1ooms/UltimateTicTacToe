@@ -8,6 +8,6 @@ class OnlineSetup {
   OnlineSetup({
     required this.lobbyCode,
     required this.isHost,
-    required this.gameSetup
+    required this.gameSetup,
   });
 }

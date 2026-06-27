@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:ultimate_tic_tac_toe/models/enum/lobby_state.dart';
 import 'package:ultimate_tic_tac_toe/utils/online_game_controller.dart';
 
-import '../../../../models/game_setup.dart';
 import '../../../../models/lobby_data.dart';
 import '../../../../models/online_setup.dart';
 
