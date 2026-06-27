@@ -91,7 +91,7 @@ class _GameScreenState extends State<GameScreen> {
       context: context,
       builder:
           (context) =>
-              GameSetupDialog(gameMode: widget.gameMode, gameStarted: false),
+              GameSetupDialog(gameMode: widget.gameMode, gameStarted: gameStarted),
     );
 
     if (gameSetupResult != null) {
@@ -105,11 +105,14 @@ class _GameScreenState extends State<GameScreen> {
         await onlineGameController?.startGame(gameSetup);
       }
 
+      if (!gameStarted) {
+        _initializeOrResetGameController(gameSetup);
+      }
+
       setState(() {
         gameStarted = true;
       });
 
-      _initializeOrResetGameController(gameSetup);
     } else if (widget.gameMode == GameMode.online &&
         isHost != null &&
         lobbyCode != null) {
