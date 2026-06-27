@@ -11,12 +11,12 @@ final List<TutorialPageData> pages = [
   ),
   TutorialPageData(
     explanation:
-        "The square that a player chooses determines which smaller board the other player must play on next.\n\nBoth the previous move and valid next moves are highlighted.",
+        "The square that a player chooses determines which smaller board the other player must play on next.\n\nIn this case, the cross player chooses the top left square in the center board, sending the circle player to the top left board.",
     moves: [Move(4, 0, Player.one, null)],
   ),
   TutorialPageData(
     explanation:
-        "Choosing the bottom left square within a small board sends the other player to that square within the big board.",
+        "The circle player chooses the bottom left square within the top left board, sending the cross player to the bottom left board.",
     moves: [Move(4, 0, Player.one, null), Move(0, 6, Player.two, null)],
   ),
   TutorialPageData(
