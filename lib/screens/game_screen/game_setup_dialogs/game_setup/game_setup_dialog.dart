@@ -3,7 +3,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:ultimate_tic_tac_toe/models/enum/bot_difficulty.dart';
 import 'package:ultimate_tic_tac_toe/models/enum/player_shape.dart';
 import 'package:ultimate_tic_tac_toe/screens/game_screen/game_setup_dialogs/game_setup/player_customizer.dart';
-
+import 'package:ultimate_tic_tac_toe/data/pref_keys.dart';
 import '../../../../models/enum/game_mode.dart';
 import '../../../../models/game_setup.dart';
 import '../../../../models/player_config.dart';
@@ -42,17 +42,17 @@ class _GameSetupDialogState extends State<GameSetupDialog> {
     prefs = await SharedPreferences.getInstance();
 
     final String player1ShapeName =
-        prefs.getString('player1Shape') ?? PlayerShape.cross.name;
+        prefs.getString(PrefKeys.player1Shape) ?? PlayerShape.cross.name;
     final String player2ShapeName =
-        prefs.getString('player2Shape') ?? PlayerShape.circle.name;
+        prefs.getString(PrefKeys.player2Shape) ?? PlayerShape.circle.name;
     final int player1Color =
-        prefs.getInt('player1Color') ?? Colors.red.toARGB32();
+        prefs.getInt(PrefKeys.player1Color) ?? Colors.red.toARGB32();
     final int player2Color =
-        prefs.getInt('player2Color') ?? Colors.blue.toARGB32();
-    isPlayer1First = prefs.getBool('isPlayer1First') ?? true;
-    if (prefs.getString('botDifficulty') != null) {
+        prefs.getInt(PrefKeys.player2Color) ?? Colors.blue.toARGB32();
+    isPlayer1First = prefs.getBool(PrefKeys.isPlayer1First) ?? true;
+    if (prefs.getString(PrefKeys.botDifficulty) != null) {
       botDifficulty = BotDifficulty.values.firstWhere(
-        (element) => element.name == prefs.getString('botDifficulty'),
+        (element) => element.name == prefs.getString(PrefKeys.botDifficulty),
       );
     }
 
@@ -82,12 +82,12 @@ class _GameSetupDialogState extends State<GameSetupDialog> {
   void _savePrefs() async {
     prefs = await SharedPreferences.getInstance();
 
-    prefs.setString('player1Shape', player1Config.shape.name);
-    prefs.setString('player2Shape', player2Config.shape.name);
-    prefs.setInt('player1Color', player1Config.color.toARGB32());
-    prefs.setInt('player2Color', player2Config.color.toARGB32());
-    prefs.setBool('isPlayer1First', isPlayer1First);
-    prefs.setString('botDifficulty', botDifficulty.name);
+    prefs.setString(PrefKeys.player1Shape, player1Config.shape.name);
+    prefs.setString(PrefKeys.player2Shape, player2Config.shape.name);
+    prefs.setInt(PrefKeys.player1Color, player1Config.color.toARGB32());
+    prefs.setInt(PrefKeys.player2Color, player2Config.color.toARGB32());
+    prefs.setBool(PrefKeys.isPlayer1First, isPlayer1First);
+    prefs.setString(PrefKeys.botDifficulty, botDifficulty.name);
   }
 
   @override

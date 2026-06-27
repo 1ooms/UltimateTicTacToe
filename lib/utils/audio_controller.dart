@@ -1,5 +1,6 @@
 import 'package:flutter_soloud/flutter_soloud.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:ultimate_tic_tac_toe/data/pref_keys.dart';
 
 class AudioController {
   static final AudioController _singleton = AudioController._internal();
@@ -17,7 +18,7 @@ class AudioController {
 
   Future<void> initialize() async {
     final prefs = await SharedPreferences.getInstance();
-    soundSetting = prefs.getBool("soundSetting") ?? true;
+    soundSetting = prefs.getBool(PrefKeys.soundSetting) ?? true;
 
     _soLoud = SoLoud.instance;
     await _soLoud!.init(bufferSize: 256);
@@ -43,7 +44,7 @@ class AudioController {
   void toggleSound() async {
     soundSetting = !soundSetting;
     final prefs = await SharedPreferences.getInstance();
-    prefs.setBool("soundSetting", soundSetting);
+    prefs.setBool(PrefKeys.soundSetting, soundSetting);
   }
 
   Future<void> playSound(String assetKey) async {
