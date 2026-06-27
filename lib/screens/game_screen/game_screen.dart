@@ -135,11 +135,6 @@ class _GameScreenState extends State<GameScreen> {
       setState(() {
         lobbyCode = onlineSetup.lobbyCode;
         isHost = onlineSetup.isHost;
-
-        // why is this here?
-        if (isHost ?? false) {
-          gameStarted = true;
-        }
       });
 
       if (isHost ?? false) {
@@ -148,7 +143,7 @@ class _GameScreenState extends State<GameScreen> {
         final gameSetupResult = onlineSetup.gameSetup;
 
         setState(() {
-          gameSetup = gameSetupResult;
+          gameSetup = gameSetupResult!;
           gameStarted = true;
         });
 
