@@ -65,7 +65,6 @@ class _OnlineSetupDialogState extends State<OnlineSetupDialog>
             Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                lobbyLoading ? CircularProgressIndicator() : SizedBox(),
                 readyToStart
                     ? SizedBox()
                     : Padding(
@@ -87,6 +86,7 @@ class _OnlineSetupDialogState extends State<OnlineSetupDialog>
                         ],
                       ),
                     ),
+                hostLoading ? CircularProgressIndicator() : SizedBox(),
                 waitingForGuest
                     ? Column(
                       children: [
@@ -153,9 +153,11 @@ class _OnlineSetupDialogState extends State<OnlineSetupDialog>
                       decoration: InputDecoration(labelText: "Enter code"),
                     ),
                     SizedBox(height: 8),
-                    ElevatedButton(
-                      onPressed: joinButtonActive ? _joinGame : null,
-                      child: const Text("Join game"),
+                    joinLoading
+                        ? CircularProgressIndicator()
+                        : ElevatedButton(
+                            onPressed: joinButtonActive ? _joinGame : null,
+                            child: const Text("Join game"),
                     ),
                   ],
                 ),
@@ -194,10 +196,14 @@ class _OnlineSetupDialogState extends State<OnlineSetupDialog>
     );
   }
 
-  bool lobbyLoading = false;
+  bool hostLoading = false;
+  bool joinLoading = false;
 
   Future<void> _startHostingGame() async {
-    lobbyLoading = true;
+    setState(() {
+      hostLoading = true;
+    });
+
     final lobbyCode = await widget.onlineGameController.hostGame();
     setState(() {
       passCode = lobbyCode;
@@ -220,7 +226,10 @@ class _OnlineSetupDialogState extends State<OnlineSetupDialog>
         });
       }
     });
-    lobbyLoading = false;
+
+    setState(() {
+      hostLoading = false;
+    });
   }
 
   Future<void> _stopHostingGame() async {
@@ -238,6 +247,10 @@ class _OnlineSetupDialogState extends State<OnlineSetupDialog>
   }
 
   Future<void> _joinGame() async {
+    setState(() {
+      joinLoading = true;
+    });
+
     final code = textFieldController.text.toUpperCase();
     final success = await widget.onlineGameController.joinGame(code);
     if (success) {
@@ -284,6 +297,10 @@ class _OnlineSetupDialogState extends State<OnlineSetupDialog>
         );
       }
     }
+
+    setState(() {
+      joinLoading = false;
+    });
   }
 
   Future<void> _leaveLobby() async {
