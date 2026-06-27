@@ -1,12 +1,13 @@
+import 'game_setup.dart';
+
 class OnlineSetup {
-  final int passCode;
-  String hostPlayerId;
-  late String guestPlayerId;
-  bool isOpen;
+  final String lobbyCode;
+  final bool isHost;
+  final GameSetup gameSetup;
 
   OnlineSetup({
-    required this.passCode,
-    required this.hostPlayerId,
-    required this.isOpen,
+    required this.lobbyCode,
+    required this.isHost,
+    required this.gameSetup
   });
 }

@@ -3,6 +3,8 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:ultimate_tic_tac_toe/utils/online_game_controller.dart';
 
+import '../../../../models/online_setup.dart';
+
 class OnlineSetupDialog extends StatefulWidget {
   final OnlineGameController onlineGameController;
 
@@ -262,11 +264,13 @@ class _OnlineSetupDialogState extends State<OnlineSetupDialog>
         final data = event.data() as Map<String, dynamic>;
         if (data['state'] == 'playing') {
           if (mounted) {
-            Navigator.of(context).pop({
-              'lobbyCode': code,
-              'isHost': false,
-              'gameSetup': data['gameSetup'],
-            });
+            Navigator.of(context).pop(
+                OnlineSetup(
+                  lobbyCode: code,
+                  isHost: false,
+                  gameSetup: data['gameSetup'],
+                )
+            );
           }
         }
       });

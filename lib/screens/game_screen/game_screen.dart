@@ -4,6 +4,7 @@ import 'package:confetti/confetti.dart';
 import 'package:flutter/material.dart';
 import 'package:ultimate_tic_tac_toe/extensions/string_extension.dart';
 import 'package:ultimate_tic_tac_toe/models/enum/game_mode.dart';
+import 'package:ultimate_tic_tac_toe/models/online_setup.dart';
 import 'package:ultimate_tic_tac_toe/screens/game_screen/board/ultimate_board.dart';
 import 'package:ultimate_tic_tac_toe/screens/game_screen/end_dialogs/draw_dialog.dart';
 import 'package:ultimate_tic_tac_toe/screens/game_screen/end_dialogs/session_ended_dialog.dart';
@@ -113,21 +114,7 @@ class _GameScreenState extends State<GameScreen> {
         gameStarted = true;
       });
 
-      if (_gameController == null) {
-        _gameController = GameController(
-          gameMode: widget.gameMode,
-          gameSetup: gameSetup,
-          onlineGameController: onlineGameController,
-          lobbyCode: lobbyCode,
-          isHost: isHost,
-          onWin: _showWinDialog,
-          onDraw: _showDrawDialog,
-          onOnlineSessionEnded: _showSessionEndedDialog,
-          onGameRestarted: _handleGameRestarted,
-        );
-      } else {
-        _gameController!.resetAndStartNewGame(gameSetup);
-      }
+      _initializeOrResetGameController(gameSetup);
     } else if (widget.gameMode == GameMode.online &&
         isHost != null &&
         lobbyCode != null) {
@@ -138,7 +125,7 @@ class _GameScreenState extends State<GameScreen> {
   }
 
   Future<void> _showOnlineSetupDialog() async {
-    final result = await showDialog<Map<String, dynamic>>(
+    final onlineSetup = await showDialog<OnlineSetup>(
       barrierDismissible: false,
       context: context,
       builder:
@@ -146,10 +133,10 @@ class _GameScreenState extends State<GameScreen> {
               OnlineSetupDialog(onlineGameController: onlineGameController!),
     );
 
-    if (result != null) {
+    if (onlineSetup != null) {
       setState(() {
-        lobbyCode = result['lobbyCode'];
-        isHost = result['isHost'];
+        lobbyCode = onlineSetup.lobbyCode;
+        isHost = onlineSetup.isHost;
 
         // why is this here?
         if (isHost ?? false) {
@@ -160,35 +147,44 @@ class _GameScreenState extends State<GameScreen> {
       if (isHost ?? false) {
         _showGameSetupDialog();
       } else {
-        final setupData = result['gameSetup'];
+        final gameSetup = onlineSetup.gameSetup;
 
-        if (setupData == null) return;
-
-        final setup = GameSetup.fromJson(setupData);
         setState(() {
-          player1 = setup.player1;
-          player2 = setup.player2;
-          player1Starts = setup.player1Starts;
-          botDifficulty = setup.botDifficulty;
+          player1 = gameSetup.player1;
+          player2 = gameSetup.player2;
+          player1Starts = gameSetup.player1Starts;
+          botDifficulty = gameSetup.botDifficulty;
           gameStarted = true;
         });
 
-        if (_gameController == null) {
-          _gameController = GameController(
-            gameMode: widget.gameMode,
-            gameSetup: setup,
-            onlineGameController: onlineGameController,
-            lobbyCode: lobbyCode,
-            isHost: isHost,
-            onWin: _showWinDialog,
-            onDraw: _showDrawDialog,
-            onOnlineSessionEnded: _showSessionEndedDialog,
-            onGameRestarted: _handleGameRestarted,
-          );
-        } else {
-          _gameController!.resetAndStartNewGame(setup);
-        }
+        _initializeOrResetGameController(gameSetup);
       }
+    }
+  }
+
+  void _initializeOrResetGameController(GameSetup setup) {
+    if (_gameController == null) {
+      _gameController = GameController(
+        gameMode: widget.gameMode,
+        gameSetup: setup,
+        localPlayer: isHost != null ? (isHost! ? Player.one : Player.two) : null,
+        onWin: _showWinDialog,
+        onDraw: _showDrawDialog,
+        onGameStateChanged: () {
+          if (widget.gameMode == GameMode.online) {
+            onlineGameController?.sendGameData();
+          }
+        },
+      );
+      if (widget.gameMode == GameMode.online) {
+        onlineGameController?.syncWith(
+          _gameController!,
+          onOnlineSessionEnded: _showSessionEndedDialog,
+          onGameRestarted: _handleGameRestarted,
+        );
+      }
+    } else {
+      _gameController!.resetAndStartNewGame(setup);
     }
   }
 
@@ -382,8 +378,8 @@ class _GameScreenState extends State<GameScreen> {
             builder: (ctx) => LeaveGameDialog(gameMode: widget.gameMode),
           );
 
-          if (shouldLeave == true && mounted) {
-            _gameController?.cancelOnlineSubscription();
+          if (shouldLeave == true && context.mounted) {
+            onlineGameController?.cancelSync();
             if (widget.gameMode == GameMode.online) {
               onlineGameController?.setOtherPlayerLeft();
             }

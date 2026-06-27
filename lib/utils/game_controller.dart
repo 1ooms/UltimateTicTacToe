@@ -9,22 +9,17 @@ import 'package:ultimate_tic_tac_toe/models/move.dart';
 import 'package:ultimate_tic_tac_toe/models/move_parameters.dart';
 import 'package:ultimate_tic_tac_toe/utils/audio_controller.dart';
 import 'package:ultimate_tic_tac_toe/utils/bot_player/bot_isolate.dart';
-import 'package:ultimate_tic_tac_toe/utils/online_game_controller.dart';
 
 part 'bot_game_handler.dart';
-part 'online_game_handler.dart';
 
-class GameController extends ChangeNotifier with BotHandler, OnlineHandler {
+class GameController extends ChangeNotifier with BotHandler {
   GameMode gameMode;
   GameSetup gameSetup;
-  OnlineGameController? onlineGameController;
-  String? lobbyCode;
-  bool? isHost;
+  Player? localPlayer;
 
   final void Function(Player winner)? onWin;
   final void Function()? onDraw;
-  final void Function(String lobbyCode)? onOnlineSessionEnded;
-  final void Function()? onGameRestarted;
+  final void Function()? onGameStateChanged;
 
   late List<List<Player?>> subBoards;
   late List<Player?> subBoardWinners;
@@ -40,13 +35,10 @@ class GameController extends ChangeNotifier with BotHandler, OnlineHandler {
   GameController({
     required this.gameMode,
     required this.gameSetup,
-    this.onlineGameController,
-    this.lobbyCode,
-    this.isHost,
+    this.localPlayer,
     this.onWin,
     this.onDraw,
-    this.onOnlineSessionEnded,
-    this.onGameRestarted,
+    this.onGameStateChanged,
   }) {
     _initializeGame();
 
@@ -54,19 +46,9 @@ class GameController extends ChangeNotifier with BotHandler, OnlineHandler {
       initBot();
     }
 
-    if (gameMode == GameMode.online) {
-      initOnline();
-    }
-
     if (gameMode == GameMode.bot && currentPlayer == Player.two) {
       makeBotMove();
     }
-  }
-
-  @override
-  void dispose() {
-    cancelOnlineSubscription();
-    super.dispose();
   }
 
   void _initializeGame() {
@@ -115,9 +97,7 @@ class GameController extends ChangeNotifier with BotHandler, OnlineHandler {
         overallWinner = currentPlayer;
         gameFinished = true;
         onWin?.call(currentPlayer);
-        if (gameMode == GameMode.online) {
-          onlineGameController?.sendGameData(getGameData());
-        }
+        onGameStateChanged?.call();
         notifyListeners();
         return;
       }
@@ -127,9 +107,7 @@ class GameController extends ChangeNotifier with BotHandler, OnlineHandler {
     if (checkDraw()) {
       gameFinished = true;
       onDraw?.call();
-      if (gameMode == GameMode.online) {
-        onlineGameController?.sendGameData(getGameData());
-      }
+      onGameStateChanged?.call();
       notifyListeners();
       return;
     }
@@ -149,9 +127,11 @@ class GameController extends ChangeNotifier with BotHandler, OnlineHandler {
       makeBotMove();
     }
 
-    if (gameMode == GameMode.online) {
-      onlineGameController?.sendGameData(getGameData());
-    }
+    onGameStateChanged?.call();
+    notifyListeners();
+  }
+
+  void notifyUI() {
     notifyListeners();
   }
 
