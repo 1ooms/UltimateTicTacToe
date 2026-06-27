@@ -51,6 +51,8 @@ class _GameScreenState extends State<GameScreen> {
   String? lobbyCode;
   bool? isHost;
 
+  late Player? localPlayer;
+
   @override
   void initState() {
     super.initState();
@@ -90,8 +92,10 @@ class _GameScreenState extends State<GameScreen> {
       barrierDismissible: false,
       context: context,
       builder:
-          (context) =>
-              GameSetupDialog(gameMode: widget.gameMode, gameStarted: gameStarted),
+          (context) => GameSetupDialog(
+            gameMode: widget.gameMode,
+            gameStarted: gameStarted,
+          ),
     );
 
     if (gameSetupResult != null) {
@@ -112,7 +116,6 @@ class _GameScreenState extends State<GameScreen> {
       setState(() {
         gameStarted = true;
       });
-
     } else if (widget.gameMode == GameMode.online &&
         isHost != null &&
         lobbyCode != null) {
@@ -152,17 +155,25 @@ class _GameScreenState extends State<GameScreen> {
     }
   }
 
+  void _setLocalPlayer() {
+    if (widget.gameMode == GameMode.online) {
+      if (isHost != null && isHost!) {
+        localPlayer = Player.one;
+      } else if (isHost != null && !isHost!) {
+        localPlayer = Player.two;
+      }
+    } else if (widget.gameMode == GameMode.bot) {
+      localPlayer = Player.one;
+    }
+  }
+
   void _initializeOrResetGameController(GameSetup setup) {
+    _setLocalPlayer();
     if (_gameController == null) {
       _gameController = GameController(
         gameMode: widget.gameMode,
         gameSetup: setup,
-        localPlayer:
-            widget.gameMode == GameMode.bot
-                ? Player.one
-                : widget.gameMode == GameMode.online
-                ? (isHost != null ? (isHost! ? Player.one : Player.two) : null)
-                : null,
+        localPlayer: localPlayer,
         onWin: _showWinDialog,
         onDraw: _showDrawDialog,
         onGameStateChanged: () {
@@ -227,9 +238,11 @@ class _GameScreenState extends State<GameScreen> {
       _isEndDialogOpen = false;
     });
 
-    Future.delayed(const Duration(milliseconds: 50), () {
-      _confettiController.play();
-    });
+    if (localPlayer == null || winner == localPlayer) {
+      Future.delayed(const Duration(milliseconds: 50), () {
+        _confettiController.play();
+      });
+    }
   }
 
   void _showDrawDialog() {
