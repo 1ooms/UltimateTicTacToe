@@ -107,7 +107,7 @@ class _GameSetupDialogState extends State<GameSetupDialog> {
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
             Text('Player', style: theme.textTheme.titleSmall),
-            Text('Icon', style: theme.textTheme.titleSmall,),
+            Text('Icon', style: theme.textTheme.titleSmall),
             Text('Who starts?', style: theme.textTheme.titleSmall),
           ],
         ),
@@ -121,8 +121,8 @@ class _GameSetupDialogState extends State<GameSetupDialog> {
                 widget.gameMode == GameMode.bot
                     ? const Icon(Icons.smart_toy_outlined)
                     : widget.gameMode == GameMode.online
-                        ? const Icon(Icons.language)
-                        : const Icon(Icons.person_outline),
+                    ? const Icon(Icons.language)
+                    : const Icon(Icons.person_outline),
               ],
             ),
             Column(
@@ -155,11 +155,10 @@ class _GameSetupDialogState extends State<GameSetupDialog> {
                   isPlayer1First = value!;
                 });
               },
-              child: Column(children: [
-                Radio<bool>(value: true,),
-                Radio<bool>(value: false,),
-              ],)
-            )
+              child: Column(
+                children: [Radio<bool>(value: true), Radio<bool>(value: false)],
+              ),
+            ),
           ],
         ),
       ],
@@ -187,35 +186,31 @@ class _GameSetupDialogState extends State<GameSetupDialog> {
       child: AlertDialog(
         scrollable: true,
         title: Text('Setup', style: theme.textTheme.titleLarge),
-        content: !isLandscape
-            ? Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  gameSetup,
-                  const SizedBox(height: 32),
-                  if (widget.gameMode == GameMode.bot) difficultyWidget,
-                ],
-              )
-            : Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Expanded(child: gameSetup),
-                  if (widget.gameMode == GameMode.bot) ...[
-                    const SizedBox(width: 32),
-                    Expanded(child: difficultyWidget),
+        content:
+            !isLandscape
+                ? Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    gameSetup,
+                    const SizedBox(height: 32),
+                    if (widget.gameMode == GameMode.bot) difficultyWidget,
                   ],
-                ],
-              ),
+                )
+                : Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(child: gameSetup),
+                    if (widget.gameMode == GameMode.bot) ...[
+                      const SizedBox(width: 32),
+                      Expanded(child: difficultyWidget),
+                    ],
+                  ],
+                ),
         actions: [
           TextButton(
             onPressed: () {
-              if (widget.gameStarted) {
-                Navigator.of(context).pop();
-              } else {
-                Navigator.of(context).pop();
-                Navigator.of(context).pop();
-              }
+              Navigator.of(context).pop();
             },
             child: const Text('Cancel'),
           ),

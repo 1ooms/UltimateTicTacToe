@@ -4,13 +4,17 @@ class PlayAgainButton extends StatelessWidget {
   final bool visible;
   final VoidCallback onPressed;
 
-  const PlayAgainButton({super.key, required this.visible, required this.onPressed});
+  const PlayAgainButton({
+    super.key,
+    required this.visible,
+    required this.onPressed,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Visibility(
       visible: visible,
-      child: TextButton(
+      child: ElevatedButton(
         onPressed: onPressed,
         child: const Text("Play again"),
       ),

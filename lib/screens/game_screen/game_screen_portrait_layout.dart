@@ -6,7 +6,8 @@ class GameScreenPortraitLayout extends StatelessWidget {
   final Widget playAgainButton;
   final Widget aiThinkingIndicator;
 
-  const GameScreenPortraitLayout({super.key,
+  const GameScreenPortraitLayout({
+    super.key,
     required this.boardWidget,
     required this.playerStatusIndicator,
     required this.playAgainButton,

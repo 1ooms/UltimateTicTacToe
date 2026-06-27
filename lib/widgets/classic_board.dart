@@ -4,6 +4,7 @@ import 'package:confetti/confetti.dart';
 import 'package:flutter/material.dart';
 
 import '../data/win_patterns.dart';
+import '../models/enum/game_mode.dart';
 import '../models/enum/player.dart';
 import '../models/player_config.dart';
 import '../screens/game_screen/end_dialogs/draw_dialog.dart';
@@ -135,6 +136,8 @@ class TicTacToeBoardState extends State<TicTacToeBoard> {
             alignment: Alignment.topCenter,
             children: [
               WinDialog(
+                isHost: false,
+                gameMode: GameMode.local,
                 winningPlayer: winner,
                 winnerConfig:
                     winner == Player.one ? widget.player1 : widget.player2,
@@ -163,6 +166,8 @@ class TicTacToeBoardState extends State<TicTacToeBoard> {
       barrierDismissible: false,
       builder:
           (ctx) => DrawDialog(
+            gameMode: GameMode.local,
+            isHost: false,
             onPlayAgain: _resetGame,
             onViewBoard: _showPlayAgainButton,
           ),

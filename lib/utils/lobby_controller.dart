@@ -1,8 +1,7 @@
 import 'dart:math';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:uuid/uuid.dart';
-
+import 'package:firebase_auth/firebase_auth.dart';
 import '../models/game_setup.dart';
 
 class LobbyController {
@@ -13,18 +12,18 @@ class LobbyController {
   void dispose() {}
 
   Future<String> createLobby() async {
-    final String hostId = Uuid().v4();
     final lobbyCode = generatePassCode();
     final lobbyRef = instance.collection('lobbies').doc(lobbyCode);
 
-    await lobbyRef.set({'hostId': hostId, 'guestId': null, 'state': 'waiting'});
+    await lobbyRef.set({
+      'state': 'waiting',
+      'hostId': FirebaseAuth.instance.currentUser?.uid,
+    });
 
     return lobbyCode;
   }
 
   Future<bool> joinLobby(String lobbyCode) async {
-    final String guestId = Uuid().v4();
-
     final lobbyRef = instance.collection('lobbies').doc(lobbyCode);
 
     final doc = await lobbyRef.get();
@@ -33,21 +32,26 @@ class LobbyController {
       return false;
     }
 
-    await instance.runTransaction((transaction) async {
+    final result = await instance.runTransaction<bool>((transaction) async {
       final snapShot = await transaction.get(lobbyRef);
 
       if (!snapShot.exists) return false;
 
       final data = snapShot.data() as Map<String, dynamic>;
 
-      if (data['guestId'] != null) {
+      if (data['guestId'] != null || data['state'] != 'waiting') {
         return false;
       }
 
-      transaction.update(lobbyRef, {'guestId': guestId, 'state': 'ready'});
+      transaction.update(lobbyRef, {
+        'guestId': FirebaseAuth.instance.currentUser?.uid,
+        'state': 'ready'
+      });
+
+      return true;
     });
 
-    return true;
+    return result;
   }
 
   Future<void> deleteLobby(String lobbyCode) async {
@@ -56,7 +60,10 @@ class LobbyController {
 
   Future<void> leaveLobby(String lobbyCode) async {
     final lobbyRef = instance.collection('lobbies').doc(lobbyCode);
-    await lobbyRef.update({'guestId': null, 'state': 'waiting'});
+    await lobbyRef.update({
+      'guestId': null,
+      'state': 'waiting'
+    });
   }
 
   String generatePassCode() {
@@ -88,6 +95,16 @@ class LobbyController {
     await instance.collection('lobbies').doc(lobbyCode).update({
       'state': 'playing',
       'gameSetup': setup.toJson(),
+      'gameData': null,
+    });
+  }
+
+  Future<void> updateGameData(
+      String lobbyCode,
+      Map<String, dynamic> gameData,
+      ) async {
+    await instance.collection('lobbies').doc(lobbyCode).update({
+      'gameData': gameData,
     });
   }
 

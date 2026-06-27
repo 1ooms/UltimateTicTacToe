@@ -8,7 +8,8 @@ class GameScreenLandscapeLayout extends StatelessWidget {
   final Widget playAgainButton;
   final Widget aiThinkingIndicator;
 
-  const GameScreenLandscapeLayout({super.key,
+  const GameScreenLandscapeLayout({
+    super.key,
     required this.boardWidget,
     required this.playerStatusIndicator,
     required this.playAgainButton,
@@ -17,7 +18,6 @@ class GameScreenLandscapeLayout extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0),
       child: Row(
@@ -39,48 +39,9 @@ class GameScreenLandscapeLayout extends StatelessWidget {
               ),
               BannerAdWidget(),
             ],
-          )
+          ),
         ],
       ),
-    );
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final totalHeight = constraints.maxHeight;
-        final totalWidth = constraints.maxWidth;
-        final sidePanelWidth = (totalWidth - totalHeight) / 2;
-
-        return Row(
-          children: [
-            SizedBox(
-              width: sidePanelWidth,
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  children: [
-                    playerStatusIndicator,
-                    const SizedBox(height: 16),
-                    playAgainButton,
-                    aiThinkingIndicator,
-                  ],
-                ),
-              ),
-            ),
-            AspectRatio(aspectRatio: 1, child: boardWidget),
-            SizedBox(
-              width: sidePanelWidth,
-              child: const Padding(
-                padding: EdgeInsets.all(16.0),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    BannerAdWidget(),
-                  ],
-                ),
-              ),
-            ),
-          ],
-        );
-      },
     );
   }
 }

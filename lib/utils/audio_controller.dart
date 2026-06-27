@@ -48,7 +48,6 @@ class AudioController {
 
   Future<void> playSound(String assetKey) async {
     if (soundSetting && _loadedSounds.containsKey(assetKey)) {
-      print(DateTime.now());
       await _soLoud!.play(_loadedSounds[assetKey]!);
     }
   }

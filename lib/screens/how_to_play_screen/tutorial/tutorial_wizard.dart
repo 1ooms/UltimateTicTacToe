@@ -7,8 +7,8 @@ import 'package:ultimate_tic_tac_toe/screens/how_to_play_screen/tutorial/static_
 import '../../../main.dart';
 import '../../../models/enum/player_shape.dart';
 import '../../../models/player_config.dart';
-import '../../game_screen/current_player_indicator.dart';
-import '../../game_screen/winner_indicator.dart';
+import '../../game_screen/game_info/current_player_indicator.dart';
+import '../../game_screen/game_info/winner_indicator.dart';
 
 class TutorialWizard extends StatefulWidget {
   const TutorialWizard({super.key});
@@ -88,6 +88,8 @@ class _TutorialWizardState extends State<TutorialWizard> {
                         player1: player1,
                         player2: player2,
                         playingAgainstBot: false,
+                        playingOnline: false,
+                        isHost: false,
                       );
 
               return Padding(

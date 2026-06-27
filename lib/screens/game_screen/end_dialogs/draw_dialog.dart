@@ -1,14 +1,20 @@
 import 'package:flutter/material.dart';
 
+import '../../../models/enum/game_mode.dart';
+
 class DrawDialog extends StatelessWidget {
   const DrawDialog({
     super.key,
     required this.onPlayAgain,
     required this.onViewBoard,
+    required this.gameMode,
+    required this.isHost,
   });
 
   final Function onPlayAgain;
   final Function onViewBoard;
+  final GameMode gameMode;
+  final bool? isHost;
 
   @override
   Widget build(BuildContext context) {
@@ -16,13 +22,15 @@ class DrawDialog extends StatelessWidget {
       title: const Text('It\'s a draw!'),
       content: const Text('No more moves left.'),
       actions: [
-        TextButton(
-          onPressed: () {
-            Navigator.of(context).pop(); // Close dialog
-            onPlayAgain();
-          },
-          child: const Text('Play Again'),
-        ),
+        gameMode == GameMode.online && isHost != true
+            ? const SizedBox()
+            : TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Close dialog
+                onPlayAgain();
+              },
+              child: const Text('Play Again'),
+            ),
         TextButton(
           onPressed: () {
             Navigator.of(context).pop(); // Close dialog

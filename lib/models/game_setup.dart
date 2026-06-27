@@ -29,9 +29,7 @@ class GameSetup {
       player1: PlayerConfig.fromJson(json['player1']),
       player2: PlayerConfig.fromJson(json['player2']),
       player1Starts: json['player1Starts'],
-      botDifficulty: json['botDifficulty'] != null
-          ? BotDifficulty.values.byName(json['botDifficulty'])
-          : null,
+      botDifficulty: null,
     );
   }
 }

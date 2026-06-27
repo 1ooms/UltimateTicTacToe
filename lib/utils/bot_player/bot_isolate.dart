@@ -1,9 +1,9 @@
 import 'dart:async';
 import 'dart:isolate';
 
-import '../enum/bot_difficulty.dart';
-import '../move.dart';
-import '../move_parameters.dart';
+import '../../models/enum/bot_difficulty.dart';
+import '../../models/move.dart';
+import '../../models/move_parameters.dart';
 import 'bot_isolate_message.dart';
 import 'bot_player.dart';
 

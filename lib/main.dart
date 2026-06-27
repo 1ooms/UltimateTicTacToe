@@ -8,10 +8,10 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:ultimate_tic_tac_toe/screens/home_screen/home_screen.dart';
+import 'package:ultimate_tic_tac_toe/utils/ad_controller.dart';
 import 'package:ultimate_tic_tac_toe/utils/audio_controller.dart';
 
 import 'firebase_options.dart';
-// import 'package:provider/provider.dart';
 
 final lightTheme = ThemeData(
   brightness: Brightness.light,
@@ -46,6 +46,9 @@ void main() async {
   final audioController = AudioController();
   await audioController.initialize();
 
+  final adController = AdController();
+  await adController.initialize();
+
   runApp(ProviderScope(child: App(audioController: audioController)));
 }
 
@@ -77,7 +80,7 @@ class _AppState extends State<App> {
         themeMode = ThemeMode.system;
         break;
       default:
-        themeMode = ThemeMode.system;
+        themeMode = ThemeMode.light;
         break;
     }
 

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../how_to_play_screen/how_to_play_screen.dart';
-import '../settings_screen.dart';
+import '../settings_screen/settings_screen.dart';
 
 class AppDrawer extends StatelessWidget {
   const AppDrawer({

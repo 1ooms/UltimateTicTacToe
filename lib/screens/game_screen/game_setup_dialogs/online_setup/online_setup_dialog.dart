@@ -1,13 +1,14 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:ultimate_tic_tac_toe/utils/online_game_controller.dart';
 
-import '../../../../utils/lobby_controller.dart';
+import '../../../../models/online_setup.dart';
 
 class OnlineSetupDialog extends StatefulWidget {
-  final LobbyController lobbyController;
+  final OnlineGameController onlineGameController;
 
-  const OnlineSetupDialog({super.key, required this.lobbyController});
+  const OnlineSetupDialog({super.key, required this.onlineGameController});
 
   @override
   State<OnlineSetupDialog> createState() => _OnlineSetupDialogState();
@@ -63,6 +64,7 @@ class _OnlineSetupDialogState extends State<OnlineSetupDialog>
             Column(
               mainAxisSize: MainAxisSize.min,
               children: [
+                lobbyLoading ? CircularProgressIndicator() : SizedBox(),
                 readyToStart
                     ? SizedBox()
                     : Padding(
@@ -191,34 +193,38 @@ class _OnlineSetupDialogState extends State<OnlineSetupDialog>
     );
   }
 
+  bool lobbyLoading = false;
+
   Future<void> _startHostingGame() async {
-    final lobbyCode = await widget.lobbyController.createLobby();
+    lobbyLoading = true;
+    final lobbyCode = await widget.onlineGameController.hostGame();
     setState(() {
       passCode = lobbyCode;
       waitingForGuest = true;
     });
-    lobbySubscription = widget.lobbyController.getLobbyStream(lobbyCode).listen(
-      (event) {
-        if (!event.exists) return;
-        final data = event.data() as Map<String, dynamic>;
-        if (mounted) {
-          setState(() {
-            if (data['state'] == 'ready') {
-              waitingForGuest = false;
-              readyToStart = true;
-            } else if (data['state'] == 'waiting') {
-              waitingForGuest = true;
-              readyToStart = false;
-            }
-          });
-        }
-      },
-    );
+    lobbySubscription = widget.onlineGameController.getLobbyStream()?.listen((
+      event,
+    ) {
+      if (!event.exists) return;
+      final data = event.data() as Map<String, dynamic>;
+      if (mounted) {
+        setState(() {
+          if (data['state'] == 'ready') {
+            waitingForGuest = false;
+            readyToStart = true;
+          } else if (data['state'] == 'waiting') {
+            waitingForGuest = true;
+            readyToStart = false;
+          }
+        });
+      }
+    });
+    lobbyLoading = false;
   }
 
   Future<void> _stopHostingGame() async {
     if (passCode != null) {
-      await widget.lobbyController.deleteLobby(passCode!);
+      await widget.onlineGameController.stopHosting();
       passCode = null;
     }
     lobbySubscription?.cancel();
@@ -232,14 +238,14 @@ class _OnlineSetupDialogState extends State<OnlineSetupDialog>
 
   Future<void> _joinGame() async {
     final code = textFieldController.text.toUpperCase();
-    final success = await widget.lobbyController.joinLobby(code);
+    final success = await widget.onlineGameController.joinGame(code);
     if (success) {
       setState(() {
         waitingForHostToStart = true;
         passCode = code;
       });
 
-      lobbySubscription = widget.lobbyController.getLobbyStream(code).listen((
+      lobbySubscription = widget.onlineGameController.getLobbyStream()?.listen((
         event,
       ) {
         if (!event.exists) {
@@ -258,25 +264,30 @@ class _OnlineSetupDialogState extends State<OnlineSetupDialog>
         final data = event.data() as Map<String, dynamic>;
         if (data['state'] == 'playing') {
           if (mounted) {
-            Navigator.of(context).pop({
-              'lobbyCode': code,
-              'isHost': false,
-              'gameSetup': data['gameSetup'],
-            });
+            Navigator.of(context).pop(
+                OnlineSetup(
+                  lobbyCode: code,
+                  isHost: false,
+                  gameSetup: data['gameSetup'],
+                )
+            );
           }
         }
       });
-    }
-    else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Lobby does not exist!")),
-      );
+    } else {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text("Lobby does not exist or is already playing!"),
+          ),
+        );
+      }
     }
   }
 
   Future<void> _leaveLobby() async {
     if (passCode != null) {
-      await widget.lobbyController.leaveLobby(passCode!);
+      await widget.onlineGameController.leaveGame();
       passCode = null;
     }
     lobbySubscription?.cancel();
