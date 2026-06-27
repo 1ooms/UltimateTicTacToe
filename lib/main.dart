@@ -24,7 +24,7 @@ final darkTheme = ThemeData(
   brightness: Brightness.dark,
   useMaterial3: true,
   textTheme: GoogleFonts.latoTextTheme(ThemeData.dark().textTheme),
-  colorScheme: ColorScheme.dark(),
+  colorSchemeSeed: Colors.teal,
 );
 
 class AppScrollBehavior extends MaterialScrollBehavior {
