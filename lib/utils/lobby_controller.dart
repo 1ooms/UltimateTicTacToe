@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../models/game_setup.dart';
+import '../models/game_data.dart';
 
 class LobbyController {
   final FirebaseFirestore instance;
@@ -101,10 +102,10 @@ class LobbyController {
 
   Future<void> updateGameData(
       String lobbyCode,
-      Map<String, dynamic> gameData,
+      GameData gameData,
       ) async {
     await instance.collection('lobbies').doc(lobbyCode).update({
-      'gameData': gameData,
+      'gameData': gameData.toJson(),
     });
   }
 

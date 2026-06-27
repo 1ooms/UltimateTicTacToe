@@ -2,9 +2,8 @@ import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import '../models/enum/player.dart';
 import '../models/game_setup.dart';
-import '../models/move.dart';
+import '../models/game_data.dart';
 import 'game_controller.dart';
 import 'lobby_controller.dart';
 
@@ -142,62 +141,41 @@ class OnlineGameController {
         }
       } else {
         if (_gameController != null) {
-          final List remoteMoveHistory = gameData['moveHistory'] as List;
-          if (remoteMoveHistory.length != _gameController!.moveHistory.length) {
-            _applyGameData(gameData);
+          final parsedGameData = GameData.fromJson(gameData);
+          if (parsedGameData.moveHistory.length != _gameController!.moveHistory.length) {
+            _applyGameData(parsedGameData);
           }
         }
       }
     });
   }
 
-  Map<String, dynamic> extractGameData() {
-    return {
-      'currentPlayer': _gameController!.currentPlayer.name,
-      'activeSubBoardIndex': _gameController!.activeSubBoardIndex,
-      'subBoardWinners':
-          _gameController!.subBoardWinners.map((p) => p?.name).toList(),
-      'subBoard1': _gameController!.subBoards[0].map((p) => p?.name).toList(),
-      'subBoard2': _gameController!.subBoards[1].map((p) => p?.name).toList(),
-      'subBoard3': _gameController!.subBoards[2].map((p) => p?.name).toList(),
-      'subBoard4': _gameController!.subBoards[3].map((p) => p?.name).toList(),
-      'subBoard5': _gameController!.subBoards[4].map((p) => p?.name).toList(),
-      'subBoard6': _gameController!.subBoards[5].map((p) => p?.name).toList(),
-      'subBoard7': _gameController!.subBoards[6].map((p) => p?.name).toList(),
-      'subBoard8': _gameController!.subBoards[7].map((p) => p?.name).toList(),
-      'subBoard9': _gameController!.subBoards[8].map((p) => p?.name).toList(),
-      'moveHistory': _gameController!.moveHistory.map((m) => m.toJson()).toList(),
-      'gameFinished': _gameController!.gameFinished,
-      'overallWinner': _gameController!.overallWinner?.name,
-    };
+  GameData extractGameData() {
+    return GameData(
+      currentPlayer: _gameController!.currentPlayer,
+      activeSubBoardIndex: _gameController!.activeSubBoardIndex,
+      subBoardWinners: _gameController!.subBoardWinners,
+      subBoards: _gameController!.subBoards,
+      moveHistory: _gameController!.moveHistory,
+      gameFinished: _gameController!.gameFinished,
+      overallWinner: _gameController!.overallWinner,
+    );
   }
 
-  void _applyGameData(Map<String, dynamic> data) {
+  void _applyGameData(GameData data) {
     if (_gameController == null) return;
     
     final bool wasFinished = _gameController!.gameFinished;
 
-    _gameController!.currentPlayer = Player.values.byName(data['currentPlayer']);
-    _gameController!.activeSubBoardIndex = data['activeSubBoardIndex'];
-    _gameController!.subBoardWinners =
-        (data['subBoardWinners'] as List)
-            .map((p) => p != null ? Player.values.byName(p) : null)
-            .toList();
-    for (int i = 1; i <= 9; i++) {
-      _gameController!.subBoards[i - 1] =
-          (data['subBoard$i'] as List)
-              .map((p) => p != null ? Player.values.byName(p) : null)
-              .toList();
+    _gameController!.currentPlayer = data.currentPlayer;
+    _gameController!.activeSubBoardIndex = data.activeSubBoardIndex;
+    _gameController!.subBoardWinners = List.from(data.subBoardWinners);
+    for (int i = 0; i < 9; i++) {
+      _gameController!.subBoards[i] = List.from(data.subBoards[i]);
     }
-    _gameController!.moveHistory =
-        (data['moveHistory'] as List).map((m) {
-          return Move.fromJson(Map<String, dynamic>.from(m as Map));
-        }).toList();
-    _gameController!.gameFinished = data['gameFinished'];
-    _gameController!.overallWinner =
-        data['overallWinner'] != null
-            ? Player.values.byName(data['overallWinner'])
-            : null;
+    _gameController!.moveHistory = List.from(data.moveHistory);
+    _gameController!.gameFinished = data.gameFinished;
+    _gameController!.overallWinner = data.overallWinner;
 
     _gameController!.notifyUI();
 
