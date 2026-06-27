@@ -14,10 +14,10 @@ import 'package:ultimate_tic_tac_toe/screens/game_screen/game_info/winner_indica
 import 'package:ultimate_tic_tac_toe/utils/game_controller.dart';
 import 'package:ultimate_tic_tac_toe/utils/ui_helpers.dart';
 
-import '../../models/enum/bot_difficulty.dart';
 import '../../models/enum/player.dart';
 import '../../models/game_setup.dart';
 import '../../models/player_config.dart';
+import '../../utils/bot_game_controller.dart';
 import '../../utils/online_game_controller.dart';
 import '../../widgets/ads/banner_ad_widget.dart';
 import 'end_dialogs/leave_game_dialog.dart';
@@ -38,13 +38,10 @@ class GameScreen extends StatefulWidget {
 }
 
 class _GameScreenState extends State<GameScreen> {
-  // game setup args
-  late PlayerConfig player1;
-  late PlayerConfig player2;
-  late bool player1Starts;
-  BotDifficulty? botDifficulty;
+  late GameSetup gameSetup;
 
   GameController? _gameController;
+  BotGameController? botGameController;
   final ConfettiController _confettiController = ConfettiController();
   bool gameStarted = false;
   bool _isEndDialogOpen = false;
@@ -70,6 +67,7 @@ class _GameScreenState extends State<GameScreen> {
   @override
   void dispose() {
     _gameController?.dispose();
+    botGameController?.dispose();
     _confettiController.dispose();
     super.dispose();
   }
@@ -88,7 +86,7 @@ class _GameScreenState extends State<GameScreen> {
   }
 
   Future<void> _showGameSetupDialog() async {
-    final gameSetup = await showDialog<GameSetup>(
+    final gameSetupResult = await showDialog<GameSetup>(
       barrierDismissible: false,
       context: context,
       builder:
@@ -96,12 +94,9 @@ class _GameScreenState extends State<GameScreen> {
               GameSetupDialog(gameMode: widget.gameMode, gameStarted: false),
     );
 
-    if (gameSetup != null) {
+    if (gameSetupResult != null) {
       setState(() {
-        player1 = gameSetup.player1;
-        player2 = gameSetup.player2;
-        player1Starts = gameSetup.player1Starts;
-        botDifficulty = gameSetup.botDifficulty;
+        gameSetup = gameSetupResult;
       });
 
       if (widget.gameMode == GameMode.online &&
@@ -147,13 +142,10 @@ class _GameScreenState extends State<GameScreen> {
       if (isHost ?? false) {
         _showGameSetupDialog();
       } else {
-        final gameSetup = onlineSetup.gameSetup;
+        final gameSetupResult = onlineSetup.gameSetup;
 
         setState(() {
-          player1 = gameSetup.player1;
-          player2 = gameSetup.player2;
-          player1Starts = gameSetup.player1Starts;
-          botDifficulty = gameSetup.botDifficulty;
+          gameSetup = gameSetupResult;
           gameStarted = true;
         });
 
@@ -167,7 +159,12 @@ class _GameScreenState extends State<GameScreen> {
       _gameController = GameController(
         gameMode: widget.gameMode,
         gameSetup: setup,
-        localPlayer: isHost != null ? (isHost! ? Player.one : Player.two) : null,
+        localPlayer:
+            widget.gameMode == GameMode.bot
+                ? Player.one
+                : widget.gameMode == GameMode.online
+                ? (isHost != null ? (isHost! ? Player.one : Player.two) : null)
+                : null,
         onWin: _showWinDialog,
         onDraw: _showDrawDialog,
         onGameStateChanged: () {
@@ -182,6 +179,8 @@ class _GameScreenState extends State<GameScreen> {
           onOnlineSessionEnded: _showSessionEndedDialog,
           onGameRestarted: _handleGameRestarted,
         );
+      } else if (widget.gameMode == GameMode.bot) {
+        botGameController = BotGameController(gameController: _gameController!);
       }
     } else {
       _gameController!.resetAndStartNewGame(setup);
@@ -189,7 +188,10 @@ class _GameScreenState extends State<GameScreen> {
   }
 
   void _showWinDialog(Player winner) {
-    Color winnerColor = winner == Player.one ? player1.color : player2.color;
+    Color winnerColor =
+        winner == Player.one
+            ? gameSetup.player1.color
+            : gameSetup.player2.color;
 
     _isEndDialogOpen = true;
     showDialog(
@@ -203,7 +205,10 @@ class _GameScreenState extends State<GameScreen> {
                 gameMode: widget.gameMode,
                 isHost: isHost,
                 winningPlayer: winner,
-                winnerConfig: winner == Player.one ? player1 : player2,
+                winnerConfig:
+                    winner == Player.one
+                        ? gameSetup.player1
+                        : gameSetup.player2,
                 viewingBoard: _gameController?.gameFinished ?? true,
                 confettiController: _confettiController,
                 onPlayAgain: _handlePlayAgain,
@@ -285,8 +290,8 @@ class _GameScreenState extends State<GameScreen> {
     final isLandscape =
         MediaQuery.of(context).orientation == Orientation.landscape;
 
-    final PlayerConfig p1 = player1;
-    final PlayerConfig p2 = player2;
+    final PlayerConfig p1 = gameSetup.player1;
+    final PlayerConfig p2 = gameSetup.player2;
     final bool playingAgainstBot = widget.gameMode == GameMode.bot;
 
     Widget playerStatusIndicator =
@@ -334,17 +339,20 @@ class _GameScreenState extends State<GameScreen> {
     Widget buildBodyContent() {
       if (gameStarted && _gameController != null) {
         return ListenableBuilder(
-          listenable: _gameController!,
+          listenable: Listenable.merge([
+            _gameController!,
+            if (botGameController != null) botGameController!,
+          ]),
           builder: (context, child) {
             final controller = _gameController!;
             final boardWidget = UltimateBoard(
               subBoards: controller.subBoards,
               subBoardWinners: controller.subBoardWinners,
-              player1: player1,
-              player2: player2,
+              player1: gameSetup.player1,
+              player2: gameSetup.player2,
               currentPlayer: controller.currentPlayer,
               isValidMove: controller.isValidMove,
-              onCellTap: controller.handleTap,
+              onCellTap: controller.makeMove,
               previousMove: controller.moveHistory.lastOrNull,
               gameFinished: controller.gameFinished,
             );
@@ -354,7 +362,7 @@ class _GameScreenState extends State<GameScreen> {
               currentPlayer: controller.currentPlayer,
               gameFinished: controller.gameFinished,
               overallWinner: controller.overallWinner,
-              aiThinking: controller.aiThinking,
+              aiThinking: botGameController?.aiThinking ?? false,
               showPlayAgainButton:
                   controller.gameFinished &&
                   !(widget.gameMode == GameMode.online && isHost != true),

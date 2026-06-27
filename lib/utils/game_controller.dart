@@ -1,4 +1,3 @@
-import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 import 'package:ultimate_tic_tac_toe/data/win_patterns.dart';
@@ -6,13 +5,9 @@ import 'package:ultimate_tic_tac_toe/models/enum/game_mode.dart';
 import 'package:ultimate_tic_tac_toe/models/enum/player.dart';
 import 'package:ultimate_tic_tac_toe/models/game_setup.dart';
 import 'package:ultimate_tic_tac_toe/models/move.dart';
-import 'package:ultimate_tic_tac_toe/models/move_parameters.dart';
 import 'package:ultimate_tic_tac_toe/utils/audio_controller.dart';
-import 'package:ultimate_tic_tac_toe/utils/bot_player/bot_isolate.dart';
 
-part 'bot_game_handler.dart';
-
-class GameController extends ChangeNotifier with BotHandler {
+class GameController extends ChangeNotifier {
   GameMode gameMode;
   GameSetup gameSetup;
   Player? localPlayer;
@@ -41,14 +36,6 @@ class GameController extends ChangeNotifier with BotHandler {
     this.onGameStateChanged,
   }) {
     _initializeGame();
-
-    if (gameMode == GameMode.bot) {
-      initBot();
-    }
-
-    if (gameMode == GameMode.bot && currentPlayer == Player.two) {
-      makeBotMove();
-    }
   }
 
   void _initializeGame() {
@@ -68,15 +55,11 @@ class GameController extends ChangeNotifier with BotHandler {
 
     moveHistory.clear();
     _initializeGame();
-    if (gameMode == GameMode.bot && currentPlayer == Player.two) {
-      makeBotMove();
-    }
     notifyListeners();
   }
 
-  void handleTap(int boardIndex, int cellIndex) {
-    if (aiThinking) return;
-    if (gameMode == GameMode.online && currentPlayer != localPlayer) {
+  void makeMove(int boardIndex, int cellIndex, {bool isBot = false}) {
+    if (localPlayer != null && currentPlayer != localPlayer && !isBot) {
       return;
     }
 
@@ -123,10 +106,6 @@ class GameController extends ChangeNotifier with BotHandler {
     // switch player turn
     currentPlayer = currentPlayer == Player.one ? Player.two : Player.one;
 
-    if (gameMode == GameMode.bot && currentPlayer == Player.two) {
-      makeBotMove();
-    }
-
     onGameStateChanged?.call();
     notifyListeners();
   }
@@ -168,7 +147,7 @@ class GameController extends ChangeNotifier with BotHandler {
   }
 
   void undoMove() {
-    if (moveHistory.isEmpty || aiThinking) return;
+    if (moveHistory.isEmpty || (localPlayer != null && currentPlayer != localPlayer)) return;
 
     audioController.playSound("assets/sounds/tap.wav");
 
@@ -184,9 +163,5 @@ class GameController extends ChangeNotifier with BotHandler {
 
     gameFinished = false;
     notifyListeners();
-
-    if (gameMode == GameMode.bot && currentPlayer == Player.two) {
-      makeBotMove();
-    }
   }
 }
