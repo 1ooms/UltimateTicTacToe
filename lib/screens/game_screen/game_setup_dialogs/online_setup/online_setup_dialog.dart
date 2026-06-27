@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:ultimate_tic_tac_toe/utils/online_game_controller.dart';
 
+import '../../../../models/game_setup.dart';
 import '../../../../models/online_setup.dart';
 
 class OnlineSetupDialog extends StatefulWidget {
@@ -117,7 +118,7 @@ class _OnlineSetupDialogState extends State<OnlineSetupDialog>
                           onPressed: () {
                             Navigator.of(
                               context,
-                            ).pop({'lobbyCode': passCode, 'isHost': true});
+                            ).pop(OnlineSetup(lobbyCode: passCode!, isHost: true, gameSetup: null));
                           },
                           child: const Text('Continue'),
                         ),
@@ -268,7 +269,7 @@ class _OnlineSetupDialogState extends State<OnlineSetupDialog>
                 OnlineSetup(
                   lobbyCode: code,
                   isHost: false,
-                  gameSetup: data['gameSetup'],
+                  gameSetup: GameSetup.fromJson(data['gameSetup']),
                 )
             );
           }
