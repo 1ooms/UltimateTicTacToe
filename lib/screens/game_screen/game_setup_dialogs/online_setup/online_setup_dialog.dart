@@ -152,7 +152,7 @@ class _OnlineSetupDialogState extends State<OnlineSetupDialog>
                       },
                       decoration: InputDecoration(labelText: "Enter code"),
                     ),
-                    SizedBox(height: 8),
+                    SizedBox(height: 16),
                     joinLoading
                         ? CircularProgressIndicator()
                         : ElevatedButton(
