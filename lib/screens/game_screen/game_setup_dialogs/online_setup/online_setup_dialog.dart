@@ -227,10 +227,10 @@ class _OnlineSetupDialogState extends State<OnlineSetupDialog>
       final data = LobbyData.fromJson(event.data() as Map<String, dynamic>);
       if (mounted) {
         setState(() {
-          if (data.state == LobbyState.ready.toString()) {
+          if (data.state == LobbyState.ready.name) {
             waitingForGuest = false;
             readyToStart = true;
-          } else if (data.state == LobbyState.waiting.toString()) {
+          } else if (data.state == LobbyState.waiting.name) {
             waitingForGuest = true;
             readyToStart = false;
           }
@@ -287,7 +287,7 @@ class _OnlineSetupDialogState extends State<OnlineSetupDialog>
           return;
         }
         final data = LobbyData.fromJson(event.data() as Map<String, dynamic>);
-        if (data.state == LobbyState.playing.toString()) {
+        if (data.state == LobbyState.playing.name) {
           if (mounted) {
             Navigator.of(context).pop(
               OnlineSetup(

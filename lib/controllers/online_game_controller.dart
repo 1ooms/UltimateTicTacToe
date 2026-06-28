@@ -95,7 +95,7 @@ class OnlineGameController {
     if (currentLobbyCode != null) {
       await lobbyController.setGameState(
         currentLobbyCode!,
-        LobbyState.otherPlayerLeft.toString(),
+        LobbyState.otherPlayerLeft.name,
       );
     }
   }
@@ -123,8 +123,8 @@ class OnlineGameController {
       if (!event.exists) return;
       final data = LobbyData.fromJson(event.data() as Map<String, dynamic>);
 
-      if (data.state == LobbyState.otherPlayerLeft.toString() ||
-          (isHost == true && data.state == LobbyState.waiting.toString())) {
+      if (data.state == LobbyState.otherPlayerLeft.name ||
+          (isHost == true && data.state == LobbyState.waiting.name)) {
         onOnlineSessionEnded?.call(currentLobbyCode!);
         return;
       }
