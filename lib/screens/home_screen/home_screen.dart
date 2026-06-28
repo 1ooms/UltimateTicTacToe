@@ -2,20 +2,43 @@ import 'package:flutter/material.dart';
 import 'package:ultimate_tic_tac_toe/models/enum/game_mode.dart';
 import 'package:ultimate_tic_tac_toe/screens/home_screen/app_drawer.dart';
 import 'package:ultimate_tic_tac_toe/screens/home_screen/game_mode_card.dart';
+import 'package:ultimate_tic_tac_toe/screens/home_screen/welcome_dialog.dart';
 
 import '../../widgets/ads/banner_ad_widget.dart';
 import '../game_screen/game_screen.dart';
 
-class HomeScreen extends StatelessWidget {
-  HomeScreen({
+class HomeScreen extends StatefulWidget {
+  const HomeScreen({
     super.key,
     required this.onChangeThemeMode,
     required this.themeMode,
+    required this.showWelcomeDialog,
   });
 
-  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   final Function(ThemeMode) onChangeThemeMode;
   final ThemeMode themeMode;
+  final bool showWelcomeDialog;
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+
+  @override
+  void initState() {
+    super.initState();
+
+    WidgetsBinding.instance.addPostFrameCallback((ctx) {
+      if (widget.showWelcomeDialog) {
+        showDialog(
+          context: context,
+          builder: (ctx) => WelcomeDialog(),
+        );
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -139,8 +162,8 @@ class HomeScreen extends StatelessWidget {
         ),
       ),
       drawer: AppDrawer(
-        onChangeThemeMode: onChangeThemeMode,
-        themeMode: themeMode,
+        onChangeThemeMode: widget.onChangeThemeMode,
+        themeMode: widget.themeMode,
       ),
       body: SafeArea(child: buildBodyContent()),
       bottomNavigationBar: BannerAdWidget(),
