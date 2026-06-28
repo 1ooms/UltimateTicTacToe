@@ -51,7 +51,7 @@ class _GameScreenState extends State<GameScreen> {
   String? lobbyCode;
   bool? isHost;
 
-  late Player? localPlayer;
+  Player? localPlayer;
 
   @override
   void initState() {
@@ -164,8 +164,6 @@ class _GameScreenState extends State<GameScreen> {
       }
     } else if (widget.gameMode == GameMode.bot) {
       localPlayer = Player.one;
-    } else {
-      localPlayer = null;
     }
   }
 
