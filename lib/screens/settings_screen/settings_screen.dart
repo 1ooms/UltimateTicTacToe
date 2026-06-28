@@ -63,17 +63,17 @@ class _SettingsScreenState extends State<SettingsScreen> {
               },
               child: Column(
                 children: [
-                  ListTile(
+                  RadioListTile<ThemeMode>(
                     title: const Text('Light theme'),
-                    leading: Radio<ThemeMode>(value: ThemeMode.light),
+                    value: ThemeMode.light,
                   ),
-                  ListTile(
+                  RadioListTile<ThemeMode>(
                     title: const Text('Dark theme'),
-                    leading: Radio<ThemeMode>(value: ThemeMode.dark),
+                    value: ThemeMode.dark,
                   ),
-                  ListTile(
+                  RadioListTile<ThemeMode>(
                     title: const Text('Use device theme'),
-                    leading: Radio<ThemeMode>(value: ThemeMode.system),
+                    value: ThemeMode.system,
                   ),
                 ],
               ),
@@ -91,13 +91,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
               },
               child: Column(
                 children: [
-                  ListTile(
+                  RadioListTile<bool>(
                     title: const Text('On'),
-                    leading: Radio<bool>(value: true),
+                    value: true,
                   ),
-                  ListTile(
+                  RadioListTile<bool>(
                     title: const Text('Off'),
-                    leading: Radio<bool>(value: false),
+                    value: false,
                   ),
                 ],
               ),
@@ -120,13 +120,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   },
                   child: Column(
                     children: [
-                      ListTile(
+                      RadioListTile<bool>(
                         title: const Text('On'),
-                        leading: Radio<bool>(value: true),
+                        value: true,
                       ),
-                      ListTile(
+                      RadioListTile<bool>(
                         title: const Text('Off'),
-                        leading: Radio<bool>(value: false),
+                        value: false,
                       ),
                     ],
                   ),

@@ -51,7 +51,7 @@ class _GameScreenState extends State<GameScreen> {
   String? lobbyCode;
   bool? isHost;
 
-  late Player? localPlayer;
+  Player? localPlayer;
 
   @override
   void initState() {
@@ -418,10 +418,19 @@ class _GameScreenState extends State<GameScreen> {
                 onPressed: () => _showGameSetupDialog(),
                 icon: const Icon(Icons.palette),
               ),
-            if (widget.gameMode != GameMode.online)
-              IconButton(
-                onPressed: () => _gameController?.undoMove(),
-                icon: const Icon(Icons.undo),
+            if (_gameController != null)
+              ListenableBuilder(
+                listenable: _gameController!,
+                builder: (context, _) {
+                  if (widget.gameMode != GameMode.online ||
+                      _gameController!.currentPlayer == localPlayer) {
+                    return IconButton(
+                      onPressed: () => _gameController!.undoMove(),
+                      icon: const Icon(Icons.undo),
+                    );
+                  }
+                  return const SizedBox.shrink();
+                },
               ),
           ],
         ),

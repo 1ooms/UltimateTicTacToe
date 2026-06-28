@@ -21,7 +21,7 @@ class LobbyController {
 
     await lobbyRef.set(
       LobbyData(
-        state: LobbyState.waiting.toString(),
+        state: LobbyState.waiting.name,
         hostId: FirebaseAuth.instance.currentUser?.uid,
       ).toJson(),
     );
@@ -48,7 +48,7 @@ class LobbyController {
       );
 
       if (lobbyData.guestId != null ||
-          lobbyData.state != LobbyState.waiting.toString()) {
+          lobbyData.state != LobbyState.waiting.name) {
         return false;
       }
 
@@ -56,7 +56,7 @@ class LobbyController {
         lobbyRef,
         LobbyData(
           guestId: FirebaseAuth.instance.currentUser?.uid,
-          state: LobbyState.ready.toString(),
+          state: LobbyState.ready.name,
         ).toJson(),
       );
 
@@ -72,9 +72,10 @@ class LobbyController {
 
   Future<void> leaveLobby(String lobbyCode) async {
     final lobbyRef = instance.collection(lobbies).doc(lobbyCode);
-    await lobbyRef.update(
-      LobbyData(guestId: null, state: LobbyState.waiting.toString()).toJson(),
-    );
+    await lobbyRef.update({
+      'guestId': FieldValue.delete(),
+      'state': LobbyState.waiting.name,
+    });
   }
 
   String generatePassCode() {
@@ -104,16 +105,11 @@ class LobbyController {
   }
 
   Future<void> startGame(String lobbyCode, GameSetup setup) async {
-    await instance
-        .collection(lobbies)
-        .doc(lobbyCode)
-        .update(
-          LobbyData(
-            state: LobbyState.playing.toString(),
-            gameSetup: setup,
-            gameData: null,
-          ).toJson(),
-        );
+    await instance.collection(lobbies).doc(lobbyCode).update({
+      'state': LobbyState.playing.name,
+      'gameSetup': setup.toJson(),
+      'gameData': FieldValue.delete(),
+    });
   }
 
   Future<void> updateGameData(String lobbyCode, GameData gameData) async {

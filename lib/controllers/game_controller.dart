@@ -147,8 +147,9 @@ class GameController extends ChangeNotifier {
 
   void undoMove() {
     if (moveHistory.isEmpty ||
-        (localPlayer != null && currentPlayer != localPlayer))
+        (localPlayer != null && currentPlayer != localPlayer)) {
       return;
+    }
 
     audioController.playSound("assets/sounds/tap.wav");
 
@@ -163,6 +164,7 @@ class GameController extends ChangeNotifier {
     }
 
     gameFinished = false;
+    onGameStateChanged?.call();
     notifyListeners();
   }
 }

@@ -173,15 +173,22 @@ class _GameSetupDialogState extends State<GameSetupDialog> {
       },
     );
 
+    void popDialog() {
+      if (!widget.gameStarted) {
+        Navigator.of(context).pop(); // Pop the dialog
+        Navigator.of(context).pop(); // Pop the screen
+      } else {
+        Navigator.of(context).pop();
+      }
+    }
+
     return PopScope(
       canPop: false,
       onPopInvokedWithResult: (didPop, result) {
-        if (!didPop && !widget.gameStarted) {
-          Navigator.of(context).pop(); // Pop the dialog
-          Navigator.of(context).pop(); // Pop the screen
-        } else if (!didPop && widget.gameStarted) {
-          Navigator.of(context).pop();
+        if (didPop) {
+          return;
         }
+        popDialog();
       },
       child: AlertDialog(
         scrollable: true,
@@ -210,7 +217,7 @@ class _GameSetupDialogState extends State<GameSetupDialog> {
         actions: [
           TextButton(
             onPressed: () {
-              Navigator.of(context).pop();
+              popDialog();
             },
             child: const Text('Cancel'),
           ),

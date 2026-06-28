@@ -90,6 +90,10 @@ class _AppState extends State<App> {
     });
   }
 
+  bool _checkFirstLogin(SharedPreferences prefs) {
+    return prefs.getBool(PrefKeys.firstLogin) ?? true;
+  }
+
   void _savePrefs() async {
     prefs = await SharedPreferences.getInstance();
 
@@ -133,6 +137,7 @@ class _AppState extends State<App> {
       home: HomeScreen(
         onChangeThemeMode: changeThemeMode,
         themeMode: themeMode,
+        showWelcomeDialog: _checkFirstLogin(prefs),
       ),
       navigatorKey: navigatorKey,
       scrollBehavior: AppScrollBehavior(),
