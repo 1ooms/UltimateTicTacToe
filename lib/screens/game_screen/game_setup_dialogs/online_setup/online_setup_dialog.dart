@@ -49,9 +49,6 @@ class _OnlineSetupDialogState extends State<OnlineSetupDialog>
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
 
-    final isLandscape =
-        MediaQuery.of(context).orientation == Orientation.landscape;
-
     final content = [
       TabBar(
         controller: tabController,
@@ -171,30 +168,39 @@ class _OnlineSetupDialogState extends State<OnlineSetupDialog>
       ),
     ];
 
+    void popDialog() {
+      if (passCode != null) {
+        if (tabController.index == 0) {
+          _stopHostingGame();
+        } else if (waitingForHostToStart) {
+          _leaveLobby();
+        }
+      }
+      Navigator.of(context).pop(); // Pop the dialog
+      Navigator.of(context).pop(); // Pop the screen
+    }
+
     return Stack(
       children: [
         PopScope(
           canPop: false,
           onPopInvokedWithResult: (didPop, result) {
             if (!didPop) {
-              if (passCode != null) {
-                if (tabController.index == 0) {
-                  // Host tab
-                  _stopHostingGame();
-                } else if (waitingForHostToStart) {
-                  // Join tab and actually joined
-                  _leaveLobby();
-                }
-              }
-              Navigator.of(context).pop(); // Pop the dialog
-              Navigator.of(context).pop(); // Pop the screen
+              popDialog();
             }
           },
-          child: Dialog(
-            child:
-                !isLandscape
-                    ? Column(mainAxisSize: MainAxisSize.min, children: content)
-                    : Row(mainAxisSize: MainAxisSize.min, children: content),
+          child: AlertDialog(
+            scrollable: true,
+            content:
+              Column(mainAxisSize: MainAxisSize.min, children: content),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  popDialog();
+                },
+                child: const Text('Go back'),
+              ),
+            ]
           ),
         ),
       ],
