@@ -2,8 +2,8 @@ import 'package:ultimate_tic_tac_toe/models/enum/player.dart';
 import 'package:ultimate_tic_tac_toe/models/move.dart';
 
 class GameData {
-  final Player currentPlayer;
-  final int? activeSubBoardIndex;
+  Player currentPlayer;
+  int? activeSubBoardIndex;
   final List<Player?> subBoardWinners;
   final List<List<Player?>> subBoards;
   final List<Move> moveHistory;

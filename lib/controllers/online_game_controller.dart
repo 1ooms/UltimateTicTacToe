@@ -100,6 +100,22 @@ class OnlineGameController {
     }
   }
 
+  Future<void> undoMove() async {
+    if (currentLobbyCode != null && _gameController != null) {
+      final gameData = extractGameData();
+      final move = gameData.moveHistory.removeLast();
+      gameData.subBoardWinners[move.boardIndex] = null;
+      gameData.subBoards[move.boardIndex][move.cellIndex] = null;
+      gameData.currentPlayer = move.player;
+      gameData.activeSubBoardIndex = move.activeBoardIndex;
+
+      await lobbyController.updateGameData(
+        currentLobbyCode!,
+        gameData,
+      );
+    }
+  }
+
   void syncWith(
     GameController gameController, {
     required void Function(String) onOnlineSessionEnded,
