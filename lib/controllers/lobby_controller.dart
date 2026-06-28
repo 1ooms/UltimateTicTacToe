@@ -72,9 +72,10 @@ class LobbyController {
 
   Future<void> leaveLobby(String lobbyCode) async {
     final lobbyRef = instance.collection(lobbies).doc(lobbyCode);
-    await lobbyRef.update(
-      LobbyData(guestId: null, state: LobbyState.waiting.name).toJson(),
-    );
+    await lobbyRef.update({
+      'guestId': FieldValue.delete(),
+      'state': LobbyState.waiting.name,
+    });
   }
 
   String generatePassCode() {
@@ -104,16 +105,11 @@ class LobbyController {
   }
 
   Future<void> startGame(String lobbyCode, GameSetup setup) async {
-    await instance
-        .collection(lobbies)
-        .doc(lobbyCode)
-        .update(
-          LobbyData(
-            state: LobbyState.playing.name,
-            gameSetup: setup,
-            gameData: null,
-          ).toJson(),
-        );
+    await instance.collection(lobbies).doc(lobbyCode).update({
+      'state': LobbyState.playing.name,
+      'gameSetup': setup.toJson(),
+      'gameData': FieldValue.delete(),
+    });
   }
 
   Future<void> updateGameData(String lobbyCode, GameData gameData) async {
