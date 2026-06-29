@@ -13,9 +13,19 @@ void _botIsolateEntryPoint(SendPort sendPort) {
   // Send back the SendPort so the main isolate can communicate with this one
   sendPort.send(isolateReceivePort.sendPort);
 
+  BotPlayer? botPlayer;
+
   isolateReceivePort.listen((message) async {
     if (message is BotIsolateMessage) {
-      final move = chooseBotMove(message.moveParametersJson);
+      final moveParameters = MoveParameters.fromJson(message.moveParametersJson);
+      if (botPlayer == null || botPlayer!.difficulty != moveParameters.difficulty) {
+        botPlayer = BotPlayer(difficulty: moveParameters.difficulty);
+      }
+
+      final stopwatch = Stopwatch()..start();
+      final move = chooseBotMove(botPlayer!, moveParameters);
+      stopwatch.stop();
+      print("Bot isolate computed move in ${stopwatch.elapsedMilliseconds} ms");
       message.responsePort.send(
         move,
       ); // Already serialized (Map<String, dynamic>?)
