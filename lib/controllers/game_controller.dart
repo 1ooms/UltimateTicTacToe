@@ -146,14 +146,26 @@ class GameController extends ChangeNotifier {
   }
 
   void undoMove() {
-    if (moveHistory.isEmpty ||
-        (localPlayer != null && currentPlayer != localPlayer)) {
+    if (
+      moveHistory.isEmpty || // no moves to undo
+      (localPlayer != null && currentPlayer != localPlayer) || // not local player's turn
+      (localPlayer != null && gameFinished) // game finished
+    ) {
       return;
     }
 
     audioController.playSound("assets/sounds/tap.wav");
 
-    int movesToUndo = gameMode == GameMode.bot ? 2 : 1;
+    int movesToUndo = 1;
+    if (gameMode == GameMode.bot) {
+      if (!gameFinished) {
+        movesToUndo = 2;
+      } else if (currentPlayer != localPlayer) {
+        movesToUndo = 2;
+      } else if (currentPlayer == localPlayer) {
+        movesToUndo = 1;
+      }
+    }
 
     for (int i = 0; i < movesToUndo && moveHistory.isNotEmpty; i++) {
       final move = moveHistory.removeLast();
