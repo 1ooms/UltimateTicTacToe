@@ -63,7 +63,7 @@ Map<String, dynamic>? chooseBotMove(
         subBoardWinners,
         botPlayerNumber,
         activeSubBoardIndex,
-        maxDepth: 6,
+        maxDepth: 9,
       );
       return (move != null) ? move.toJson() : null;
   }
@@ -100,45 +100,77 @@ class BotPlayer {
     Player botPlayer,
     int? activeSubBoardIndex, {
     required int maxDepth,
+    int maxTimeMs = 2000,
   }) {
     _board = board;
     _subBoardWinners = subBoardWinners;
     _botPlayer = botPlayer;
 
     final stopwatch = Stopwatch()..start();
-    int bestScore = -1000000;
-    List<Move> bestMoves = List<Move>.empty(growable: true);
 
-    int alpha = -1000000;
-    int beta = 1000000;
+    Move? bestMoveSoFar;
+    List<Move> validMoves = _getValidMoves(activeSubBoardIndex);
+    if (validMoves.isEmpty) return null;
 
-    for (final move in _getValidMoves(activeSubBoardIndex)) {
-      int score = _evaluateMove(
-        move,
-        botPlayer,
-        1,
-        maxDepth,
-        alpha,
-        beta,
-      );
+    try {
+      for (int currentDepth = 1; currentDepth <= maxDepth; currentDepth++) {
+        int bestScore = -1000000;
+        List<Move> bestMoves = [];
 
-      if (score > bestScore) {
-        bestScore = score;
-        bestMoves.clear();
-        bestMoves.add(move);
-      } else if (score == bestScore) {
-        bestMoves.add(move);
+        int alpha = -1000000;
+        int beta = 1000000;
+
+        // Evaluate the best move from the previous iteration first
+        if (bestMoveSoFar != null) {
+          validMoves.remove(bestMoveSoFar);
+          validMoves.insert(0, bestMoveSoFar);
+        }
+
+        for (final move in validMoves) {
+          int score = _evaluateMove(
+            move,
+            botPlayer,
+            1,
+            currentDepth,
+            alpha,
+            beta,
+            stopwatch,
+            maxTimeMs,
+          );
+
+          if (score > bestScore) {
+            bestScore = score;
+            bestMoves.clear();
+            bestMoves.add(move);
+          } else if (score == bestScore) {
+            bestMoves.add(move);
+          }
+          
+          alpha = max(alpha, bestScore);
+        }
+
+        if (bestMoves.isNotEmpty) {
+          bestMoveSoFar = bestMoves[_random.nextInt(bestMoves.length)];
+        }
+
+        // If winning move is found, no need to search deeper
+        if (bestScore > 500) {
+          break;
+        }
       }
-      
-      alpha = max(alpha, bestScore);
+    } catch (e) {
+      if (e is SearchTimeoutException) {
+        // print("Search timed out after ${stopwatch.elapsedMilliseconds} ms.");
+      } else {
+        rethrow;
+      }
     }
 
-    int randomBestMoveIndex = _random.nextInt(bestMoves.length);
-
     stopwatch.stop();
-    print("minimaxMove completed in ${stopwatch.elapsedMilliseconds} ms");
+    // print("minimaxMove completed in ${stopwatch.elapsedMilliseconds} ms");
 
-    return bestMoves[randomBestMoveIndex];
+    // Fallback for timeout before depth 1 completed
+    return bestMoveSoFar ?? validMoves[_random.nextInt(validMoves.length)];
   }
 
   int _minimax(
@@ -148,7 +180,13 @@ class BotPlayer {
     int maxDepth,
     int alpha,
     int beta,
+    Stopwatch stopwatch,
+    int maxTimeMs,
   ) {
+    if (stopwatch.elapsedMilliseconds > maxTimeMs) {
+      throw SearchTimeoutException();
+    }
+
     Player? winner = checkOverallWinner();
     if (winner != null) {
       if (winner == _botPlayer) {
@@ -173,6 +211,8 @@ class BotPlayer {
           maxDepth,
           alpha,
           beta,
+          stopwatch,
+          maxTimeMs,
         );
         maxEval = max(maxEval, eval);
         alpha = max(alpha, eval);
@@ -189,6 +229,8 @@ class BotPlayer {
           maxDepth,
           alpha,
           beta,
+          stopwatch,
+          maxTimeMs,
         );
         minEval = min(minEval, eval);
         beta = min(beta, eval);
@@ -205,6 +247,8 @@ class BotPlayer {
     int maxDepth,
     int alpha,
     int beta,
+    Stopwatch stopwatch,
+    int maxTimeMs,
   ) {
     final prevWinner = _subBoardWinners[move.boardIndex];
     _applyMove(move, currentPlayer);
@@ -215,6 +259,8 @@ class BotPlayer {
       maxDepth,
       alpha,
       beta,
+      stopwatch,
+      maxTimeMs,
     );
     _undoMove(move, prevWinner);
     return eval;
@@ -322,3 +368,5 @@ class BotPlayer {
     return score;
   }
 }
+
+class SearchTimeoutException implements Exception {}
