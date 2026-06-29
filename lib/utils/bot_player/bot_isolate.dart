@@ -25,7 +25,7 @@ void _botIsolateEntryPoint(SendPort sendPort) {
       final stopwatch = Stopwatch()..start();
       final move = chooseBotMove(botPlayer!, moveParameters);
       stopwatch.stop();
-      print("Bot isolate computed move in ${stopwatch.elapsedMilliseconds} ms");
+      // print("Bot isolate computed move in ${stopwatch.elapsedMilliseconds} ms");
       message.responsePort.send(
         move,
       ); // Already serialized (Map<String, dynamic>?)
