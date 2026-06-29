@@ -63,7 +63,7 @@ Map<String, dynamic>? chooseBotMove(
         subBoardWinners,
         botPlayerNumber,
         activeSubBoardIndex,
-        maxDepth: 9,
+        maxDepth: 6,
       );
       return (move != null) ? move.toJson() : null;
   }
@@ -104,7 +104,7 @@ class BotPlayer {
     _board = board;
     _subBoardWinners = subBoardWinners;
     _botPlayer = botPlayer;
-    
+
     final stopwatch = Stopwatch()..start();
     int bestScore = -1000000;
     List<Move> bestMoves = List<Move>.empty(growable: true);
@@ -176,7 +176,7 @@ class BotPlayer {
         );
         maxEval = max(maxEval, eval);
         alpha = max(alpha, eval);
-        if (beta <= alpha) break;
+        if (beta < alpha) break;
       }
       return maxEval;
     } else {
@@ -192,7 +192,7 @@ class BotPlayer {
         );
         minEval = min(minEval, eval);
         beta = min(beta, eval);
-        if (beta <= alpha) break;
+        if (beta < alpha) break;
       }
       return minEval;
     }
