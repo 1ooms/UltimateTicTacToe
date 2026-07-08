@@ -186,42 +186,46 @@ class _TutorialWizardState extends State<TutorialWizard> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       color: Theme.of(context).colorScheme.surfaceContainerHighest,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          IconButton(
-            icon: const Icon(Icons.chevron_left),
-            onPressed: _currentPage > 0 ? () => _goTo(_currentPage - 1) : null,
-          ),
-          Row(
-            mainAxisSize: MainAxisSize.min,
-            children: List.generate(pages.length, (index) {
-              final isActive = index == _currentPage;
-              return AnimatedContainer(
-                duration: const Duration(milliseconds: 300),
-                margin: const EdgeInsets.symmetric(horizontal: 4),
-                width: isActive ? 12 : 8,
-                height: isActive ? 12 : 8,
-                decoration: BoxDecoration(
-                  color:
-                      isActive
-                          ? Theme.of(context).colorScheme.primary
-                          : Theme.of(
-                            context,
-                          ).colorScheme.onSurface.withAlpha(100),
-                  shape: BoxShape.circle,
-                ),
-              );
-            }),
-          ),
-          IconButton(
-            icon: const Icon(Icons.chevron_right),
-            onPressed:
-                _currentPage < pages.length - 1
-                    ? () => _goTo(_currentPage + 1)
-                    : null,
-          ),
-        ],
+      child: SafeArea(
+        top: false,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            IconButton(
+              icon: const Icon(Icons.chevron_left),
+              onPressed:
+                  _currentPage > 0 ? () => _goTo(_currentPage - 1) : null,
+            ),
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: List.generate(pages.length, (index) {
+                final isActive = index == _currentPage;
+                return AnimatedContainer(
+                  duration: const Duration(milliseconds: 300),
+                  margin: const EdgeInsets.symmetric(horizontal: 4),
+                  width: isActive ? 12 : 8,
+                  height: isActive ? 12 : 8,
+                  decoration: BoxDecoration(
+                    color:
+                        isActive
+                            ? Theme.of(context).colorScheme.primary
+                            : Theme.of(
+                              context,
+                            ).colorScheme.onSurface.withAlpha(100),
+                    shape: BoxShape.circle,
+                  ),
+                );
+              }),
+            ),
+            IconButton(
+              icon: const Icon(Icons.chevron_right),
+              onPressed:
+                  _currentPage < pages.length - 1
+                      ? () => _goTo(_currentPage + 1)
+                      : null,
+            ),
+          ],
+        ),
       ),
     );
   }
