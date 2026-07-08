@@ -8,6 +8,7 @@ class StaticBoardState {
   final Player currentPlayer;
   final int? activeSubBoardIndex;
   final Move? lastMove;
+  final Player? overallWinner;
 
   StaticBoardState({
     required this.subBoards,
@@ -15,6 +16,7 @@ class StaticBoardState {
     required this.currentPlayer,
     required this.activeSubBoardIndex,
     required this.lastMove,
+    this.overallWinner,
   });
 }
 
@@ -24,6 +26,7 @@ StaticBoardState buildStaticBoardState(List<Move> moves) {
   int? activeSubBoardIndex;
   Player currentPlayer = Player.one;
   Move? lastMove;
+  Player? overallWinner;
 
   for (final move in moves) {
     subBoards[move.boardIndex][move.cellIndex] = move.player;
@@ -35,6 +38,13 @@ StaticBoardState buildStaticBoardState(List<Move> moves) {
           pattern.every((i) => subBoards[move.boardIndex][i] == move.player),
     )) {
       subBoardWinners[move.boardIndex] = move.player;
+
+      // Check if overall game is won
+      if (winPatterns.any(
+        (pattern) => pattern.every((i) => subBoardWinners[i] == move.player),
+      )) {
+        overallWinner = move.player;
+      }
     }
 
     activeSubBoardIndex = move.cellIndex;
@@ -53,5 +63,6 @@ StaticBoardState buildStaticBoardState(List<Move> moves) {
     currentPlayer: currentPlayer,
     activeSubBoardIndex: activeSubBoardIndex,
     lastMove: lastMove,
+    overallWinner: overallWinner,
   );
 }

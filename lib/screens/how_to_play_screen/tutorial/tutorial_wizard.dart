@@ -73,12 +73,12 @@ class _TutorialWizardState extends State<TutorialWizard> {
             itemBuilder: (ctx, index) {
               final page = pages[index];
               final boardState = buildStaticBoardState(page.moves);
-              final gameFinished = _currentPage == pages.length - 1;
+              final gameFinished = boardState.overallWinner != null;
 
               Widget playerStatusIndicator =
                   gameFinished
                       ? WinnerIndicator(
-                        overallWinner: Player.two,
+                        overallWinner: boardState.overallWinner!,
                         player1: player1,
                         player2: player2,
                         playingAgainstBot: false,
@@ -105,8 +105,7 @@ class _TutorialWizardState extends State<TutorialWizard> {
                                 moveHistory: page.moves,
                                 player1: player1,
                                 player2: player2,
-                                gameFinished:
-                                    (_currentPage == pages.length - 1),
+                                gameFinished: gameFinished,
                               ),
                             ),
                             const SizedBox(height: 16),
@@ -154,8 +153,7 @@ class _TutorialWizardState extends State<TutorialWizard> {
                                     moveHistory: page.moves,
                                     player1: player1,
                                     player2: player2,
-                                    gameFinished:
-                                        (_currentPage == pages.length - 1),
+                                    gameFinished: gameFinished,
                                   ),
                                 ),
                                 SizedBox(
