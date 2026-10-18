@@ -91,14 +91,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
               },
               child: Column(
                 children: [
-                  RadioListTile<bool>(
-                    title: const Text('On'),
-                    value: true,
-                  ),
-                  RadioListTile<bool>(
-                    title: const Text('Off'),
-                    value: false,
-                  ),
+                  RadioListTile<bool>(title: const Text('On'), value: true),
+                  RadioListTile<bool>(title: const Text('Off'), value: false),
                 ],
               ),
             ),
@@ -120,10 +114,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   },
                   child: Column(
                     children: [
-                      RadioListTile<bool>(
-                        title: const Text('On'),
-                        value: true,
-                      ),
+                      RadioListTile<bool>(title: const Text('On'), value: true),
                       RadioListTile<bool>(
                         title: const Text('Off'),
                         value: false,

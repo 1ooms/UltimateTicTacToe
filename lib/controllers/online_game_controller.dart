@@ -109,10 +109,7 @@ class OnlineGameController {
       gameData.currentPlayer = move.player;
       gameData.activeSubBoardIndex = move.activeBoardIndex;
 
-      await lobbyController.updateGameData(
-        currentLobbyCode!,
-        gameData,
-      );
+      await lobbyController.updateGameData(currentLobbyCode!, gameData);
     }
   }
 

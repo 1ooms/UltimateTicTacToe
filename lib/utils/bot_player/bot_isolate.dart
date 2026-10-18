@@ -17,8 +17,11 @@ void _botIsolateEntryPoint(SendPort sendPort) {
 
   isolateReceivePort.listen((message) async {
     if (message is BotIsolateMessage) {
-      final moveParameters = MoveParameters.fromJson(message.moveParametersJson);
-      if (botPlayer == null || botPlayer!.difficulty != moveParameters.difficulty) {
+      final moveParameters = MoveParameters.fromJson(
+        message.moveParametersJson,
+      );
+      if (botPlayer == null ||
+          botPlayer!.difficulty != moveParameters.difficulty) {
         botPlayer = BotPlayer(difficulty: moveParameters.difficulty);
       }
 

@@ -146,10 +146,11 @@ class GameController extends ChangeNotifier {
   }
 
   void undoMove() {
-    if (
-      moveHistory.isEmpty || // no moves to undo
-      (localPlayer != null && currentPlayer != localPlayer && !gameFinished) // not local player's turn (except when game finished)
-    ) {
+    if (moveHistory.isEmpty || // no moves to undo
+        (localPlayer != null &&
+            currentPlayer != localPlayer &&
+            !gameFinished) // not local player's turn (except when game finished)
+        ) {
       return;
     }
 

@@ -145,7 +145,7 @@ class BotPlayer {
           } else if (score == bestScore) {
             bestMoves.add(move);
           }
-          
+
           alpha = max(alpha, bestScore);
         }
 

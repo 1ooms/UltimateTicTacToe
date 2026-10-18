@@ -32,10 +32,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
     WidgetsBinding.instance.addPostFrameCallback((ctx) {
       if (widget.showWelcomeDialog) {
-        showDialog(
-          context: context,
-          builder: (ctx) => WelcomeDialog(),
-        );
+        showDialog(context: context, builder: (ctx) => WelcomeDialog());
       }
     });
   }
