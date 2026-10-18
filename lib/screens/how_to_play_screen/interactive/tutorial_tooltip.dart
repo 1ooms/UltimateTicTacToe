@@ -55,9 +55,7 @@ class TutorialTooltip extends StatelessWidget {
             const SizedBox(height: 12),
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                _buildActionButton(context),
-              ],
+              children: [_buildActionButton(context)],
             ),
           ],
         ),
@@ -66,8 +64,6 @@ class TutorialTooltip extends StatelessWidget {
   }
 
   Widget _buildActionButton(BuildContext context) {
-    final theme = Theme.of(context);
-
     // if (isInteractionLocked) {
     //   final label =
     //       step.phase == TutorialPhase.fastForward
@@ -108,6 +104,6 @@ class TutorialTooltip extends StatelessWidget {
       return FilledButton(onPressed: onNext, child: const Text('Next'));
     }
 
-    return SizedBox();
+    return const SizedBox();
   }
 }

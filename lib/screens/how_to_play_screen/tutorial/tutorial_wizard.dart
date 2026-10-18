@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:ultimate_tic_tac_toe/data/tutorial_pages.dart';
-import 'package:ultimate_tic_tac_toe/models/enum/player.dart';
 import 'package:ultimate_tic_tac_toe/screens/how_to_play_screen/tutorial/static_board.dart';
 import 'package:ultimate_tic_tac_toe/screens/how_to_play_screen/tutorial/static_board_state.dart';
 

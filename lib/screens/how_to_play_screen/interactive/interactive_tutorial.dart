@@ -5,6 +5,8 @@ import 'package:ultimate_tic_tac_toe/models/tutorial_step.dart';
 import 'package:ultimate_tic_tac_toe/screens/game_screen/game_info/current_player_indicator.dart';
 import 'package:ultimate_tic_tac_toe/screens/game_screen/game_info/winner_indicator.dart';
 import 'package:ultimate_tic_tac_toe/screens/how_to_play_screen/interactive/exit_tutorial_dialog.dart';
+import 'package:ultimate_tic_tac_toe/screens/how_to_play_screen/interactive/interactive_tutorial_landscape_layout.dart';
+import 'package:ultimate_tic_tac_toe/screens/how_to_play_screen/interactive/interactive_tutorial_portrait_layout.dart';
 import 'package:ultimate_tic_tac_toe/screens/how_to_play_screen/interactive/spotlight_overlay.dart';
 import 'package:ultimate_tic_tac_toe/screens/how_to_play_screen/interactive/tutorial_board_wrapper.dart';
 import 'package:ultimate_tic_tac_toe/screens/how_to_play_screen/interactive/tutorial_game_controller.dart';
@@ -51,6 +53,12 @@ class _InteractiveTutorialState extends State<InteractiveTutorial>
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _updateSpotlight();
     });
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _updateSpotlight();
   }
 
   @override
@@ -196,22 +204,50 @@ class _InteractiveTutorialState extends State<InteractiveTutorial>
 
   @override
   Widget build(BuildContext context) {
-    final playerStatusIndicator =
-        _controller.isFinished
-            ? WinnerIndicator(
-              overallWinner: Player.one,
-              player1: _controller.player1,
-              player2: _controller.player2,
-              playingAgainstBot: false,
+    final boardWidget = TutorialBoardWrapper(
+      key: _boardKey,
+      gameController: _controller.game,
+      player1: _controller.player1,
+      player2: _controller.player2,
+      subBoardKeys: _subBoardKeys,
+      cellKeys: _cellKeys,
+      onCellTap: _onCellTap,
+    );
+
+    final scrimWidget = GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTapDown: _onScrimTap,
+      child: AnimatedBuilder(
+        animation: Listenable.merge([_spotlightController, _pulseController]),
+        builder: (context, _) {
+          return SpotlightOverlay(
+            targetRect: _currentInterpolatedRect,
+            pulseValue: _pulseController.value,
+          );
+        },
+      ),
+    );
+
+    final tooltipWidget = TutorialTooltip(
+      step: _controller.currentStep,
+      stepIndex: _controller.currentStepIndex,
+      totalSteps: _controller.totalSteps,
+      isInteractionLocked: _controller.isInteractionLocked,
+      onNext: _controller.advance,
+      onFinish: () => Navigator.of(context).pop(),
+    );
+
+    final skipButton =
+        !_controller.isFinished
+            ? TextButton(
+              onPressed: _handleExit,
+              style: TextButton.styleFrom(foregroundColor: Colors.white),
+              child: const Text('Skip tutorial'),
             )
-            : CurrentPlayerIndicator(
-              currentPlayer: _controller.game.currentPlayer,
-              player1: _controller.player1,
-              player2: _controller.player2,
-              playingAgainstBot: false,
-              playingOnline: false,
-              isHost: false,
-            );
+            : null;
+
+    final isLandscape =
+        MediaQuery.of(context).orientation == Orientation.landscape;
 
     return PopScope(
       canPop: false,
@@ -228,113 +264,22 @@ class _InteractiveTutorialState extends State<InteractiveTutorial>
             onPressed: _handleExit,
           ),
         ),
-        body: Stack(
+        body: SizedBox.expand(
           key: _stackKey,
-          children: [
-            // Layer 1: Content with fixed-position board at top
-            SafeArea(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16.0,
-                  vertical: 8.0,
-                ),
-                child: Column(
-                  children: [
-                    playerStatusIndicator,
-                    const SizedBox(height: 12),
-                    // Pinned board: vertical position is fixed and independent of tooltip size
-                    TutorialBoardWrapper(
-                      key: _boardKey,
-                      gameController: _controller.game,
-                      player1: _controller.player1,
-                      player2: _controller.player2,
-                      subBoardKeys: _subBoardKeys,
-                      cellKeys: _cellKeys,
-                      onCellTap: _onCellTap,
-                    ),
-                  ],
-                ),
-              ),
-            ),
-
-            // Layer 2: Full-page dark scrim with clear cutout over target area
-            Positioned.fill(
-              child: GestureDetector(
-                behavior: HitTestBehavior.opaque,
-                onTapDown: _onScrimTap,
-                child: AnimatedBuilder(
-                  animation: Listenable.merge([
-                    _spotlightController,
-                    _pulseController,
-                  ]),
-                  builder: (context, _) {
-                    return SpotlightOverlay(
-                      targetRect: _currentInterpolatedRect,
-                      pulseValue: _pulseController.value,
-                    );
-                  },
-                ),
-              ),
-            ),
-
-            // Layer 3: Tooltip and Skip Button rendered above scrim
-            SafeArea(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16.0,
-                  vertical: 8.0,
-                ),
-                child: Column(
-                  children: [
-                    // Invisible placeholders matching Layer 1 exactly so lower controls align
-                    Visibility(
-                      visible: false,
-                      maintainSize: true,
-                      maintainAnimation: true,
-                      maintainState: true,
-                      child: playerStatusIndicator,
-                    ),
-                    const SizedBox(height: 12),
-                    const Visibility(
-                      visible: false,
-                      maintainSize: true,
-                      maintainAnimation: true,
-                      maintainState: true,
-                      child: AspectRatio(aspectRatio: 1, child: SizedBox()),
-                    ),
-                    const SizedBox(height: 12),
-
-                    // Active tooltip and action controls
-                    Expanded(
-                      child: Center(
-                        child: SingleChildScrollView(
-                          child: TutorialTooltip(
-                            step: _controller.currentStep,
-                            stepIndex: _controller.currentStepIndex,
-                            totalSteps: _controller.totalSteps,
-                            isInteractionLocked:
-                                _controller.isInteractionLocked,
-                            onNext: _controller.advance,
-                            onFinish: () => Navigator.of(context).pop(),
-                          ),
-                        ),
-                      ),
-                    ),
-                    if (!_controller.isFinished)
-                      TextButton(
-                        onPressed: _handleExit,
-                        style: TextButton.styleFrom(
-                          foregroundColor: Colors.white,
-                        ),
-                        child: const Text('Skip tutorial'),
-                      )
-                    else
-                      const SizedBox(height: 48),
-                  ],
-                ),
-              ),
-            ),
-          ],
+          child:
+              isLandscape
+                  ? InteractiveTutorialLandscapeLayout(
+                    boardWidget: boardWidget,
+                    scrimWidget: scrimWidget,
+                    tooltipWidget: tooltipWidget,
+                    skipButton: skipButton,
+                  )
+                  : InteractiveTutorialPortraitLayout(
+                    boardWidget: boardWidget,
+                    scrimWidget: scrimWidget,
+                    tooltipWidget: tooltipWidget,
+                    skipButton: skipButton,
+                  ),
         ),
       ),
     );

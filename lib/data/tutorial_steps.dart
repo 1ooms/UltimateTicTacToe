@@ -57,8 +57,7 @@ final List<TutorialStep> tutorialSteps = [
 
   const TutorialStep(
     phase: TutorialPhase.userMove,
-    explanation:
-        'Now it’s your turn. Tap highlighted square.',
+    explanation: 'Now it’s your turn. Tap highlighted square.',
     boardIndex: 4,
     cellIndex: 4,
     spotlightKind: SpotlightKind.cell,
@@ -108,7 +107,7 @@ final List<TutorialStep> tutorialSteps = [
     phase: TutorialPhase.fastForward,
     explanation:
         'You’ve got the hang of it!\n\n'
-        'Now let’s fast-forward a few moves to see how to win a small board...',
+        'Now let’s fast-forward a few moves to see how to win a board...',
     spotlightKind: SpotlightKind.none,
     fastForwardMoves: [
       (0, 6),
@@ -125,16 +124,14 @@ final List<TutorialStep> tutorialSteps = [
 
   const TutorialStep(
     phase: TutorialPhase.activeBoard,
-    explanation:
-        'You already hold a couple squares in the center board. ',
+    explanation: 'You already hold a couple squares in the center board. ',
     boardIndex: 4,
     spotlightKind: SpotlightKind.subBoard,
   ),
 
   const TutorialStep(
     phase: TutorialPhase.userMove,
-    explanation:
-        'Tap bottom-right to complete three in a row!',
+    explanation: 'Tap bottom-right to complete three in a row!',
     boardIndex: 4,
     cellIndex: 8,
     spotlightKind: SpotlightKind.cell,
@@ -144,7 +141,7 @@ final List<TutorialStep> tutorialSteps = [
     phase: TutorialPhase.subBoardWon,
     explanation:
         'Three in a row! You won the center board!\n\n'
-        'Winning a small board claims that entire square on the big board.',
+        'Winning a board claims that square on the big board.',
     boardIndex: 4,
     spotlightKind: SpotlightKind.subBoard,
   ),
@@ -207,8 +204,7 @@ final List<TutorialStep> tutorialSteps = [
 
   const TutorialStep(
     phase: TutorialPhase.subBoardWon,
-    explanation:
-        'You won the bottom-left board!',
+    explanation: 'You won the bottom-left board!',
     boardIndex: 6,
     spotlightKind: SpotlightKind.subBoard,
   ),

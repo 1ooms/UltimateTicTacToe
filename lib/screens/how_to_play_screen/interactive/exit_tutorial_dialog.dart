@@ -7,7 +7,9 @@ class ExitTutorialDialog extends StatelessWidget {
   Widget build(BuildContext context) {
     return AlertDialog(
       title: const Text('Exit tutorial?'),
-      content: const Text('Your progress in the tutorial will not be saved. You can play the tutorial again via the menu.'),
+      content: const Text(
+        'Your progress in the tutorial will not be saved. You can play the tutorial again via the menu.',
+      ),
       actions: [
         TextButton(
           onPressed: () => Navigator.of(context).pop(true),
