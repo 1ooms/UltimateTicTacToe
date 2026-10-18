@@ -6,7 +6,7 @@ class BannerAdWidget extends StatefulWidget {
   const BannerAdWidget({super.key, this.adSize = AdSize.banner});
 
   final AdSize adSize;
-  final adUnitId = 'ca-app-pub-3940256099942544/6300978111';
+  final adUnitId = 'ca-app-pub-2203878385400561/2767919472';
 
   @override
   State<BannerAdWidget> createState() => _BannerAdWidgetState();
