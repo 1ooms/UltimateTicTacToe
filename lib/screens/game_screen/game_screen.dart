@@ -78,16 +78,23 @@ class _GameScreenState extends State<GameScreen> {
   }
 
   Future<void> _initializeOnlineGame() async {
-    onlineGameController = OnlineGameController();
-    bool connected = await onlineGameController!.initialize();
-    if (!connected) {
+    try {
+      onlineGameController = OnlineGameController();
+      bool connected = await onlineGameController!.initialize();
+      if (!connected) {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Failed to connect to the server.")),
+        );
+        return;
+      }
+      _showOnlineSetupDialog();
+    } catch (_) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Failed to connect to the server.")),
       );
-      return;
     }
-    _showOnlineSetupDialog();
   }
 
   Future<void> _showGameSetupDialog() async {

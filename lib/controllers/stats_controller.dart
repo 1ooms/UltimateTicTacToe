@@ -23,6 +23,22 @@ class StatsController extends ChangeNotifier {
   StatsController._internal({PlayGamesService? playGamesService})
       : _playGamesService = playGamesService ?? PlayGamesService();
 
+  @visibleForTesting
+  StatsController.forTesting({
+    PlayGamesService? playGamesService,
+    GameStats initialStats = const GameStats(),
+  }) : _playGamesService = playGamesService ?? PlayGamesService(),
+       _stats = initialStats,
+       _initialized = true;
+
+  @visibleForTesting
+  void resetForTesting({GameStats stats = const GameStats()}) {
+    _stats = stats;
+    _initialized = false;
+    _syncStatus = CloudSyncStatus.idle;
+    _accountName = null;
+  }
+
   final PlayGamesService _playGamesService;
 
   GameStats _stats = const GameStats();
