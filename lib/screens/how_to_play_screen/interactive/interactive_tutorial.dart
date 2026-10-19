@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:ultimate_tic_tac_toe/data/tutorial_steps.dart';
-import 'package:ultimate_tic_tac_toe/models/enum/player.dart';
 import 'package:ultimate_tic_tac_toe/models/tutorial_step.dart';
-import 'package:ultimate_tic_tac_toe/screens/game_screen/game_info/current_player_indicator.dart';
-import 'package:ultimate_tic_tac_toe/screens/game_screen/game_info/winner_indicator.dart';
 import 'package:ultimate_tic_tac_toe/screens/how_to_play_screen/interactive/exit_tutorial_dialog.dart';
 import 'package:ultimate_tic_tac_toe/screens/how_to_play_screen/interactive/interactive_tutorial_landscape_layout.dart';
 import 'package:ultimate_tic_tac_toe/screens/how_to_play_screen/interactive/interactive_tutorial_portrait_layout.dart';

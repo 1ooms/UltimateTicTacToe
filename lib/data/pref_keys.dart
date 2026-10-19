@@ -9,4 +9,5 @@ class PrefKeys {
   static const String botDifficulty = 'botDifficulty';
   static const String adSetting = 'adSetting';
   static const String soundSetting = 'soundSetting';
+  static const String gameStats = 'gameStats';
 }

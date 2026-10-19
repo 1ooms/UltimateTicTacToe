@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../how_to_play_screen/how_to_play_screen.dart';
 import '../settings_screen/settings_screen.dart';
+import '../statistics_screen/statistics_screen.dart';
 
 class AppDrawer extends StatelessWidget {
   const AppDrawer({
@@ -37,6 +38,19 @@ class AppDrawer extends StatelessWidget {
             title: Text('Play'),
             onTap: () {
               Navigator.pop(context);
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.bar_chart),
+            title: const Text('Statistics'),
+            onTap: () {
+              Navigator.pop(context);
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (ctx) => const StatisticsScreen(),
+                ),
+              );
             },
           ),
           ListTile(

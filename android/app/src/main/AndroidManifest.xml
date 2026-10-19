@@ -33,6 +33,9 @@
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
             android:value="ca-app-pub-2203878385400561~9868514447"/>
+        <meta-data
+            android:name="com.google.android.gms.games.APP_ID"
+            android:value="@string/game_services_project_id" />
     </application>
     <uses-permission android:name="android.permission.INTERNET"/>
     <!-- Required to query activities that can process text, see:

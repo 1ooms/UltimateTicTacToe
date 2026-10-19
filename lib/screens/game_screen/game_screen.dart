@@ -19,6 +19,7 @@ import '../../models/game_setup.dart';
 import '../../models/player_config.dart';
 import '../../controllers/bot_game_controller.dart';
 import '../../controllers/online_game_controller.dart';
+import '../../controllers/stats_controller.dart';
 import '../../widgets/ads/banner_ad_widget.dart';
 import 'end_dialogs/leave_game_dialog.dart';
 import 'game_info/bot_thinking_indicator.dart';
@@ -45,6 +46,7 @@ class _GameScreenState extends State<GameScreen> {
   final ConfettiController _confettiController = ConfettiController();
   bool gameStarted = false;
   bool _isEndDialogOpen = false;
+  bool _hasRecordedStats = false;
 
   // online game args
   OnlineGameController? onlineGameController;
@@ -168,6 +170,7 @@ class _GameScreenState extends State<GameScreen> {
   }
 
   void _initializeOrResetGameController(GameSetup setup) {
+    _hasRecordedStats = false;
     _setLocalPlayer();
     if (_gameController == null) {
       _gameController = GameController(
@@ -196,7 +199,32 @@ class _GameScreenState extends State<GameScreen> {
     }
   }
 
+  void _recordGameStats({Player? winner, bool isDraw = false}) {
+    if (_hasRecordedStats) return;
+    _hasRecordedStats = true;
+
+    final statsController = StatsController();
+    switch (widget.gameMode) {
+      case GameMode.local:
+        statsController.recordLocalGamePlayed();
+        break;
+      case GameMode.online:
+        statsController.recordOnlineGamePlayed();
+        break;
+      case GameMode.bot:
+        final difficulty = gameSetup.botDifficulty;
+        final bool userWon = !isDraw && winner == Player.one;
+        statsController.recordBotGamePlayed(
+          won: userWon,
+          difficulty: difficulty!,
+        );
+        break;
+    }
+  }
+
   void _showWinDialog(Player winner) {
+    _recordGameStats(winner: winner);
+
     Color winnerColor =
         winner == Player.one
             ? gameSetup.player1.color
@@ -246,6 +274,8 @@ class _GameScreenState extends State<GameScreen> {
   }
 
   void _showDrawDialog() {
+    _recordGameStats(isDraw: true);
+
     _isEndDialogOpen = true;
     showDialog(
       context: context,
