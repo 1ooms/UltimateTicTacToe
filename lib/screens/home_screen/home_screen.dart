@@ -39,21 +39,23 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final textTheme = Theme.of(context).textTheme;
     final isLandscape =
         MediaQuery.of(context).orientation == Orientation.landscape;
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
 
     Widget buildGameModeCards() {
       final double cardWidth = 220.0;
 
-      return ListView(
+      final cardsList = ListView(
+        shrinkWrap: true,
         scrollDirection: isLandscape ? Axis.horizontal : Axis.vertical,
         children: [
           SizedBox(
             width: isLandscape ? cardWidth : null,
             child: GameModeCard(
-              title: 'Local',
+              title: isLandscape ? 'Local\ngame' : 'Local game',
               icon: Icons.group,
+              gradient: CardGradients.local(isDarkMode),
               onTap: () {
                 Navigator.push(
                   context,
@@ -67,8 +69,9 @@ class _HomeScreenState extends State<HomeScreen> {
           SizedBox(
             width: isLandscape ? cardWidth : null,
             child: GameModeCard(
-              title: 'Online',
+              title: isLandscape ? 'Online\ngame' : 'Online game',
               icon: Icons.public,
+              gradient: CardGradients.online(isDarkMode),
               onTap: () {
                 Navigator.push(
                   context,
@@ -91,8 +94,9 @@ class _HomeScreenState extends State<HomeScreen> {
           SizedBox(
             width: isLandscape ? cardWidth : null,
             child: GameModeCard(
-              title: 'Bot',
+              title: isLandscape ? 'Bot\ngame' : 'Bot game',
               icon: Icons.smart_toy,
+              gradient: CardGradients.bot(isDarkMode),
               onTap: () {
                 Navigator.push(
                   context,
@@ -105,52 +109,18 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ],
       );
-    }
 
-    Widget buildBodyContent() {
       if (isLandscape) {
-        return Row(
-          children: [
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.all(24.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text('New Game', style: textTheme.headlineMedium),
-                    const SizedBox(height: 16),
-                    Expanded(child: buildGameModeCards()),
-                  ],
-                ),
-              ),
-            ),
-          ],
-        );
-      } else {
-        return Column(
-          children: [
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.all(24.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text('New Game', style: textTheme.headlineMedium),
-                    const SizedBox(height: 16),
-                    Expanded(child: buildGameModeCards()),
-                  ],
-                ),
-              ),
-            ),
-          ],
-        );
+        return Center(child: cardsList);
       }
+      return cardsList;
     }
 
     return Scaffold(
       key: _scaffoldKey,
       appBar: AppBar(
         title: const Text('Ultimate Tic Tac Toe'),
+        centerTitle: true,
         leading: IconButton(
           icon: const Icon(Icons.menu),
           onPressed: () {
@@ -162,7 +132,12 @@ class _HomeScreenState extends State<HomeScreen> {
         onChangeThemeMode: widget.onChangeThemeMode,
         themeMode: widget.themeMode,
       ),
-      body: SafeArea(child: buildBodyContent()),
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(24.0),
+          child: Column(children: [Expanded(child: buildGameModeCards())]),
+        ),
+      ),
       bottomNavigationBar: BannerAdWidget(),
     );
   }
