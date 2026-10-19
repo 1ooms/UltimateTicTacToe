@@ -10,4 +10,6 @@ class PrefKeys {
   static const String adSetting = 'adSetting';
   static const String soundSetting = 'soundSetting';
   static const String gameStats = 'gameStats';
+  static const String savedGameLocal = 'savedGameLocal';
+  static const String savedGameBot = 'savedGameBot';
 }

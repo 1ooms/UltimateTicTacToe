@@ -4,8 +4,10 @@ import 'package:ultimate_tic_tac_toe/screens/home_screen/app_drawer.dart';
 import 'package:ultimate_tic_tac_toe/screens/home_screen/game_mode_card.dart';
 import 'package:ultimate_tic_tac_toe/screens/home_screen/welcome_dialog.dart';
 
+import '../../services/game_save_service.dart';
 import '../../widgets/ads/banner_ad_widget.dart';
 import '../game_screen/game_screen.dart';
+import 'continue_game_dialog.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({
@@ -13,11 +15,13 @@ class HomeScreen extends StatefulWidget {
     required this.onChangeThemeMode,
     required this.themeMode,
     required this.showWelcomeDialog,
+    this.gameSaveService,
   });
 
   final Function(ThemeMode) onChangeThemeMode;
   final ThemeMode themeMode;
   final bool showWelcomeDialog;
+  final GameSaveService? gameSaveService;
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -35,6 +39,55 @@ class _HomeScreenState extends State<HomeScreen> {
         showDialog(context: context, builder: (ctx) => WelcomeDialog());
       }
     });
+  }
+
+  Future<void> _handleGameModeTap(GameMode mode) async {
+    if (mode == GameMode.online) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (ctx) => const GameScreen(gameMode: GameMode.online),
+        ),
+      );
+      return;
+    }
+
+    final saveService = widget.gameSaveService ?? const GameSaveService();
+    final savedGame = await saveService.getSavedGame(mode);
+
+    if (!mounted) return;
+
+    if (savedGame == null) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (ctx) => GameScreen(gameMode: mode)),
+      );
+      return;
+    }
+
+    final action = await showDialog<ContinueGameAction>(
+      context: context,
+      builder: (ctx) => ContinueGameDialog(gameMode: mode),
+    );
+
+    if (!mounted) return;
+
+    if (action == ContinueGameAction.continueGame) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder:
+              (ctx) => GameScreen(gameMode: mode, initialSavedGame: savedGame),
+        ),
+      );
+    } else if (action == ContinueGameAction.newGame) {
+      await saveService.clearSavedGame(mode);
+      if (!mounted) return;
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (ctx) => GameScreen(gameMode: mode)),
+      );
+    }
   }
 
   @override
@@ -56,14 +109,7 @@ class _HomeScreenState extends State<HomeScreen> {
               title: isLandscape ? 'Local\ngame' : 'Local game',
               icon: Icons.group,
               gradient: CardGradients.local(isDarkMode),
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (ctx) => GameScreen(gameMode: GameMode.local),
-                  ),
-                );
-              },
+              onTap: () => _handleGameModeTap(GameMode.local),
             ),
           ),
           SizedBox(
@@ -72,23 +118,7 @@ class _HomeScreenState extends State<HomeScreen> {
               title: isLandscape ? 'Online\ngame' : 'Online game',
               icon: Icons.public,
               gradient: CardGradients.online(isDarkMode),
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (ctx) => GameScreen(gameMode: GameMode.online),
-                  ),
-                );
-                // showCustomSnackBar(
-                //   context,
-                //   Text(
-                //     'Coming soon!',
-                //     style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                //       color: Theme.of(context).colorScheme.onInverseSurface,
-                //     ),
-                //   ),
-                // );
-              },
+              onTap: () => _handleGameModeTap(GameMode.online),
             ),
           ),
           SizedBox(
@@ -97,14 +127,7 @@ class _HomeScreenState extends State<HomeScreen> {
               title: isLandscape ? 'Bot\ngame' : 'Bot game',
               icon: Icons.smart_toy,
               gradient: CardGradients.bot(isDarkMode),
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (ctx) => GameScreen(gameMode: GameMode.bot),
-                  ),
-                );
-              },
+              onTap: () => _handleGameModeTap(GameMode.bot),
             ),
           ),
         ],

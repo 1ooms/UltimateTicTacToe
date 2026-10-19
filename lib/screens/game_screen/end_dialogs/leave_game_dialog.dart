@@ -13,7 +13,9 @@ class LeaveGameDialog extends StatelessWidget {
       content:
           gameMode == GameMode.online
               ? const Text("Leave the game? Online session will end.")
-              : const Text("Leave the game? Progress will not be saved."),
+              : const Text(
+                "Leave the game? Your progress will be saved so you can continue later.",
+              ),
       actions: [
         TextButton(
           onPressed: () => Navigator.of(context).pop(true),

@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:ultimate_tic_tac_toe/data/win_patterns.dart';
 import 'package:ultimate_tic_tac_toe/models/enum/game_mode.dart';
 import 'package:ultimate_tic_tac_toe/models/enum/player.dart';
+import 'package:ultimate_tic_tac_toe/models/game_data.dart';
 import 'package:ultimate_tic_tac_toe/models/game_setup.dart';
 import 'package:ultimate_tic_tac_toe/models/move.dart';
 import 'package:ultimate_tic_tac_toe/controllers/audio_controller.dart';
@@ -35,6 +36,36 @@ class GameController extends ChangeNotifier {
     this.onGameStateChanged,
   }) {
     _initializeGame();
+  }
+
+  GameController.restore({
+    required this.gameMode,
+    required this.gameSetup,
+    required GameData savedData,
+    this.localPlayer,
+    this.onWin,
+    this.onDraw,
+    this.onGameStateChanged,
+  }) {
+    subBoards = savedData.subBoards.map((b) => List<Player?>.from(b)).toList();
+    subBoardWinners = List<Player?>.from(savedData.subBoardWinners);
+    moveHistory = List<Move>.from(savedData.moveHistory);
+    currentPlayer = savedData.currentPlayer;
+    activeSubBoardIndex = savedData.activeSubBoardIndex;
+    gameFinished = savedData.gameFinished;
+    overallWinner = savedData.overallWinner;
+  }
+
+  GameData toGameData() {
+    return GameData(
+      currentPlayer: currentPlayer,
+      activeSubBoardIndex: activeSubBoardIndex,
+      subBoardWinners: List<Player?>.from(subBoardWinners),
+      subBoards: subBoards.map((b) => List<Player?>.from(b)).toList(),
+      moveHistory: List<Move>.from(moveHistory),
+      gameFinished: gameFinished,
+      overallWinner: overallWinner,
+    );
   }
 
   void _initializeGame() {
