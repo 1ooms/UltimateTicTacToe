@@ -3,7 +3,7 @@ import '../../controllers/stats_controller.dart';
 import '../../extensions/string_extension.dart';
 import '../../models/enum/bot_difficulty.dart';
 import '../../models/game_stats.dart';
-import '../home_screen/game_mode_card.dart';
+import '../../utils/game_mode_gradients.dart';
 
 class StatisticsScreen extends StatelessWidget {
   const StatisticsScreen({super.key});

@@ -13,6 +13,7 @@ import 'package:ultimate_tic_tac_toe/screens/game_screen/game_info/play_again_bu
 import 'package:ultimate_tic_tac_toe/screens/game_screen/game_info/winner_indicator.dart';
 import 'package:ultimate_tic_tac_toe/controllers/game_controller.dart';
 import 'package:ultimate_tic_tac_toe/utils/ui_helpers.dart';
+import 'package:ultimate_tic_tac_toe/utils/game_mode_gradients.dart';
 
 import '../../models/enum/player.dart';
 import '../../models/game_setup.dart';
@@ -418,6 +419,8 @@ class _GameScreenState extends State<GameScreen> {
     final isLandscape =
         MediaQuery.of(context).orientation == Orientation.landscape;
 
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
     return PopScope(
       canPop: false,
       onPopInvokedWithResult: (didPop, result) async {
@@ -438,9 +441,21 @@ class _GameScreenState extends State<GameScreen> {
       },
       child: Scaffold(
         appBar: AppBar(
+          flexibleSpace: Container(
+            decoration: BoxDecoration(
+              gradient: GameModeGradients.forMode(
+                widget.gameMode,
+                isDarkMode,
+              ),
+            ),
+          ),
+          foregroundColor: Colors.white,
           title: Text(
             '${widget.gameMode.name.capitalize()} Game',
-            style: Theme.of(context).textTheme.titleLarge,
+            style: Theme.of(context).textTheme.titleLarge?.copyWith(
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
+            ),
           ),
           actions: [
             if (widget.gameMode != GameMode.online)
