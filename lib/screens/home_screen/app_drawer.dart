@@ -18,20 +18,24 @@ class AppDrawer extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-    final textTheme = theme.textTheme;
+    final isDarkMode = theme.brightness == Brightness.dark;
+
+    AssetImage image;
+    if (isDarkMode) {
+      image = AssetImage('assets/icon/icon_dark.png');
+    } else {
+      image = AssetImage('assets/icon/icon.png');
+    }
 
     return Drawer(
       child: ListView(
         padding: EdgeInsets.zero,
         children: [
           DrawerHeader(
-            decoration: BoxDecoration(color: colorScheme.primary),
-            child: Text(
-              'Ultimate Tic Tac Toe',
-              style: textTheme.titleLarge?.copyWith(
-                color: colorScheme.onPrimary,
-              ),
-            ),
+            decoration: BoxDecoration(
+                image: DecorationImage(image: image, fit: BoxFit.cover, opacity: 0.9, alignment: Alignment.bottomCenter),
+                color: colorScheme.surface),
+            child: SizedBox(),
           ),
           ListTile(
             leading: Icon(Icons.play_circle),
