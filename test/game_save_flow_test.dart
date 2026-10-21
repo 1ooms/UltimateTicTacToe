@@ -106,7 +106,7 @@ void main() {
       expect(find.byType(ContinueGameDialog), findsOneWidget);
 
       // Tap 'Continue'
-      await tester.tap(find.widgetWithText(ElevatedButton, 'Continue'));
+      await tester.tap(find.widgetWithText(FilledButton, 'Continue'));
       await tester.pumpAndSettle();
 
       // Should be in GameScreen with restored board, and NO GameSetupDialog
@@ -139,7 +139,7 @@ void main() {
       expect(find.byType(ContinueGameDialog), findsOneWidget);
 
       // Tap 'New Game'
-      await tester.tap(find.widgetWithText(TextButton, 'New Game'));
+      await tester.tap(find.widgetWithText(ElevatedButton, 'New Game'));
       await tester.pumpAndSettle();
 
       // Saved game should be cleared
