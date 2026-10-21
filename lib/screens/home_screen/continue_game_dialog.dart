@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../../extensions/string_extension.dart';
 import '../../models/enum/game_mode.dart';
 
 enum ContinueGameAction { continueGame, newGame }
@@ -12,8 +11,6 @@ class ContinueGameDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final modeLabel = '${gameMode.name.capitalize()} Game';
-
     return AlertDialog(
       title: const Text('Continue saved game?'),
       content: Row(

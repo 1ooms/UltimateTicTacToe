@@ -271,10 +271,16 @@ class _GameScreenState extends State<GameScreen> {
     final statsController = StatsController();
     switch (widget.gameMode) {
       case GameMode.local:
-        statsController.recordLocalGamePlayed();
+        statsController.recordLocalGamePlayed(winner: winner, isDraw: isDraw);
         break;
       case GameMode.online:
-        statsController.recordOnlineGamePlayed();
+        final bool userWon =
+            isDraw
+                ? false
+                : (winner != null && localPlayer != null
+                    ? winner == localPlayer
+                    : false);
+        statsController.recordOnlineGamePlayed(won: userWon, isDraw: isDraw);
         break;
       case GameMode.bot:
         final difficulty = gameSetup.botDifficulty;
@@ -282,6 +288,7 @@ class _GameScreenState extends State<GameScreen> {
         statsController.recordBotGamePlayed(
           won: userWon,
           difficulty: difficulty!,
+          isDraw: isDraw,
         );
         break;
     }

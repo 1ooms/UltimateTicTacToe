@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../how_to_play_screen/how_to_play_screen.dart';
 import '../settings_screen/settings_screen.dart';
 import '../statistics_screen/statistics_screen.dart';
+import '../../controllers/stats_controller.dart';
 
 class AppDrawer extends StatelessWidget {
   const AppDrawer({
@@ -33,8 +34,14 @@ class AppDrawer extends StatelessWidget {
         children: [
           DrawerHeader(
             decoration: BoxDecoration(
-                image: DecorationImage(image: image, fit: BoxFit.cover, opacity: 0.9, alignment: Alignment.bottomCenter),
-                color: colorScheme.surface),
+              image: DecorationImage(
+                image: image,
+                fit: BoxFit.cover,
+                opacity: 0.9,
+                alignment: Alignment.bottomCenter,
+              ),
+              color: colorScheme.surface,
+            ),
             child: SizedBox(),
           ),
           ListTile(
@@ -51,10 +58,16 @@ class AppDrawer extends StatelessWidget {
               Navigator.pop(context);
               Navigator.push(
                 context,
-                MaterialPageRoute(
-                  builder: (ctx) => const StatisticsScreen(),
-                ),
+                MaterialPageRoute(builder: (ctx) => const StatisticsScreen()),
               );
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.emoji_events_outlined),
+            title: const Text('Achievements'),
+            onTap: () {
+              Navigator.pop(context);
+              StatsController().showAchievements();
             },
           ),
           ListTile(

@@ -2,7 +2,7 @@ import 'dart:developer' as developer;
 import 'package:flutter/foundation.dart';
 import 'package:games_services/games_services.dart';
 
-/// Service interface/wrapper for Google Play Games Saved Games integration.
+/// Service interface/wrapper for Google Play Games integration.
 class PlayGamesService {
   static const String statsSaveSlotName = 'player_stats';
 
@@ -17,7 +17,10 @@ class PlayGamesService {
 
     try {
       final result = await GameAuth.signIn();
-      developer.log('Play Games sign in result: $result', name: 'PlayGamesService');
+      developer.log(
+        'Play Games sign in result: $result',
+        name: 'PlayGamesService',
+      );
       return await isSignedIn();
     } catch (e, stack) {
       developer.log(
@@ -85,7 +88,10 @@ class PlayGamesService {
         data: data,
         description: description ?? 'Ultimate Tic Tac Toe Player Statistics',
       );
-      developer.log('Saved game "$name" successfully', name: 'PlayGamesService');
+      developer.log(
+        'Saved game "$name" successfully',
+        name: 'PlayGamesService',
+      );
       return true;
     } catch (e, stack) {
       developer.log(
@@ -95,6 +101,125 @@ class PlayGamesService {
         stackTrace: stack,
       );
       return false;
+    }
+  }
+
+  /// Unlocks an achievement in Google Play Games / Game Center.
+  Future<bool> unlockAchievement(String androidId, {String? iOSId}) async {
+    if (!isSupportedPlatform) return false;
+
+    try {
+      final signedIn = await isSignedIn();
+      if (!signedIn) return false;
+
+      await Achievements.unlock(
+        achievement: Achievement(androidID: androidId, iOSID: iOSId ?? ''),
+      );
+      developer.log(
+        'Unlocked achievement "$androidId"',
+        name: 'PlayGamesService',
+      );
+      return true;
+    } catch (e, stack) {
+      developer.log(
+        'Failed to unlock achievement "$androidId"',
+        name: 'PlayGamesService',
+        error: e,
+        stackTrace: stack,
+      );
+      return false;
+    }
+  }
+
+  /// Sets progress for an incremental achievement.
+  Future<bool> setAchievementSteps(
+    String androidId, {
+    required int steps,
+    String? iOSId,
+  }) async {
+    if (!isSupportedPlatform || steps <= 0) return false;
+
+    try {
+      final signedIn = await isSignedIn();
+      if (!signedIn) return false;
+
+      await Achievements.setSteps(
+        achievement: Achievement(
+          androidID: androidId,
+          iOSID: iOSId ?? '',
+          steps: steps,
+        ),
+      );
+      developer.log(
+        'Set achievement "$androidId" steps to $steps',
+        name: 'PlayGamesService',
+      );
+      return true;
+    } catch (e, stack) {
+      developer.log(
+        'Failed to set steps for achievement "$androidId"',
+        name: 'PlayGamesService',
+        error: e,
+        stackTrace: stack,
+      );
+      return false;
+    }
+  }
+
+  /// Increments an achievement by [steps].
+  Future<bool> incrementAchievement(
+    String androidId, {
+    int steps = 1,
+    String? iOSId,
+  }) async {
+    if (!isSupportedPlatform || steps <= 0) return false;
+
+    try {
+      final signedIn = await isSignedIn();
+      if (!signedIn) return false;
+
+      await Achievements.increment(
+        achievement: Achievement(
+          androidID: androidId,
+          iOSID: iOSId ?? '',
+          steps: steps,
+        ),
+      );
+      developer.log(
+        'Incremented achievement "$androidId" by $steps',
+        name: 'PlayGamesService',
+      );
+      return true;
+    } catch (e, stack) {
+      developer.log(
+        'Failed to increment achievement "$androidId"',
+        name: 'PlayGamesService',
+        error: e,
+        stackTrace: stack,
+      );
+      return false;
+    }
+  }
+
+  /// Opens the native achievements UI overlay.
+  Future<void> showAchievements() async {
+    if (!isSupportedPlatform) return;
+
+    try {
+      bool signedIn = await isSignedIn();
+      if (!signedIn) {
+        signedIn = await signIn();
+      }
+      if (signedIn) {
+        await Achievements.showAchievements();
+      }
+    } catch (e, stack) {
+      developer.log(
+        'Failed to show achievements overlay',
+        name: 'PlayGamesService',
+        error: e,
+        stackTrace: stack,
+      );
     }
   }
 }

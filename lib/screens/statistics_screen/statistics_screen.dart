@@ -13,9 +13,7 @@ class StatisticsScreen extends StatelessWidget {
     final statsController = StatsController();
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Statistics'),
-      ),
+      appBar: AppBar(title: const Text('Statistics')),
       body: ListenableBuilder(
         listenable: statsController,
         builder: (context, _) {
@@ -88,9 +86,7 @@ class _LandscapeLayout extends StatelessWidget {
               ),
             ),
             const SizedBox(width: 16),
-            Expanded(
-              child: _BotDifficultySection(stats: stats),
-            ),
+            Expanded(child: _BotDifficultySection(stats: stats)),
           ],
         ),
         const SizedBox(height: 24),
@@ -348,9 +344,8 @@ class _DifficultyTile extends StatelessWidget {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 
-    final winRateText = played > 0
-        ? '${((wins / played) * 100).toStringAsFixed(0)}%'
-        : '0%';
+    final winRateText =
+        played > 0 ? '${((wins / played) * 100).toStringAsFixed(0)}%' : '0%';
 
     return Card(
       margin: const EdgeInsets.symmetric(vertical: 6),
