@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
+import '../../controllers/stats_controller.dart';
 import '../how_to_play_screen/how_to_play_screen.dart';
 import '../settings_screen/settings_screen.dart';
 import '../statistics_screen/statistics_screen.dart';
-import '../../controllers/stats_controller.dart';
 
 class AppDrawer extends StatelessWidget {
   const AppDrawer({
@@ -20,13 +20,14 @@ class AppDrawer extends StatelessWidget {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final isDarkMode = theme.brightness == Brightness.dark;
+    final isLandscape =
+        MediaQuery.of(context).orientation == Orientation.landscape;
 
-    AssetImage image;
-    if (isDarkMode) {
-      image = AssetImage('assets/icon/icon_dark.png');
-    } else {
-      image = AssetImage('assets/icon/icon.png');
-    }
+    final image = AssetImage(
+      isDarkMode ? 'assets/icon/icon_dark.png' : 'assets/icon/icon.png',
+    );
+    final visualDensity =
+        isLandscape ? VisualDensity.compact : VisualDensity.standard;
 
     return Drawer(
       child: ListView(
@@ -42,16 +43,20 @@ class AppDrawer extends StatelessWidget {
               ),
               color: colorScheme.surface,
             ),
-            child: SizedBox(),
+            child: const SizedBox(),
           ),
           ListTile(
-            leading: Icon(Icons.play_circle),
-            title: Text('Play'),
+            dense: isLandscape,
+            visualDensity: visualDensity,
+            leading: const Icon(Icons.play_circle),
+            title: const Text('Play'),
             onTap: () {
               Navigator.pop(context);
             },
           ),
           ListTile(
+            dense: isLandscape,
+            visualDensity: visualDensity,
             leading: const Icon(Icons.bar_chart),
             title: const Text('Statistics'),
             onTap: () {
@@ -63,6 +68,8 @@ class AppDrawer extends StatelessWidget {
             },
           ),
           ListTile(
+            dense: isLandscape,
+            visualDensity: visualDensity,
             leading: const Icon(Icons.emoji_events_outlined),
             title: const Text('Achievements'),
             onTap: () {
@@ -71,8 +78,10 @@ class AppDrawer extends StatelessWidget {
             },
           ),
           ListTile(
-            leading: Icon(Icons.settings),
-            title: Text('Settings'),
+            dense: isLandscape,
+            visualDensity: visualDensity,
+            leading: const Icon(Icons.settings),
+            title: const Text('Settings'),
             onTap: () {
               Navigator.push(
                 context,
@@ -87,25 +96,17 @@ class AppDrawer extends StatelessWidget {
             },
           ),
           ListTile(
-            leading: Icon(Icons.help),
-            title: Text('How to play'),
+            dense: isLandscape,
+            visualDensity: visualDensity,
+            leading: const Icon(Icons.help),
+            title: const Text('How to play'),
             onTap: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (ctx) => HowToPlayScreen()),
+                MaterialPageRoute(builder: (ctx) => const HowToPlayScreen()),
               );
             },
           ),
-          // ListTile(
-          //   leading: Icon(Icons.help),
-          //   title: Text('Test screen'),
-          //   onTap: () {
-          //     Navigator.push(
-          //       context,
-          //       MaterialPageRoute(builder: (ctx) => IntroScreen()),
-          //     );
-          //   },
-          // ),
         ],
       ),
     );
