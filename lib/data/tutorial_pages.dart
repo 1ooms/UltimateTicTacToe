@@ -33,12 +33,12 @@ final List<TutorialPageData> pages = [
   ),
   TutorialPageData(
     explanation:
-    "The squares a player is allowed to play depend on their opponent's last move.\n\nIn this example, the circle player has played the bottom right square within the top left board. The cross player must therefore play their next move on the bottom right board.",
+        "The squares a player is allowed to play depend on their opponent's last move.\n\nIn this example, the circle player has played the bottom right square within the top left board. The cross player must therefore play their next move on the bottom right board.",
     moves: [Move(4, 0, Player.one, null), Move(0, 8, Player.two, null)],
   ),
   TutorialPageData(
     explanation:
-    "The current player's possible moves are indicated with that player's color.\n\nThe opponent's previous move is indicated with a thick border.",
+        "The current player's possible moves are indicated with that player's color.\n\nThe opponent's previous move is indicated with a thick border.",
     moves: [Move(4, 0, Player.one, null), Move(0, 8, Player.two, null)],
   ),
   TutorialPageData(

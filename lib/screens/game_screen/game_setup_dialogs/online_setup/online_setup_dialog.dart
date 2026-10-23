@@ -191,8 +191,7 @@ class _OnlineSetupDialogState extends State<OnlineSetupDialog>
           },
           child: AlertDialog(
             scrollable: true,
-            content:
-              Column(mainAxisSize: MainAxisSize.min, children: content),
+            content: Column(mainAxisSize: MainAxisSize.min, children: content),
             actions: [
               TextButton(
                 onPressed: () {
@@ -200,7 +199,7 @@ class _OnlineSetupDialogState extends State<OnlineSetupDialog>
                 },
                 child: const Text('Go back'),
               ),
-            ]
+            ],
           ),
         ),
       ],

@@ -13,12 +13,16 @@ import 'package:ultimate_tic_tac_toe/screens/game_screen/game_info/play_again_bu
 import 'package:ultimate_tic_tac_toe/screens/game_screen/game_info/winner_indicator.dart';
 import 'package:ultimate_tic_tac_toe/controllers/game_controller.dart';
 import 'package:ultimate_tic_tac_toe/utils/ui_helpers.dart';
+import 'package:ultimate_tic_tac_toe/utils/game_mode_gradients.dart';
 
 import '../../models/enum/player.dart';
 import '../../models/game_setup.dart';
 import '../../models/player_config.dart';
+import '../../models/saved_game.dart';
 import '../../controllers/bot_game_controller.dart';
 import '../../controllers/online_game_controller.dart';
+import '../../controllers/stats_controller.dart';
+import '../../services/game_save_service.dart';
 import '../../widgets/ads/banner_ad_widget.dart';
 import 'end_dialogs/leave_game_dialog.dart';
 import 'game_info/bot_thinking_indicator.dart';
@@ -29,9 +33,16 @@ import 'game_setup_dialogs/game_setup/game_setup_dialog.dart';
 import 'game_setup_dialogs/online_setup/online_setup_dialog.dart';
 
 class GameScreen extends StatefulWidget {
-  const GameScreen({super.key, required this.gameMode});
+  const GameScreen({
+    super.key,
+    required this.gameMode,
+    this.initialSavedGame,
+    this.gameSaveService,
+  });
 
   final GameMode gameMode;
+  final SavedGame? initialSavedGame;
+  final GameSaveService? gameSaveService;
 
   @override
   State<GameScreen> createState() => _GameScreenState();
@@ -39,12 +50,14 @@ class GameScreen extends StatefulWidget {
 
 class _GameScreenState extends State<GameScreen> {
   late GameSetup gameSetup;
+  late final GameSaveService _gameSaveService;
 
   GameController? _gameController;
   BotGameController? botGameController;
   final ConfettiController _confettiController = ConfettiController();
   bool gameStarted = false;
   bool _isEndDialogOpen = false;
+  bool _hasRecordedStats = false;
 
   // online game args
   OnlineGameController? onlineGameController;
@@ -56,9 +69,12 @@ class _GameScreenState extends State<GameScreen> {
   @override
   void initState() {
     super.initState();
+    _gameSaveService = widget.gameSaveService ?? const GameSaveService();
 
     WidgetsBinding.instance.addPostFrameCallback((ctx) {
-      if (widget.gameMode == GameMode.online) {
+      if (widget.initialSavedGame != null) {
+        _restoreSavedGame(widget.initialSavedGame!);
+      } else if (widget.gameMode == GameMode.online) {
         _initializeOnlineGame();
       } else {
         _showGameSetupDialog();
@@ -75,16 +91,23 @@ class _GameScreenState extends State<GameScreen> {
   }
 
   Future<void> _initializeOnlineGame() async {
-    onlineGameController = OnlineGameController();
-    bool connected = await onlineGameController!.initialize();
-    if (!connected) {
+    try {
+      onlineGameController = OnlineGameController();
+      bool connected = await onlineGameController!.initialize();
+      if (!connected) {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Failed to connect to the server.")),
+        );
+        return;
+      }
+      _showOnlineSetupDialog();
+    } catch (_) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Failed to connect to the server.")),
       );
-      return;
     }
-    _showOnlineSetupDialog();
   }
 
   Future<void> _showGameSetupDialog() async {
@@ -111,6 +134,9 @@ class _GameScreenState extends State<GameScreen> {
 
       if (!gameStarted) {
         _initializeOrResetGameController(gameSetup);
+      } else {
+        _gameController?.gameSetup = gameSetup;
+        _saveCurrentGameProgress();
       }
 
       setState(() {
@@ -155,6 +181,50 @@ class _GameScreenState extends State<GameScreen> {
     }
   }
 
+  void _restoreSavedGame(SavedGame savedGame) {
+    setState(() {
+      gameSetup = savedGame.gameSetup;
+      gameStarted = true;
+    });
+
+    _hasRecordedStats = false;
+    _setLocalPlayer();
+    _gameController = GameController.restore(
+      gameMode: widget.gameMode,
+      gameSetup: savedGame.gameSetup,
+      savedData: savedGame.gameData,
+      localPlayer: localPlayer,
+      onWin: _showWinDialog,
+      onDraw: _showDrawDialog,
+      onGameStateChanged: _handleGameStateChanged,
+    );
+
+    if (widget.gameMode == GameMode.bot) {
+      botGameController = BotGameController(gameController: _gameController!);
+    }
+  }
+
+  void _handleGameStateChanged() {
+    if (widget.gameMode == GameMode.online) {
+      onlineGameController?.sendGameData();
+    } else {
+      _saveCurrentGameProgress();
+    }
+  }
+
+  void _saveCurrentGameProgress() {
+    if (widget.gameMode == GameMode.online ||
+        _gameController == null ||
+        _gameController!.gameFinished) {
+      return;
+    }
+    _gameSaveService.saveGame(
+      mode: widget.gameMode,
+      setup: gameSetup,
+      data: _gameController!.toGameData(),
+    );
+  }
+
   void _setLocalPlayer() {
     if (widget.gameMode == GameMode.online) {
       if (isHost != null && isHost!) {
@@ -168,6 +238,7 @@ class _GameScreenState extends State<GameScreen> {
   }
 
   void _initializeOrResetGameController(GameSetup setup) {
+    _hasRecordedStats = false;
     _setLocalPlayer();
     if (_gameController == null) {
       _gameController = GameController(
@@ -176,11 +247,7 @@ class _GameScreenState extends State<GameScreen> {
         localPlayer: localPlayer,
         onWin: _showWinDialog,
         onDraw: _showDrawDialog,
-        onGameStateChanged: () {
-          if (widget.gameMode == GameMode.online) {
-            onlineGameController?.sendGameData();
-          }
-        },
+        onGameStateChanged: _handleGameStateChanged,
       );
       if (widget.gameMode == GameMode.online) {
         onlineGameController?.syncWith(
@@ -194,9 +261,45 @@ class _GameScreenState extends State<GameScreen> {
     } else {
       _gameController!.resetAndStartNewGame(setup);
     }
+    _saveCurrentGameProgress();
+  }
+
+  void _recordGameStats({Player? winner, bool isDraw = false}) {
+    if (_hasRecordedStats) return;
+    _hasRecordedStats = true;
+
+    final statsController = StatsController();
+    switch (widget.gameMode) {
+      case GameMode.local:
+        statsController.recordLocalGamePlayed(winner: winner, isDraw: isDraw);
+        break;
+      case GameMode.online:
+        final bool userWon =
+            isDraw
+                ? false
+                : (winner != null && localPlayer != null
+                    ? winner == localPlayer
+                    : false);
+        statsController.recordOnlineGamePlayed(won: userWon, isDraw: isDraw);
+        break;
+      case GameMode.bot:
+        final difficulty = gameSetup.botDifficulty;
+        final bool userWon = !isDraw && winner == Player.one;
+        statsController.recordBotGamePlayed(
+          won: userWon,
+          difficulty: difficulty!,
+          isDraw: isDraw,
+        );
+        break;
+    }
   }
 
   void _showWinDialog(Player winner) {
+    _recordGameStats(winner: winner);
+    if (widget.gameMode != GameMode.online) {
+      _gameSaveService.clearSavedGame(widget.gameMode);
+    }
+
     Color winnerColor =
         winner == Player.one
             ? gameSetup.player1.color
@@ -246,6 +349,11 @@ class _GameScreenState extends State<GameScreen> {
   }
 
   void _showDrawDialog() {
+    _recordGameStats(isDraw: true);
+    if (widget.gameMode != GameMode.online) {
+      _gameSaveService.clearSavedGame(widget.gameMode);
+    }
+
     _isEndDialogOpen = true;
     showDialog(
       context: context,
@@ -284,6 +392,9 @@ class _GameScreenState extends State<GameScreen> {
   }
 
   void _handlePlayAgain() {
+    if (widget.gameMode != GameMode.online) {
+      _gameSaveService.clearSavedGame(widget.gameMode);
+    }
     setState(() {
       gameStarted = false;
     });
@@ -388,6 +499,8 @@ class _GameScreenState extends State<GameScreen> {
     final isLandscape =
         MediaQuery.of(context).orientation == Orientation.landscape;
 
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
     return PopScope(
       canPop: false,
       onPopInvokedWithResult: (didPop, result) async {
@@ -408,9 +521,18 @@ class _GameScreenState extends State<GameScreen> {
       },
       child: Scaffold(
         appBar: AppBar(
+          flexibleSpace: Container(
+            decoration: BoxDecoration(
+              gradient: GameModeGradients.forMode(widget.gameMode, isDarkMode),
+            ),
+          ),
+          foregroundColor: Colors.white,
           title: Text(
             '${widget.gameMode.name.capitalize()} Game',
-            style: Theme.of(context).textTheme.titleLarge,
+            style: Theme.of(context).textTheme.titleLarge?.copyWith(
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
+            ),
           ),
           actions: [
             if (widget.gameMode != GameMode.online)

@@ -11,6 +11,7 @@ import 'package:ultimate_tic_tac_toe/screens/home_screen/home_screen.dart';
 import 'package:ultimate_tic_tac_toe/data/pref_keys.dart';
 import 'package:ultimate_tic_tac_toe/controllers/ad_controller.dart';
 import 'package:ultimate_tic_tac_toe/controllers/audio_controller.dart';
+import 'package:ultimate_tic_tac_toe/controllers/stats_controller.dart';
 
 import 'firebase_options.dart';
 
@@ -49,6 +50,9 @@ void main() async {
 
   final adController = AdController();
   await adController.initialize();
+
+  final statsController = StatsController();
+  await statsController.initialize();
 
   runApp(ProviderScope(child: App(audioController: audioController)));
 }

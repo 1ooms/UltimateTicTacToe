@@ -17,18 +17,12 @@ class WelcomeDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: const Text("Welcome!"),
+      title: const Text("Welcome to Ultimate Tic Tac Toe!"),
       content: Text(
-        "It looks like this is your first time playing. Would you like to read the rules of the game?",
+        "It looks like this is your first time playing. Let's go through the rules of the game.",
         style: Theme.of(context).textTheme.bodyMedium,
       ),
       actions: [
-        TextButton(
-          onPressed: () {
-            Navigator.of(context).pop();
-          },
-          child: const Text("No"),
-        ),
         ElevatedButton(
           onPressed: () {
             Navigator.of(context).pop();
@@ -36,7 +30,7 @@ class WelcomeDialog extends StatelessWidget {
               MaterialPageRoute(builder: (context) => const HowToPlayScreen()),
             );
           },
-          child: const Text("Yes"),
+          child: const Text("Continue"),
         ),
       ],
     );

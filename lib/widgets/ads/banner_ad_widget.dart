@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:ultimate_tic_tac_toe/controllers/ad_controller.dart';
@@ -6,7 +7,15 @@ class BannerAdWidget extends StatefulWidget {
   const BannerAdWidget({super.key, this.adSize = AdSize.banner});
 
   final AdSize adSize;
-  final adUnitId = 'ca-app-pub-2203878385400561/2767919472';
+
+  String get adUnitId {
+    if (kDebugMode) {
+      return defaultTargetPlatform == TargetPlatform.iOS
+          ? 'ca-app-pub-3940256099942544/2934735716' // iOS Test Banner
+          : 'ca-app-pub-3940256099942544/6300978111'; // Android Test Banner
+    }
+    return 'ca-app-pub-2203878385400561/2767919472'; // Production Banner
+  }
 
   @override
   State<BannerAdWidget> createState() => _BannerAdWidgetState();
@@ -69,15 +78,14 @@ class _BannerAdWidgetState extends State<BannerAdWidget> {
     return ValueListenableBuilder<bool>(
       valueListenable: adController.adSettingNotifier,
       builder: (context, showAd, child) {
-        if (!showAd || _bannerAd == null) {
-          return const SizedBox();
-        }
-
         return SafeArea(
           child: SizedBox(
             width: widget.adSize.width.toDouble(),
             height: widget.adSize.height.toDouble(),
-            child: AdWidget(ad: _bannerAd!),
+            child:
+                (showAd && _bannerAd != null)
+                    ? AdWidget(ad: _bannerAd!)
+                    : const SizedBox(),
           ),
         );
       },
