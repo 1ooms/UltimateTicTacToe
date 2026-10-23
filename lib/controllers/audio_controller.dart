@@ -47,9 +47,9 @@ class AudioController {
     prefs.setBool(PrefKeys.soundSetting, soundSetting);
   }
 
-  Future<void> playSound(String assetKey) async {
+  void playSound(String assetKey) {
     if (soundSetting && _loadedSounds.containsKey(assetKey)) {
-      await _soLoud!.play(_loadedSounds[assetKey]!);
+      _soLoud!.play(_loadedSounds[assetKey]!);
     }
   }
 }

@@ -35,7 +35,7 @@ class TutorialBoardWrapper extends StatelessWidget {
             player2: player2,
             currentPlayer: gameController.currentPlayer,
             isValidMove: gameController.isValidMove,
-            onCellTap: (_, __) {},
+            onCellTap: (_, _) {},
             previousMove: gameController.moveHistory.lastOrNull,
             gameFinished: gameController.gameFinished,
           ),

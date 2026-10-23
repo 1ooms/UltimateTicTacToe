@@ -49,7 +49,7 @@ class StaticBoard extends StatelessWidget {
                   boardState.subBoards[boardIdx][cellIdx] == null;
               return valid;
             },
-            onCellTap: (_, __) {},
+            onCellTap: (_, _) {},
             previousMove: boardState.lastMove,
             gameFinished: gameFinished,
           );
